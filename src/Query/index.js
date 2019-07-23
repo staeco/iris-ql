@@ -19,17 +19,9 @@ export default class Query {
     return this
   }
   value = () => this.parsed
+  hasAnalytics = () => this.parsed.group && this.parsed.group.length > 0
   execute = async ({ count=true }={}) => {
-    /*
-    if (this.hasAnalytics()) {
-      const rows = await query.Model.findAll({
-        raw: true,
-        ...this.parsed
-      })
-      return rows
-    }
-    */
-    const fn = count ? 'findAndCountAll' : 'findAll'
+    const fn = count && !this.hasAnalytics() ? 'findAndCountAll' : 'findAll'
     return this.table[fn]({
       raw: true,
       ...this.parsed
