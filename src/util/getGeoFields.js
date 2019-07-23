@@ -1,8 +1,11 @@
-// TODO: convert to use plain sequelize info, not custom table info
-export default (tableSchema) => {
-  const ret = Object.keys(tableSchema).filter((k) =>
-    tableSchema[k].geospatial
-  )
+import types from 'sequelize'
+
+export default (table) => {
+  const attrs = table.rawAttributes
+  const ret = Object.keys(attrs).filter((k) => {
+    const { type } = attrs[k]
+    return type instanceof types.GEOGRAPHY || type instanceof types.GEOMETRY
+  })
 
   return ret.length !== 0 ? ret : null
 }

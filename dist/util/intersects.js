@@ -12,9 +12,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // TODO: convert to use plain sequelize info, not custom table
 var _default = (geo, {
   table,
-  column = table.resource
+  column = table.name
 }) => {
-  const geoFields = (0, _getGeoFields.default)(table.fields.schema);
+  const geoFields = (0, _getGeoFields.default)(table);
   if (!geo || !geoFields) return (0, _sequelize.literal)(false);
   const wheres = geoFields.map(f => (0, _sequelize.fn)('ST_Intersects', (0, _sequelize.col)(`${column}.${f}`), geo));
   if (wheres.length === 1) return wheres[0];

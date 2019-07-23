@@ -3,9 +3,18 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-// TODO: convert to use plain sequelize info, not custom table info
-var _default = tableSchema => {
-  const ret = Object.keys(tableSchema).filter(k => tableSchema[k].geospatial);
+var _sequelize = _interopRequireDefault(require("sequelize"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var _default = table => {
+  const attrs = table.rawAttributes;
+  const ret = Object.keys(attrs).filter(k => {
+    const {
+      type
+    } = attrs[k];
+    return type instanceof _sequelize.default.GEOGRAPHY || type instanceof _sequelize.default.GEOMETRY;
+  });
   return ret.length !== 0 ? ret : null;
 };
 

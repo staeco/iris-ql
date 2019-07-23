@@ -18,6 +18,10 @@ npm install iris-ql --save
 TODO - WIP
 ```
 
+## DB Support
+
+Currently only works with Postgres. In the future, the database layer will be broken out into adapters and multiple stores will be supported.
+
 [downloads-image]: http://img.shields.io/npm/dm/iris-ql.svg
 [npm-url]: https://npmjs.org/package/iris-ql
 [npm-image]: http://img.shields.io/npm/v/iris-ql.svg

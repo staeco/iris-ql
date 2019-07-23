@@ -28,8 +28,8 @@ const parseStringArray = v => {
 };
 
 const parseIffyNumber = v => {
-  if (v == null || !v) return;
   if (typeof v === 'number') return v;
+  if (v == null || !v) return;
 
   if (typeof v === 'string') {
     const n = parseFloat(v);
@@ -60,7 +60,8 @@ var _default = (query, opt) => {
   }*/
 
   const out = {
-    where: [],
+    where: [{} // very dumb fix for https://github.com/sequelize/sequelize/issues/10142
+    ],
     order: [] // searching
 
   };
@@ -175,10 +176,10 @@ var _default = (query, opt) => {
         xmax,
         ymax
       } = query.within;
-      const actualXMin = xmin != null && parseFloat(xmin);
-      const actualYMin = ymin != null && parseFloat(ymin);
-      const actualXMax = xmax != null && parseFloat(xmax);
-      const actualYMax = ymax != null && parseFloat(ymax);
+      const actualXMin = parseIffyNumber(xmin);
+      const actualYMin = parseIffyNumber(ymin);
+      const actualXMax = parseIffyNumber(xmax);
+      const actualYMax = parseIffyNumber(ymax);
       const xminIssue = (0, _isValidCoordinate.lon)(actualXMin);
       const xmaxIssue = (0, _isValidCoordinate.lon)(actualXMax);
       const yminIssue = (0, _isValidCoordinate.lat)(actualYMin);
@@ -217,7 +218,9 @@ var _default = (query, opt) => {
       }
 
       const box = (0, _sequelize.fn)('ST_MakeEnvelope', actualXMin, actualYMin, actualXMax, actualYMax);
-      out.where.push((0, _intersects.default)(box, table));
+      out.where.push((0, _intersects.default)(box, {
+        table
+      }));
     }
   } // if they defined a point
 
@@ -234,8 +237,8 @@ var _default = (query, opt) => {
         x,
         y
       } = query.intersects;
-      const actualX = x != null && parseFloat(x);
-      const actualY = y != null && parseFloat(y);
+      const actualX = parseIffyNumber(x);
+      const actualY = parseIffyNumber(y);
       const latIssue = (0, _isValidCoordinate.lat)(actualY);
       const lonIssue = (0, _isValidCoordinate.lon)(actualX);
 
@@ -255,7 +258,9 @@ var _default = (query, opt) => {
         });
       }
 
-      out.where.push((0, _intersects.default)((0, _sequelize.fn)('ST_Point', actualX, actualY), table));
+      out.where.push((0, _intersects.default)((0, _sequelize.fn)('ST_Point', actualX, actualY), {
+        table
+      }));
     }
   } // ordering
 

@@ -1,6 +1,6 @@
 {
   "name": "iris-ql",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "User friendly API query language",
   "main": "dist/index.js",
   "keywords": [],
@@ -21,11 +21,12 @@
   ],
   "scripts": {
     "preversion": "npm run clean && npm run build",
-    "build": "babel src --out-dir dist",
+    "build": "babel src --copy-files --out-dir dist",
     "clean": "rimraf dist",
     "lint": "eslint src test",
     "lint:fix": "eslint src test --fix",
-    "test": "dropdb iris-ql || true && createdb iris-ql && mocha --require @babel/register --recursive --reporter spec --bail --exit --timeout 36000 && npm run-script lint"
+    "test-db": "dropdb iris-ql || true && createdb iris-ql && psql iris-ql -c 'CREATE EXTENSION IF NOT EXISTS postgis;'",
+    "test": "npm run-script test-db && mocha --require @babel/register --recursive --reporter spec --bail --exit --timeout 36000 && npm run-script lint"
   },
   "peerDependencies": {
     "pg": ">=7",

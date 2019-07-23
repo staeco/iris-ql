@@ -24,13 +24,16 @@ export default class Query {
     if (this.hasAnalytics()) {
       const rows = await query.Model.findAll({
         raw: true,
-        ...query.value()
+        ...this.parsed
       })
       return rows
     }
     */
     const fn = count ? 'findAndCountAll' : 'findAll'
-    return this.table[fn](this.parsed)
+    return this.table[fn]({
+      raw: true,
+      ...this.parsed
+    })
   }
   executeStream = async () => {
     // TODO

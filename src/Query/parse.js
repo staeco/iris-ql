@@ -16,8 +16,8 @@ const parseStringArray = (v) => {
 }
 
 const parseIffyNumber = (v) => {
-  if (v == null || !v) return
   if (typeof v === 'number') return v
+  if (v == null || !v) return
   if (typeof v === 'string') {
     const n = parseFloat(v)
     if (isNaN(n)) throw new Error('Bad number value')
@@ -43,7 +43,9 @@ export default (query, opt) => {
     fieldLimit: opt.fieldLimit || Object.keys(attrs)
   }*/
   const out = {
-    where: [],
+    where: [
+      {} // very dumb fix for https://github.com/sequelize/sequelize/issues/10142
+    ],
     order: []
   }
 
@@ -135,10 +137,10 @@ export default (query, opt) => {
       })
     } else {
       const { xmin, ymin, xmax, ymax } = query.within
-      const actualXMin = xmin != null && parseFloat(xmin)
-      const actualYMin = ymin != null && parseFloat(ymin)
-      const actualXMax = xmax != null && parseFloat(xmax)
-      const actualYMax = ymax != null && parseFloat(ymax)
+      const actualXMin = parseIffyNumber(xmin)
+      const actualYMin = parseIffyNumber(ymin)
+      const actualXMax = parseIffyNumber(xmax)
+      const actualYMax = parseIffyNumber(ymax)
       const xminIssue = lon(actualXMin)
       const xmaxIssue = lon(actualXMax)
       const yminIssue = lat(actualYMin)
@@ -172,7 +174,7 @@ export default (query, opt) => {
         })
       }
       const box = fn('ST_MakeEnvelope', actualXMin, actualYMin, actualXMax, actualYMax)
-      out.where.push(intersects(box, table))
+      out.where.push(intersects(box, { table }))
     }
   }
 
@@ -186,8 +188,8 @@ export default (query, opt) => {
       })
     } else {
       const { x, y } = query.intersects
-      const actualX = x != null && parseFloat(x)
-      const actualY = y != null && parseFloat(y)
+      const actualX = parseIffyNumber(x)
+      const actualY = parseIffyNumber(y)
       const latIssue = lat(actualY)
       const lonIssue = lon(actualX)
       if (lonIssue !== true) {
@@ -204,7 +206,7 @@ export default (query, opt) => {
           message: latIssue
         })
       }
-      out.where.push(intersects(fn('ST_Point', actualX, actualY), table))
+      out.where.push(intersects(fn('ST_Point', actualX, actualY), { table }))
     }
   }
 
