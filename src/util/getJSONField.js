@@ -9,7 +9,7 @@ export default (v, opt) => {
   const path = v.split('.')
   const col = path.shift()
   if (fieldLimit && !fieldLimit.includes(col)) throw new BadRequestError(`Non-existent field: ${col}`)
-  const lit = literal(jsonPath({ column: col, resource: table.resource, path }))
+  const lit = literal(jsonPath({ column: col, table, path }))
   if (!dataType || !cast) return lit // non-dataType json fields, or asked to keep it raw
 
   // if a dataType is specified, check the type of the field to see if it needs casting

@@ -17,6 +17,8 @@ class Filter {
   constructor(obj, table, options = {}) {
     this.value = () => this.parsed;
 
+    this.toJSON = () => this.input;
+
     if (!obj) throw new Error('Missing value!');
     this.input = obj;
     this.table = table;

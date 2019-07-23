@@ -32,7 +32,7 @@ var _default = (v, opt) => {
   if (fieldLimit && !fieldLimit.includes(col)) throw new _errors.BadRequestError(`Non-existent field: ${col}`);
   const lit = (0, _sequelize.literal)((0, _toString.jsonPath)({
     column: col,
-    resource: table.resource,
+    table,
     path
   }));
   if (!dataType || !cast) return lit; // non-dataType json fields, or asked to keep it raw

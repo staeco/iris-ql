@@ -74,7 +74,7 @@ export const interval = (start, end) =>
   types.fn('sub', ms(end), ms(start))
 
 export const ms = (v) =>
-  numeric(types.literal(`extract(epoch from ${value(v)}) * 1000`))
+  numeric(types.literal(`extract(epoch from ${value({ value: v })}) * 1000`))
 
 export const truncate = (precision, f) => {
   const p = truncates[precision && precision.raw]

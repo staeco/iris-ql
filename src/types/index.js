@@ -56,7 +56,7 @@ export const date = {
     const base = types.fn('to_timestamp', txt, 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
     if (!timezone) return base
     if (!zones.has(timezone)) throw new BadRequestError('Not a valid timezone')
-    return types.literal(`${value(base)} AT TIME ZONE '${timezone}'`)
+    return types.literal(`${value({ value: base })} AT TIME ZONE '${timezone}'`)
   }
 }
 

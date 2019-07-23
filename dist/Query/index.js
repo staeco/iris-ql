@@ -24,19 +24,14 @@ class Query {
 
     this.value = () => this.parsed;
 
+    this.toJSON = () => this.input;
+
+    this.hasAnalytics = () => this.parsed.group && this.parsed.group.length > 0;
+
     this.execute = async ({
       count = true
     } = {}) => {
-      /*
-      if (this.hasAnalytics()) {
-        const rows = await query.Model.findAll({
-          raw: true,
-          ...this.parsed
-        })
-        return rows
-      }
-      */
-      const fn = count ? 'findAndCountAll' : 'findAll';
+      const fn = count && !this.hasAnalytics() ? 'findAndCountAll' : 'findAll';
       return this.table[fn](_objectSpread({
         raw: true
       }, this.parsed));

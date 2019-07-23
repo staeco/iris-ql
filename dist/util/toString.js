@@ -3,38 +3,35 @@
 exports.__esModule = true;
 exports.jsonPath = exports.select = exports.value = exports.where = void 0;
 
-const where = (db, {
+const where = ({
   value,
-  tableName,
-  Model
-}) => db.dialect.QueryGenerator.getWhereConditions(value, tableName, Model);
+  table
+}) => table.sequelize.dialect.QueryGenerator.getWhereConditions(value, table.name, table);
 
 exports.where = where;
 
-const value = (db, {
+const value = ({
   value,
-  tableName,
-  Model
-}) => db.dialect.QueryGenerator.handleSequelizeMethod(value, tableName, Model);
+  table
+}) => table.sequelize.dialect.QueryGenerator.handleSequelizeMethod(value, table.name, table);
 
 exports.value = value;
 
-const select = (db, {
+const select = ({
   value,
-  tableName,
-  Model
-}) => db.dialect.QueryGenerator.selectQuery(tableName, value, tableName, Model);
+  table
+}) => table.sequelize.dialect.QueryGenerator.selectQuery(table.name, value, table.name, table);
 
 exports.select = select;
 
-const jsonPath = (db, {
+const jsonPath = ({
   column,
-  resource,
+  table,
   path
 }) => {
-  const ncol = db.dialect.QueryGenerator.jsonPathExtractionQuery(column, path) // remove parens it puts on for literally no reason
+  const ncol = table.sequelize.dialect.QueryGenerator.jsonPathExtractionQuery(column, path) // remove parens it puts on for literally no reason
   .replace(/^\(/, '').replace(/\)$/, '');
-  return `"${resource}".${ncol}`;
+  return `"${table.name}".${ncol}`;
 };
 
 exports.jsonPath = jsonPath;
