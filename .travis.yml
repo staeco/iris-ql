@@ -3,15 +3,16 @@ node_js:
   - "10"
   - "11"
   - "12"
+before_install:
+  - sudo apt-get update
+  - sudo apt-get --yes remove postgresql\*
+  - sudo apt-get install -y postgresql-11 postgresql-client-11 postgresql-11-postgis-2.5
+  - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
+  - sudo service postgresql restart 11
 addons:
-  postgresql: 11
-  apt:
-    packages:
-    - postgresql-11
-    - postgresql-client-11
-    - postgresql-11-postgis-2.5
+  postgresql: 11.4
 env:
   global:
-    - PGPORT=5433
+    - PGPORT=5432
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
