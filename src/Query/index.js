@@ -19,6 +19,7 @@ export default class Query {
     return this
   }
   value = () => this.parsed
+  toJSON = () => this.input
   hasAnalytics = () => this.parsed.group && this.parsed.group.length > 0
   execute = async ({ count=true }={}) => {
     const fn = count && !this.hasAnalytics() ? 'findAndCountAll' : 'findAll'

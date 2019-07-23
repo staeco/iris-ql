@@ -12,4 +12,5 @@ export default class Filter {
     })
   }
   value = () => this.parsed
+  toJSON = () => this.input
 }

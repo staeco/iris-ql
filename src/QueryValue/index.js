@@ -12,4 +12,5 @@ export default class QueryValue {
     })
   }
   value = () => this.parsed
+  toJSON = () => this.input
 }

@@ -12,4 +12,5 @@ export default class Aggregation {
     })
   }
   value = () => this.parsed
+  toJSON = () => this.input
 }

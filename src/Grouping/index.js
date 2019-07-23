@@ -12,4 +12,5 @@ export default class Grouping {
     })
   }
   value = () => this.parsed
+  toJSON = () => this.input
 }
