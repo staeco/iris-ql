@@ -22,8 +22,8 @@ var _stringArray = _interopRequireDefault(require("../util/iffy/stringArray"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 //import { forEach } from 'lodash'
-//import parseQueryValue from './parseQueryValue'
-//import parseFilter from './parseFilter'
+//import Filter from '../Filter'
+//import Ordering from '../Ordering'
 var _default = (query, opt) => {
   const errors = [];
   const {

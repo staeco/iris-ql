@@ -7,8 +7,8 @@ import { ValidationError } from '../errors'
 import parseIffyDate from '../util/iffy/date'
 import parseIffyNumber from '../util/iffy/number'
 import parseIffyStringArray from '../util/iffy/stringArray'
-//import parseQueryValue from './parseQueryValue'
-//import parseFilter from './parseFilter'
+//import Filter from '../Filter'
+//import Ordering from '../Ordering'
 
 export default (query, opt) => {
   const errors = []

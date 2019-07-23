@@ -1,6 +1,6 @@
 import parse from './parse'
 
-export default class QueryValue {
+export default class Filter {
   constructor(obj, table, options={}) {
     if (!obj) throw new Error('Missing value!')
     this.input = obj
