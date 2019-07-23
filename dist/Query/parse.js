@@ -13,40 +13,17 @@ var _intersects = _interopRequireDefault(require("../util/intersects"));
 
 var _errors = require("../errors");
 
+var _date = _interopRequireDefault(require("../util/iffy/date"));
+
+var _number = _interopRequireDefault(require("../util/iffy/number"));
+
+var _stringArray = _interopRequireDefault(require("../util/iffy/stringArray"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 //import { forEach } from 'lodash'
 //import parseQueryValue from './parseQueryValue'
 //import parseFilter from './parseFilter'
-// for string array query params we support explicit arrays or split by commas
-const parseStringArray = v => {
-  if (v == null) return []; // nada
-
-  if (Array.isArray(v)) return v;
-  if (typeof v === 'string') return v.split(',');
-  return [String(v)];
-};
-
-const parseIffyNumber = v => {
-  if (typeof v === 'number') return v;
-  if (v == null || !v) return;
-
-  if (typeof v === 'string') {
-    const n = parseFloat(v);
-    if (isNaN(n)) throw new Error('Bad number value');
-    return n;
-  }
-
-  throw new Error('Bad number value');
-};
-
-const parseIffyDate = v => {
-  if (v == null || !v) return;
-  const d = new Date(v);
-  if (isNaN(d)) throw new Error('Bad date value');
-  return d;
-};
-
 var _default = (query, opt) => {
   const errors = [];
   const {
@@ -102,7 +79,7 @@ var _default = (query, opt) => {
 
   if (query.before) {
     try {
-      const beforeVal = parseIffyDate(query.before);
+      const beforeVal = (0, _date.default)(query.before);
       out.where.push({
         $or: [{
           createdAt: {
@@ -125,7 +102,7 @@ var _default = (query, opt) => {
 
   if (query.after) {
     try {
-      const afterVal = parseIffyDate(query.after);
+      const afterVal = (0, _date.default)(query.after);
       out.where.push({
         $or: [{
           createdAt: {
@@ -176,10 +153,10 @@ var _default = (query, opt) => {
         xmax,
         ymax
       } = query.within;
-      const actualXMin = parseIffyNumber(xmin);
-      const actualYMin = parseIffyNumber(ymin);
-      const actualXMax = parseIffyNumber(xmax);
-      const actualYMax = parseIffyNumber(ymax);
+      const actualXMin = (0, _number.default)(xmin);
+      const actualYMin = (0, _number.default)(ymin);
+      const actualXMax = (0, _number.default)(xmax);
+      const actualYMax = (0, _number.default)(ymax);
       const xminIssue = (0, _isValidCoordinate.lon)(actualXMin);
       const xmaxIssue = (0, _isValidCoordinate.lon)(actualXMax);
       const yminIssue = (0, _isValidCoordinate.lat)(actualYMin);
@@ -237,8 +214,8 @@ var _default = (query, opt) => {
         x,
         y
       } = query.intersects;
-      const actualX = parseIffyNumber(x);
-      const actualY = parseIffyNumber(y);
+      const actualX = (0, _number.default)(x);
+      const actualY = (0, _number.default)(y);
       const latIssue = (0, _isValidCoordinate.lat)(actualY);
       const lonIssue = (0, _isValidCoordinate.lon)(actualX);
 
@@ -315,7 +292,7 @@ var _default = (query, opt) => {
 
 
   if (query.exclusions) {
-    const parsed = parseStringArray(query.exclusions).map((k, idx) => {
+    const parsed = (0, _stringArray.default)(query.exclusions).map((k, idx) => {
       const [first] = k.split('.');
 
       if (!first || !attrs[first]) {
@@ -336,7 +313,7 @@ var _default = (query, opt) => {
 
   if (query.limit) {
     try {
-      out.limit = parseIffyNumber(query.limit);
+      out.limit = (0, _number.default)(query.limit);
     } catch (err) {
       errors.push({
         path: ['limit'],
@@ -348,7 +325,7 @@ var _default = (query, opt) => {
 
   if (query.offset) {
     try {
-      out.offset = parseIffyNumber(query.offset);
+      out.offset = (0, _number.default)(query.offset);
     } catch (err) {
       errors.push({
         path: ['offset'],

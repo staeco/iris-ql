@@ -4,34 +4,11 @@ import { fn } from 'sequelize'
 import { lat, lon } from '../util/isValidCoordinate'
 import intersects from '../util/intersects'
 import { ValidationError } from '../errors'
+import parseIffyDate from '../util/iffy/date'
+import parseIffyNumber from '../util/iffy/number'
+import parseIffyStringArray from '../util/iffy/stringArray'
 //import parseQueryValue from './parseQueryValue'
 //import parseFilter from './parseFilter'
-
-// for string array query params we support explicit arrays or split by commas
-const parseStringArray = (v) => {
-  if (v == null) return [] // nada
-  if (Array.isArray(v)) return v
-  if (typeof v === 'string') return v.split(',')
-  return [ String(v) ]
-}
-
-const parseIffyNumber = (v) => {
-  if (typeof v === 'number') return v
-  if (v == null || !v) return
-  if (typeof v === 'string') {
-    const n = parseFloat(v)
-    if (isNaN(n)) throw new Error('Bad number value')
-    return n
-  }
-  throw new Error('Bad number value')
-}
-
-const parseIffyDate = (v) => {
-  if (v == null || !v) return
-  const d = new Date(v)
-  if (isNaN(d)) throw new Error('Bad date value')
-  return d
-}
 
 export default (query, opt) => {
   const errors = []
@@ -262,7 +239,7 @@ export default (query, opt) => {
 
   // exclusions
   if (query.exclusions) {
-    const parsed = parseStringArray(query.exclusions).map((k, idx) => {
+    const parsed = parseIffyStringArray(query.exclusions).map((k, idx) => {
       const [ first ] = k.split('.')
       if (!first || !attrs[first]) {
         errors.push({
