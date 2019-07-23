@@ -1,7 +1,7 @@
 import types from 'sequelize'
 import { connect } from '../../src'
 
-const db = connect(process.env.POSTGRES_URL || 'postgres://postgres@localhost/iris-ql')
+const db = connect(process.env.POSTGRES_URL || `postgres://postgres@localhost:${process.env.PGPORT || 5432}/iris-ql`)
 
 db.define('user', {
   id: {
