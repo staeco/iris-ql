@@ -11,6 +11,7 @@ export default class Query {
       table,
       ...options
     })
+    if (!this.parsed.group || this.parsed.group.length === 0) throw new Error('Missing groupings!')
   }
   update = (fn) => {
     const newValue = fn(this.parsed)
@@ -20,13 +21,11 @@ export default class Query {
   }
   value = () => this.parsed
   toJSON = () => this.input
-  execute = async ({ count=true }={}) => {
-    const fn = count ? 'findAndCountAll' : 'findAll'
-    return this.table[fn]({
+  execute = async () =>
+    this.table.findAll({
       raw: true,
       ...this.parsed
     })
-  }
   executeStream = async () => {
     // TODO
   }

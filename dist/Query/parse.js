@@ -24,17 +24,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //import { forEach } from 'lodash'
 //import Filter from '../Filter'
 //import Ordering from '../Ordering'
-var _default = (query, opt) => {
+var _default = (query, opt = {}) => {
   const errors = [];
   const {
     table
-  } = opt; // options we pass on, default in fieldLimit
-
+  } = opt;
+  if (!opt.table) throw new Error('Missing table!');
   const attrs = table.rawAttributes;
-  /*const popt = {
-    ...opt,
-    fieldLimit: opt.fieldLimit || Object.keys(attrs)
-  }*/
+  const initialFieldLimit = opt.fieldLimit || Object.keys(attrs); // options we pass on, default in fieldLimit
 
   const out = {
     where: [{} // very dumb fix for https://github.com/sequelize/sequelize/issues/10142
@@ -44,7 +41,7 @@ var _default = (query, opt) => {
   };
 
   if (query.search) {
-    const searchable = Object.keys(attrs).filter(k => attrs[k].searchable);
+    const searchable = initialFieldLimit.filter(k => attrs[k].searchable);
     const isSearchable = searchable.length !== 0;
     const isValid = typeof query.search === 'string';
 
@@ -121,22 +118,7 @@ var _default = (query, opt) => {
         message: 'Not a valid date!'
       });
     }
-  } // filterings
-
-  /*
-  if (query.filters) {
-    if (typeof query.filters !== 'object') {
-      errors.push({
-        path: [ 'filters' ],
-        value: query.filters,
-        message: 'Must be an object or array.'
-      })
-    } else {
-      out.where.push(parseFilter(query.filters, popt))
-    }
-  }
-  */
-  // if they defined a geo bounding box
+  } // if they defined a geo bounding box
 
 
   if (query.within) {
@@ -239,7 +221,74 @@ var _default = (query, opt) => {
         table
       }));
     }
-  } // ordering
+  } // exclusions
+
+
+  if (query.exclusions) {
+    const parsed = (0, _stringArray.default)(query.exclusions).map((k, idx) => {
+      const [first] = k.split('.');
+
+      if (!first || !attrs[first] || !initialFieldLimit.includes(first)) {
+        errors.push({
+          path: ['exclusions', idx],
+          value: k,
+          message: 'Invalid exclusion.'
+        });
+        return null;
+      }
+
+      return k;
+    });
+    out.attributes = {
+      exclude: parsed
+    };
+  } // limit
+
+
+  if (query.limit) {
+    try {
+      out.limit = (0, _number.default)(query.limit);
+    } catch (err) {
+      errors.push({
+        path: ['limit'],
+        value: query.limit,
+        message: 'Invalid limit.'
+      });
+    }
+  } // offset
+
+
+  if (query.offset) {
+    try {
+      out.offset = (0, _number.default)(query.offset);
+    } catch (err) {
+      errors.push({
+        path: ['offset'],
+        value: query.offset,
+        message: 'Invalid offset.'
+      });
+    }
+  } // further items have the ability to use new aggregations
+
+  /*
+  const withNewFields = {
+    ...opt,
+    fieldLimit: initialFieldLimit.concat(attrs.map((i) => i[1]))
+  }
+   // filterings
+  if (query.filters) {
+    if (typeof query.filters !== 'object') {
+      errors.push({
+        path: [ 'filters' ],
+        value: query.filters,
+        message: 'Must be an object or array.'
+      })
+    } else {
+      out.where.push(parseFilter(query.filters, popt))
+    }
+  }
+  */
+  // ordering
 
   /*
   if (query.orderings) {
@@ -288,52 +337,7 @@ var _default = (query, opt) => {
     }
   }
   */
-  // exclusions
 
-
-  if (query.exclusions) {
-    const parsed = (0, _stringArray.default)(query.exclusions).map((k, idx) => {
-      const [first] = k.split('.');
-
-      if (!first || !attrs[first]) {
-        errors.push({
-          path: ['exclusions', idx],
-          value: k,
-          message: 'Invalid exclusion.'
-        });
-        return null;
-      }
-
-      return k;
-    });
-    out.attributes = {
-      exclude: parsed
-    };
-  }
-
-  if (query.limit) {
-    try {
-      out.limit = (0, _number.default)(query.limit);
-    } catch (err) {
-      errors.push({
-        path: ['limit'],
-        value: query.limit,
-        message: 'Invalid limit.'
-      });
-    }
-  }
-
-  if (query.offset) {
-    try {
-      out.offset = (0, _number.default)(query.offset);
-    } catch (err) {
-      errors.push({
-        path: ['offset'],
-        value: query.offset,
-        message: 'Invalid offset.'
-      });
-    }
-  }
 
   if (errors.length !== 0) throw new _errors.ValidationError(errors);
   return out;

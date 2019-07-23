@@ -26,14 +26,9 @@ class Query {
 
     this.toJSON = () => this.input;
 
-    this.execute = async ({
-      count = true
-    } = {}) => {
-      const fn = count ? 'findAndCountAll' : 'findAll';
-      return this.table[fn](_objectSpread({
-        raw: true
-      }, this.parsed));
-    };
+    this.execute = async () => this.table.findAll(_objectSpread({
+      raw: true
+    }, this.parsed));
 
     this.executeStream = async () => {// TODO
     };
@@ -46,6 +41,7 @@ class Query {
     this.parsed = (0, _parse.default)(obj, _objectSpread({
       table
     }, options));
+    if (!this.parsed.group || this.parsed.group.length === 0) throw new Error('Missing groupings!');
   }
 
 }
