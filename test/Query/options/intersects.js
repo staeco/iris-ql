@@ -28,7 +28,6 @@ describe('Query#options#intersects', () => {
     should.exist(res.rows)
     res.count.should.equal(1)
     res.rows.length.should.equal(1)
-    console.log(res.rows[0])
     res.rows[0].location.coordinates.should.eql([ 5, 5 ])
   })
 })

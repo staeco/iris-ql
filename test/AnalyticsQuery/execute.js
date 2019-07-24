@@ -2,13 +2,28 @@ import should from 'should'
 import { Connection, AnalyticsQuery } from '../../src'
 import db from '../fixtures/db'
 
-describe.skip('AnalyticsQuery#execute', () => {
+describe('AnalyticsQuery#execute', () => {
   const conn = new Connection(db)
   const { user } = conn.tables()
-  it('should execute with count off', async () => {
-    const query = new AnalyticsQuery({ groupings: [ { field: 'name' } ] }, user)
-    const res = await query.execute({ count: false })
+  it('should execute', async () => {
+    const query = new AnalyticsQuery({
+      aggregations: [
+        {
+          value: { function: 'count' },
+          alias: 'count'
+        },
+        {
+          value: { field: 'name' },
+          alias: 'name'
+        }
+      ],
+      groupings: [
+        { field: 'name' }
+      ]
+    }, user)
+    const res = await query.execute()
     should.exist(res)
-    console.log(res)
+    res.length.should.eql(3)
+    res[0].count.should.eql(1)
   })
 })

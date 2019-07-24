@@ -18,7 +18,7 @@ export default (query, opt={}) => {
   const initialFieldLimit = opt.fieldLimit || Object.keys(attrs)
   const popt = {
     ...opt,
-    fieldLimit: opt.fieldLimit || Object.keys(attrs)
+    fieldLimit: initialFieldLimit
   }
 
   // options we pass on, default in fieldLimit

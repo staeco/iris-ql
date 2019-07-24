@@ -1,6 +1,6 @@
 import parse from './parse'
 
-export default class Query {
+export default class AnalyticsQuery {
   constructor(obj, table, options={}) {
     if (!obj) throw new Error('Missing query!')
     if (!table) throw new Error('Missing table!')
