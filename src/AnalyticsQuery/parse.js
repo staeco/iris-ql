@@ -1,7 +1,7 @@
 import isObject from 'is-pure-object'
-import Query from './Query'
-import QueryValue from './QueryValue'
-import Filter from './Filter'
+import Query from '../Query'
+import QueryValue from '../QueryValue'
+import Filter from '../Filter'
 import { ValidationError } from '../errors'
 import aggregateWithFilter from '../util/aggregateWithFilter'
 

@@ -7,7 +7,7 @@ import { ValidationError } from '../errors'
 import parseIffyDate from '../util/iffy/date'
 import parseIffyNumber from '../util/iffy/number'
 import parseIffyStringArray from '../util/iffy/stringArray'
-//import Filter from '../Filter'
+import Filter from '../Filter'
 //import Ordering from '../Ordering'
 
 export default (query, opt={}) => {
@@ -16,12 +16,10 @@ export default (query, opt={}) => {
   if (!table) throw new Error('Missing table!')
   const attrs = table.rawAttributes
   const initialFieldLimit = opt.fieldLimit || Object.keys(attrs)
-  /*
   const popt = {
     ...opt,
     fieldLimit: opt.fieldLimit || Object.keys(attrs)
   }
-  */
 
   // options we pass on, default in fieldLimit
   const out = {
@@ -221,7 +219,6 @@ export default (query, opt={}) => {
   }
 
   // filterings
-  /*
   if (query.filters) {
     if (typeof query.filters !== 'object') {
       errors.push({
@@ -235,6 +232,7 @@ export default (query, opt={}) => {
   }
 
   // ordering
+  /*
   if (query.orderings) {
     if (!Array.isArray(query.orderings)) {
       errors.push({
