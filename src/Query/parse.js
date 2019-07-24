@@ -13,7 +13,7 @@ import parseIffyStringArray from '../util/iffy/stringArray'
 export default (query, opt={}) => {
   const errors = []
   const { table } = opt
-  if (!opt.table) throw new Error('Missing table!')
+  if (!table) throw new Error('Missing table!')
   const attrs = table.rawAttributes
   const initialFieldLimit = opt.fieldLimit || Object.keys(attrs)
 

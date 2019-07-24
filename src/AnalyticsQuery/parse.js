@@ -2,13 +2,13 @@ import isObject from 'is-pure-object'
 import Query from './Query'
 import QueryValue from './QueryValue'
 import Filter from './Filter'
-import { ValidationError, BadRequestError } from '../errors'
+import { ValidationError } from '../errors'
 import aggregateWithFilter from '../util/aggregateWithFilter'
 
 // this is an extension of parseQuery that allows for aggregations and groupings
 export default (query={}, opt) => {
   const { table } = opt
-  if (!table) throw new BadRequestError('Not a valid table')
+  if (!table) throw new Error('Missing table!')
   const errors = []
   let attrs
   const initialFieldLimit = Object.keys(table.rawAttributes)
