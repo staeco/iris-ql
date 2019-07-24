@@ -1,8 +1,7 @@
-import types from 'sequelize'
 import { BadRequestError } from '../errors'
 import pgAliases from '../Connection/aliases'
-import { where, value } from '../util/toString'
 import getJSONField from '../util/getJSONField'
+import castFields from '../util/castFields'
 import QueryValue from '../QueryValue'
 
 const reserved = new Set(Object.keys(pgAliases))
@@ -17,7 +16,7 @@ const isObject = (x) =>
 const isQueryValue = (v) => v && (v.function || v.field || v.as)
 
 export default (obj, opt) => {
-  const { dataType, table, fieldLimit } = opt
+  const { table, fieldLimit } = opt
   // recursively walk a filter object and replace query values with the real thing
   const transformValues = (v, parent='') => {
     if (isQueryValue(v)) return new QueryValue(v, { ...opt, castJSON: false }).value() // keep it raw, we cast it all later
@@ -41,17 +40,6 @@ export default (obj, opt) => {
     return v
   }
   // turn where object into string with fields casted
-  const castFields = (v) => {
-    if (Array.isArray(v)) v = { $and: v } // convert it
-    if (!dataType) return v // no casting required!
-    const str = where({ value: v, table })
-    const regex = new RegExp(`"${table.resource}"\\."(\\w*)"#>>'{(\\w*)}'`, 'g')
-    const redone = str.replace(regex, (match, col, field) => {
-      const lit = getJSONField(`${col}.${field}`, opt)
-      return value({ value: lit, table })
-    })
-    return types.literal(redone)
-  }
 
-  return castFields(transformValues(obj))
+  return castFields(transformValues(obj), opt, table)
 }
