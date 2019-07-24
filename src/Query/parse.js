@@ -16,6 +16,12 @@ export default (query, opt={}) => {
   if (!table) throw new Error('Missing table!')
   const attrs = table.rawAttributes
   const initialFieldLimit = opt.fieldLimit || Object.keys(attrs)
+  /*
+  const popt = {
+    ...opt,
+    fieldLimit: opt.fieldLimit || Object.keys(attrs)
+  }
+  */
 
   // options we pass on, default in fieldLimit
   const out = {
@@ -214,14 +220,8 @@ export default (query, opt={}) => {
     }
   }
 
-  // further items have the ability to use new aggregations
-  /*
-  const withNewFields = {
-    ...opt,
-    fieldLimit: initialFieldLimit.concat(attrs.map((i) => i[1]))
-  }
-
   // filterings
+  /*
   if (query.filters) {
     if (typeof query.filters !== 'object') {
       errors.push({
@@ -230,13 +230,11 @@ export default (query, opt={}) => {
         message: 'Must be an object or array.'
       })
     } else {
-      out.where.push(parseFilter(query.filters, popt))
+      out.where.push(new Filter(query.filters, popt).value())
     }
   }
-  */
 
   // ordering
-  /*
   if (query.orderings) {
     if (!Array.isArray(query.orderings)) {
       errors.push({
@@ -271,7 +269,10 @@ export default (query, opt={}) => {
 
         if (direction && value && isDirectionValid) {
           try {
-            out.order.push([ parseQueryValue(value, popt), direction ])
+            out.order.push([
+              new QueryValue(value, popt).value(),
+              direction
+            ])
           } catch (err) {
             errors.push({
               path: [ 'orderings', idx, 'value' ],
