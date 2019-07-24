@@ -1,4 +1,4 @@
-//import { forEach } from 'lodash'
+import { forEach } from 'lodash'
 import isObject from 'is-pure-object'
 import { fn } from 'sequelize'
 import { lat, lon } from '../util/isValidCoordinate'
@@ -8,7 +8,7 @@ import parseIffyDate from '../util/iffy/date'
 import parseIffyNumber from '../util/iffy/number'
 import parseIffyStringArray from '../util/iffy/stringArray'
 import Filter from '../Filter'
-//import Ordering from '../Ordering'
+import QueryValue from '../QueryValue'
 
 export default (query, opt={}) => {
   const errors = []
@@ -232,7 +232,6 @@ export default (query, opt={}) => {
   }
 
   // ordering
-  /*
   if (query.orderings) {
     if (!Array.isArray(query.orderings)) {
       errors.push({
@@ -282,7 +281,6 @@ export default (query, opt={}) => {
       })
     }
   }
-  */
 
   if (errors.length !== 0) throw new ValidationError(errors)
   return out

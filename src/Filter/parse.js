@@ -2,16 +2,10 @@ import { BadRequestError } from '../errors'
 import pgAliases from '../Connection/aliases'
 import getJSONField from '../util/getJSONField'
 import castFields from '../util/castFields'
+import isObject from 'is-pure-object'
 import QueryValue from '../QueryValue'
 
 const reserved = new Set(Object.keys(pgAliases))
-
-const isObject = (x) =>
-  typeof x === 'object'
-  && x !== null
-  && !(x instanceof RegExp)
-  && !(x instanceof Error)
-  && !(x instanceof Date)
 
 const isQueryValue = (v) => v && (v.function || v.field || v.as)
 
