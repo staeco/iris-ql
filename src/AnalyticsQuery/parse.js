@@ -7,7 +7,7 @@ import aggregateWithFilter from '../util/aggregateWithFilter'
 
 // this is an extension of parseQuery that allows for aggregations and groupings
 export default (query={}, opt) => {
-  const { table } = opt
+  const { table, context=[] } = opt
   if (!table) throw new Error('Missing table!')
   const errors = []
   let attrs
@@ -17,7 +17,7 @@ export default (query={}, opt) => {
   if (query.timezone) {
     if (typeof query.timezone !== 'string') {
       errors.push({
-        path: [ 'timezone' ],
+        path: [ ...context, 'timezone' ],
         value: query.timezone,
         message: 'Must be a string.'
       })
@@ -28,7 +28,7 @@ export default (query={}, opt) => {
   }
   if (!Array.isArray(query.aggregations)) {
     errors.push({
-      path: [ 'aggregations' ],
+      path: [ ...context, 'aggregations' ],
       value: query.aggregations,
       message: 'Must be an array.'
     })
@@ -36,7 +36,7 @@ export default (query={}, opt) => {
     attrs = query.aggregations.map((a, idx) => {
       if (!isObject(a)) {
         errors.push({
-          path: [ 'aggregations', idx ],
+          path: [ ...context, 'aggregations', idx ],
           value: a,
           message: 'Must be an object.'
         })
@@ -44,21 +44,21 @@ export default (query={}, opt) => {
       }
       if (!a.alias) {
         errors.push({
-          path: [ 'aggregations', idx, 'alias' ],
+          path: [ ...context, 'aggregations', idx, 'alias' ],
           value: a.alias,
           message: 'Missing alias!'
         })
         return null
       } else if (typeof a.alias !== 'string') {
         errors.push({
-          path: [ 'aggregations', idx, 'alias' ],
+          path: [ ...context, 'aggregations', idx, 'alias' ],
           value: a.alias,
           message: 'Must be a string.'
         })
       }
       if (!a.value) {
         errors.push({
-          path: [ 'aggregations', idx, 'value' ],
+          path: [ ...context, 'aggregations', idx, 'value' ],
           value: a.value,
           message: 'Missing value!'
         })
@@ -66,7 +66,7 @@ export default (query={}, opt) => {
       }
       if (a.filters && !isObject(a.filters) && !Array.isArray(a.filters)) {
         errors.push({
-          path: [ 'aggregations', idx, 'filters' ],
+          path: [ ...context, 'aggregations', idx, 'filters' ],
           value: a.filters,
           message: 'Must be an object or array.'
         })
@@ -77,7 +77,7 @@ export default (query={}, opt) => {
         agg = new QueryValue(a.value, opt).value()
       } catch (err) {
         errors.push({
-          path: [ 'aggregations', idx, 'value' ],
+          path: [ ...context, 'aggregations', idx, 'value' ],
           value: a.value,
           message: err.message
         })
@@ -86,7 +86,7 @@ export default (query={}, opt) => {
         parsedFilters = a.filters && new Filter(a.filters, opt).value()
       } catch (err) {
         errors.push({
-          path: [ 'aggregations', idx, 'filters' ],
+          path: [ ...context, 'aggregations', idx, 'filters' ],
           value: a.filters,
           message: err.message
         })
@@ -107,7 +107,7 @@ export default (query={}, opt) => {
   if (query.groupings) {
     if (!Array.isArray(query.groupings)) {
       errors.push({
-        path: [ 'groupings' ],
+        path: [ ...context, 'groupings' ],
         value: query.groupings,
         message: 'Must be an array.'
       })
@@ -117,7 +117,7 @@ export default (query={}, opt) => {
           return new QueryValue(i, nopt).value()
         } catch (err) {
           errors.push({
-            path: [ 'groupings', idx ],
+            path: [ ...context, 'groupings', idx ],
             value: i,
             message: err.message
           })

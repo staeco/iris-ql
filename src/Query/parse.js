@@ -8,11 +8,11 @@ import parseIffyDate from '../util/iffy/date'
 import parseIffyNumber from '../util/iffy/number'
 import parseIffyStringArray from '../util/iffy/stringArray'
 import Filter from '../Filter'
-import QueryValue from '../QueryValue'
+import Ordering from '../Ordering'
 
 export default (query, opt={}) => {
   const errors = []
-  const { table } = opt
+  const { table, context=[] } = opt
   if (!table) throw new Error('Missing table!')
   const attrs = table.rawAttributes
   const initialFieldLimit = opt.fieldLimit || Object.keys(attrs)
@@ -36,14 +36,14 @@ export default (query, opt={}) => {
     const isValid = typeof query.search === 'string'
     if (!isValid) {
       errors.push({
-        path: [ 'search' ],
+        path: [ ...context, 'search' ],
         value: query.search,
         message: 'Must be a string.'
       })
     }
     if (!isSearchable) {
       errors.push({
-        path: [ 'search' ],
+        path: [ ...context, 'search' ],
         value: query.search,
         message: 'Endpoint does not support search.'
       })
@@ -68,7 +68,7 @@ export default (query, opt={}) => {
       })
     } catch (err) {
       errors.push({
-        path: [ 'before' ],
+        path: [ ...context, 'before' ],
         value: query.before,
         message: 'Not a valid date!'
       })
@@ -85,7 +85,7 @@ export default (query, opt={}) => {
       })
     } catch (err) {
       errors.push({
-        path: [ 'after' ],
+        path: [ ...context, 'after' ],
         value: query.after,
         message: 'Not a valid date!'
       })
@@ -96,7 +96,7 @@ export default (query, opt={}) => {
   if (query.within) {
     if (!isObject(query.within)) {
       errors.push({
-        path: [ 'within' ],
+        path: [ ...context, 'within' ],
         value: query.within,
         message: 'Must be an object.'
       })
@@ -112,28 +112,28 @@ export default (query, opt={}) => {
       const ymaxIssue = lat(actualYMax)
       if (xminIssue !== true) {
         errors.push({
-          path: [ 'within', 'xmin' ],
+          path: [ ...context, 'within', 'xmin' ],
           value: xmin,
           message: xminIssue
         })
       }
       if (yminIssue !== true) {
         errors.push({
-          path: [ 'within', 'ymin' ],
+          path: [ ...context, 'within', 'ymin' ],
           value: ymin,
           message: yminIssue
         })
       }
       if (xmaxIssue !== true) {
         errors.push({
-          path: [ 'within', 'xmax' ],
+          path: [ ...context, 'within', 'xmax' ],
           value: xmax,
           message: xmaxIssue
         })
       }
       if (ymaxIssue !== true) {
         errors.push({
-          path: [ 'within', 'ymax' ],
+          path: [ ...context, 'within', 'ymax' ],
           value: ymax,
           message: ymaxIssue
         })
@@ -147,7 +147,7 @@ export default (query, opt={}) => {
   if (query.intersects) {
     if (!isObject(query.intersects)) {
       errors.push({
-        path: [ 'intersects' ],
+        path: [ ...context, 'intersects' ],
         value: query.intersects,
         message: 'Must be an object.'
       })
@@ -159,14 +159,14 @@ export default (query, opt={}) => {
       const lonIssue = lon(actualX)
       if (lonIssue !== true) {
         errors.push({
-          path: [ 'intersects', 'x' ],
+          path: [ ...context, 'intersects', 'x' ],
           value: x,
           message: lonIssue
         })
       }
       if (latIssue !== true) {
         errors.push({
-          path: [ 'intersects', 'y' ],
+          path: [ ...context, 'intersects', 'y' ],
           value: y,
           message: latIssue
         })
@@ -181,7 +181,7 @@ export default (query, opt={}) => {
       const [ first ] = k.split('.')
       if (!first || !attrs[first] || !initialFieldLimit.includes(first)) {
         errors.push({
-          path: [ 'exclusions', idx ],
+          path: [ ...context, 'exclusions', idx ],
           value: k,
           message: 'Invalid exclusion.'
         })
@@ -198,7 +198,7 @@ export default (query, opt={}) => {
       out.limit = parseIffyNumber(query.limit)
     } catch (err) {
       errors.push({
-        path: [ 'limit' ],
+        path: [ ...context, 'limit' ],
         value: query.limit,
         message: 'Invalid limit.'
       })
@@ -211,7 +211,7 @@ export default (query, opt={}) => {
       out.offset = parseIffyNumber(query.offset)
     } catch (err) {
       errors.push({
-        path: [ 'offset' ],
+        path: [ ...context, 'offset' ],
         value: query.offset,
         message: 'Invalid offset.'
       })
@@ -222,12 +222,15 @@ export default (query, opt={}) => {
   if (query.filters) {
     if (typeof query.filters !== 'object') {
       errors.push({
-        path: [ 'filters' ],
+        path: [ ...context, 'filters' ],
         value: query.filters,
         message: 'Must be an object or array.'
       })
     } else {
-      out.where.push(new Filter(query.filters, popt).value())
+      out.where.push(new Filter(query.filters, {
+        ...popt,
+        context: [ ...context, 'filters' ]
+      }).value())
     }
   }
 
@@ -235,49 +238,16 @@ export default (query, opt={}) => {
   if (query.orderings) {
     if (!Array.isArray(query.orderings)) {
       errors.push({
-        path: [ 'orderings' ],
+        path: [ ...context, 'orderings' ],
         value: query.orderings,
         message: 'Must be an array.'
       })
     } else {
-      forEach(query.orderings, ({ value, direction }={}, idx) => {
-        const isDirectionValid = direction === 'asc' || direction === 'desc'
-        if (!value) {
-          errors.push({
-            path: [ 'orderings', idx, 'value' ],
-            value,
-            message: 'Missing ordering value.'
-          })
-        }
-        if (!direction) {
-          errors.push({
-            path: [ 'orderings', idx, 'direction' ],
-            value: direction,
-            message: 'Missing ordering direction.'
-          })
-        }
-        if (!isDirectionValid) {
-          errors.push({
-            path: [ 'orderings', idx, 'direction' ],
-            value: direction,
-            message: 'Invalid ordering direction - must be asc or desc.'
-          })
-        }
-
-        if (direction && value && isDirectionValid) {
-          try {
-            out.order.push([
-              new QueryValue(value, popt).value(),
-              direction
-            ])
-          } catch (err) {
-            errors.push({
-              path: [ 'orderings', idx, 'value' ],
-              value,
-              message: err.message
-            })
-          }
-        }
+      forEach(query.orderings, (v, idx) => {
+        out.order.push(new Ordering(v, {
+          ...popt,
+          context: [ ...context, 'orderings', idx ]
+        }).value())
       })
     }
   }

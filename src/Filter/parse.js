@@ -33,7 +33,7 @@ export default (obj, opt) => {
     }
     return v
   }
-  // turn where object into string with fields casted
 
+  // turn where object into string with fields casted
   return castFields(transformValues(obj), opt, table)
 }

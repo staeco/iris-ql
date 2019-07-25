@@ -3,9 +3,10 @@
 ### Query
 
 - `filters`
-  - Create the `Filter` class
+  - More tests
+  - Make errors pass proper path and context
 - `orderings`
-  - Create the `Ordering` class
+  - More tests
 
 ### AnalyticsQuery
 
