@@ -1,7 +1,6 @@
 import getGeoFields from './getGeoFields'
 import { fn, or, col, literal } from 'sequelize'
 
-// TODO: convert to use plain sequelize info, not custom table
 export default (geo, { table, column=table.name }) => {
   const geoFields = getGeoFields(table)
   if (!geo || !geoFields) return literal(false)

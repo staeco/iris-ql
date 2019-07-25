@@ -20,7 +20,7 @@ describe('AnalyticsQuery#execute', () => {
       groupings: [
         { field: 'name' }
       ]
-    }, user)
+    }, { table: user })
     const res = await query.execute()
     should.exist(res)
     res.length.should.eql(3)

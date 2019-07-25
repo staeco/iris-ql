@@ -7,17 +7,17 @@ describe('Query#options#exclusions', () => {
   const { user } = conn.tables()
 
   it('should work for valid exclusions values', async () => {
-    should.exist(new Query({ exclusions: [] }, user))
-    should.exist(new Query({ exclusions: [ 'id' ] }, user))
-    should.exist(new Query({ exclusions: '' }, user))
+    should.exist(new Query({ exclusions: [] }, { table: user }))
+    should.exist(new Query({ exclusions: [ 'id' ] }, { table: user }))
+    should.exist(new Query({ exclusions: '' }, { table: user }))
   })
   it('should return 400 on bad exclusions', async () => {
-    should.throws(() => new Query({ exclusions: {} }, user))
-    should.throws(() => new Query({ exclusions: 'blahblah' }, user))
-    should.throws(() => new Query({ exclusions: [ 'field-does-not-exist' ] }, user))
+    should.throws(() => new Query({ exclusions: {} }, { table: user }))
+    should.throws(() => new Query({ exclusions: 'blahblah' }, { table: user }))
+    should.throws(() => new Query({ exclusions: [ 'field-does-not-exist' ] }, { table: user }))
   })
   it('should execute with exclusions', async () => {
-    const query = new Query({ exclusions: [ 'id' ], limit: 1 }, user)
+    const query = new Query({ exclusions: [ 'id' ], limit: 1 }, { table: user })
     const res = await query.execute()
     should.exist(res.count)
     should.exist(res.rows)

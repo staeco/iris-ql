@@ -1,16 +1,12 @@
 import parse from './parse'
 
 export default class AnalyticsQuery {
-  constructor(obj, table, options={}) {
-    if (!obj) throw new Error('Missing query!')
-    if (!table) throw new Error('Missing table!')
+  constructor(obj, options={}) {
+    if (!obj) throw new Error('Missing value!')
+    if (!options.table) throw new Error('Missing table!')
     this.input = obj
-    this.table = table
     this.options = options
-    this.parsed = parse(obj, {
-      table,
-      ...options
-    })
+    this.parsed = parse(obj, options)
     if (!this.parsed.group || this.parsed.group.length === 0) throw new Error('Missing groupings!')
   }
   update = (fn) => {
@@ -22,7 +18,7 @@ export default class AnalyticsQuery {
   value = () => this.parsed
   toJSON = () => this.input
   execute = async () =>
-    this.table.findAll({
+    this.options.table.findAll({
       raw: true,
       ...this.parsed
     })

@@ -102,7 +102,7 @@ export default (query={}, opt) => {
 
   const fieldLimit = initialFieldLimit.concat(attrs.map((i) => i[1]))
   const nopt = { ...opt, fieldLimit }
-  const out = new Query(query, nopt.table, nopt).value()
+  const out = new Query(query, nopt).value()
 
   if (query.groupings) {
     if (!Array.isArray(query.groupings)) {

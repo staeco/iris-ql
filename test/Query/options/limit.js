@@ -7,16 +7,16 @@ describe('Query#options#limit', () => {
   const { user } = conn.tables()
 
   it('should work for valid limit values', async () => {
-    should.exist(new Query({ limit: 1 }, user))
-    should.exist(new Query({ limit: '1' }, user))
-    should.exist(new Query({ limit: '' }, user))
+    should.exist(new Query({ limit: 1 }, { table: user }))
+    should.exist(new Query({ limit: '1' }, { table: user }))
+    should.exist(new Query({ limit: '' }, { table: user }))
   })
   it('should return 400 on bad limits', async () => {
-    should.throws(() => new Query({ limit: {} }, user))
-    should.throws(() => new Query({ limit: 'blahblah' }, user))
+    should.throws(() => new Query({ limit: {} }, { table: user }))
+    should.throws(() => new Query({ limit: 'blahblah' }, { table: user }))
   })
   it('should execute with limit', async () => {
-    const query = new Query({ limit: 1 }, user)
+    const query = new Query({ limit: 1 }, { table: user })
     const res = await query.execute()
     should.exist(res.count)
     should.exist(res.rows)

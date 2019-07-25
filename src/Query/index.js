@@ -1,16 +1,12 @@
 import parse from './parse'
 
 export default class Query {
-  constructor(obj, table, options={}) {
+  constructor(obj, options={}) {
     if (!obj) throw new Error('Missing query!')
-    if (!table) throw new Error('Missing table!')
+    if (!options.table) throw new Error('Missing table!')
     this.input = obj
-    this.table = table
     this.options = options
-    this.parsed = parse(obj, {
-      table,
-      ...options
-    })
+    this.parsed = parse(obj, options)
   }
   update = (fn) => {
     const newValue = fn(this.parsed)
@@ -22,7 +18,7 @@ export default class Query {
   toJSON = () => this.input
   execute = async ({ count=true }={}) => {
     const fn = count ? 'findAndCountAll' : 'findAll'
-    return this.table[fn]({
+    return this.options.table[fn]({
       raw: true,
       ...this.parsed
     })
