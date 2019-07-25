@@ -12,6 +12,7 @@ describe('Query#options#filters', () => {
   })
   it('should return 400 on bad filters', async () => {
     should.throws(() => new Query({ filters: 'blahblah' }, { table: user }))
+    should.throws(() => new Query({ filters: { missing: true } }, { table: user }))
   })
   it('should execute with filters', async () => {
     const query = new Query({ filters: { name: { $eq: 'Yo Yo 1' } } }, { table: user })

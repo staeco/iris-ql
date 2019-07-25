@@ -1,6 +1,6 @@
 import parse from './parse'
 
-export default class Filter {
+export default class Ordering {
   constructor(obj, options={}) {
     if (!obj) throw new Error('Missing value!')
     if (!options.table) throw new Error('Missing table!')
