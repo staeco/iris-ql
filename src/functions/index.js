@@ -1,7 +1,6 @@
 import types from 'sequelize'
 import isObject from 'is-pure-object'
 import { BadRequestError } from '../errors'
-import { value } from '../util/toString'
 
 const numeric = (v) => types.cast(v, 'numeric')
 const truncates = {
@@ -73,8 +72,7 @@ export const lastYear = () => types.literal("CURRENT_DATE - INTERVAL '1 year'")
 export const interval = (start, end) =>
   types.fn('sub', ms(end), ms(start))
 
-export const ms = (v) =>
-  numeric(types.literal(`extract(epoch from ${value({ value: v })}) * 1000`))
+export const ms = (v) => types.fn('time_to_ms', v)
 
 export const truncate = (precision, f) => {
   const p = truncates[precision && precision.raw]

@@ -4,8 +4,7 @@ import { ValidationError } from '../errors'
 export default ({ value, direction }={}, opt) => {
   const error = new ValidationError()
   let out
-  const { table, context=[] } = opt
-  if (!table) throw new Error('Missing table!')
+  const { context=[] } = opt
   const isDirectionValid = direction === 'asc' || direction === 'desc'
   if (!value) {
     error.add({

@@ -6,7 +6,7 @@ import aggregateWithFilter from '../util/aggregateWithFilter'
 
 export default (a, opt) => {
   const { table, context=[] } = opt
-  if (!table) throw new Error('Missing table!')
+  let agg, parsedFilters
   const error = new ValidationError()
 
   if (!isObject(a)) {
@@ -15,7 +15,7 @@ export default (a, opt) => {
       value: a,
       message: 'Must be an object.'
     })
-    return null
+    throw error // dont even bother continuing
   }
   if (!a.alias) {
     error.add({
@@ -23,7 +23,6 @@ export default (a, opt) => {
       value: a.alias,
       message: 'Missing alias!'
     })
-    return null
   } else if (typeof a.alias !== 'string') {
     error.add({
       path: [ ...context, 'alias' ],
@@ -37,17 +36,9 @@ export default (a, opt) => {
       value: a.value,
       message: 'Missing value!'
     })
-    return null
-  }
-  if (a.filters && !isObject(a.filters) && !Array.isArray(a.filters)) {
-    error.add({
-      path: [ ...context, 'filters' ],
-      value: a.filters,
-      message: 'Must be an object or array.'
-    })
+    throw error // dont even bother continuing
   }
 
-  let agg, parsedFilters
   try {
     agg = new QueryValue(a.value, {
       ...opt,
@@ -55,6 +46,14 @@ export default (a, opt) => {
     }).value()
   } catch (err) {
     error.add(err)
+  }
+
+  if (a.filters && !isObject(a.filters) && !Array.isArray(a.filters)) {
+    error.add({
+      path: [ ...context, 'filters' ],
+      value: a.filters,
+      message: 'Must be an object or array.'
+    })
   }
   try {
     parsedFilters = a.filters && new Filter(a.filters, {

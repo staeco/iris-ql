@@ -1,0 +1,9 @@
+CREATE OR REPLACE FUNCTION time_to_ms(a timestamptz) RETURNS numeric AS $$
+  SELECT CAST(extract(epoch from a) * 1000 AS numeric)
+$$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
+RETURNS NULL ON NULL INPUT;
+
+CREATE OR REPLACE FUNCTION time_to_ms(a timestamp) RETURNS numeric AS $$
+  SELECT CAST(extract(epoch from a) * 1000 AS numeric)
+$$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
+RETURNS NULL ON NULL INPUT;

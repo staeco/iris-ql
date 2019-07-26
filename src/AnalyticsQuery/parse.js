@@ -6,7 +6,6 @@ import { ValidationError } from '../errors'
 // this is an extension of parseQuery that allows for aggregations and groupings
 export default (query={}, opt) => {
   const { table, context=[] } = opt
-  if (!table) throw new Error('Missing table!')
   const error = new ValidationError()
   let attrs
   const initialFieldLimit = Object.keys(table.rawAttributes)

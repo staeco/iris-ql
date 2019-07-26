@@ -10,3 +10,4 @@
 
 - Remove `toString` wherever possible
 - Function type safety
+- Flesh out casting more, prevent invalid castings and add type safety

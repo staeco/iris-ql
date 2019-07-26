@@ -13,7 +13,6 @@ import Ordering from '../Ordering'
 export default (query, opt={}) => {
   const error = new ValidationError()
   const { table, context=[] } = opt
-  if (!table) throw new Error('Missing table!')
   const attrs = table.rawAttributes
   const initialFieldLimit = opt.fieldLimit || Object.keys(attrs)
   const popt = {
@@ -220,7 +219,7 @@ export default (query, opt={}) => {
 
   // filterings
   if (query.filters) {
-    if (typeof query.filters !== 'object') {
+    if (!isObject(query.filters) && !Array.isArray(query.filters)) {
       error.add({
         path: [ ...context, 'filters' ],
         value: query.filters,

@@ -5,7 +5,7 @@ import db from '../../fixtures/db'
 describe('AnalyticsQuery#options#aggregations', () => {
   const conn = new Connection(db)
   const { user } = conn.tables()
-  it('should execute with all options', async () => {
+  it('should execute a basic query', async () => {
     const query = new AnalyticsQuery({
       aggregations: [
         {
@@ -28,6 +28,45 @@ describe('AnalyticsQuery#options#aggregations', () => {
     should.exist(res)
     res.length.should.eql(3)
     res[0].count.should.eql(1)
+  })
+  it('should execute a query with casting', async () => {
+    const query = new AnalyticsQuery({
+      aggregations: [
+        {
+          value: { function: 'count' },
+          alias: 'count',
+          filters: {
+            createdAt: { $gte: { function: 'lastWeek' } }
+          }
+        },
+        {
+          value: { field: 'name' },
+          alias: 'name'
+        },
+        {
+          value: {
+            function: 'average',
+            as: 'text',
+            arguments: [
+              {
+                function: 'ms',
+                arguments: [
+                  { field: 'createdAt' }
+                ]
+              }
+            ]
+          },
+          alias: 'timeSpent'
+        }
+      ],
+      groupings: [
+        { field: 'name' }
+      ]
+    }, { table: user })
+    const res = await query.execute()
+    should.exist(res)
+    res.length.should.eql(3)
+    should(typeof res[0].timeSpent).eql('string')
   })
   it('should return aggregation invalid alias errors correctly', async () => {
     try {

@@ -5,6 +5,7 @@ export const groups = [
   'misc',
   'math',
   'json',
+  'time',
   'geospatial'
 ].map((name) => ({
   name,
