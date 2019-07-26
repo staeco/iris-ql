@@ -21,13 +21,21 @@
   ],
   "scripts": {
     "preversion": "npm run clean && npm run build",
-    "build": "babel src --copy-files --out-dir dist",
+    "build": "NODE_ENV=production babel src --copy-files --out-dir dist",
     "clean": "rimraf dist",
     "lint": "eslint src test",
     "lint:fix": "eslint src test --fix",
     "test-make-user": "createuser postgres -lsd",
     "test-db": "dropdb iris-ql -U postgres || true && createdb iris-ql -U postgres && psql iris-ql -c 'CREATE EXTENSION IF NOT EXISTS postgis;' -U postgres",
-    "test": "npm run-script test-db && mocha --require @babel/register --recursive --reporter spec --bail --exit --timeout 36000 && npm run-script lint"
+    "test": "npm run-script test-db && NODE_ENV=test nyc mocha --require @babel/register --recursive --reporter spec --bail --exit --timeout 36000 && npm run-script lint"
+  },
+  "nyc": {
+    "extends": "@istanbuljs/nyc-config-babel",
+    "include": [
+      "src/**/*.js"
+    ],
+    "all": true,
+    "check-coverage": true
   },
   "peerDependencies": {
     "pg": ">=7",
@@ -37,11 +45,14 @@
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
     "@babel/register": "^7.4.4",
+    "@istanbuljs/nyc-config-babel": "^2.1.1",
     "@stae/babel-node": "^0.1.0",
     "@stae/linters": "^0.1.2",
+    "babel-plugin-istanbul": "^5.2.0",
     "eslint": "^5.0.0",
     "eslint-cli": "^1.0.0",
     "mocha": "^6.0.0",
+    "nyc": "^14.1.1",
     "pg": "^7.11.0",
     "rimraf": "^2.5.0",
     "sequelize": "^5.10.1",

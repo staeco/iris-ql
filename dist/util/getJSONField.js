@@ -22,14 +22,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 // TODO: convert to use plain sequelize info, not custom table
 var _default = (v, opt) => {
   const {
+    context = [],
     dataType,
     table,
-    fieldLimit,
+    fieldLimit = Object.keys(table.rawAttributes),
     cast = true
   } = opt;
   const path = v.split('.');
   const col = path.shift();
-  if (fieldLimit && !fieldLimit.includes(col)) throw new _errors.BadRequestError(`Non-existent field: ${col}`);
+
+  if (fieldLimit && !fieldLimit.includes(col)) {
+    throw new _errors.ValidationError({
+      path: context,
+      value: v,
+      message: `Field does not exist: ${col}`
+    });
+  }
+
   const lit = (0, _sequelize.literal)((0, _toString.jsonPath)({
     column: col,
     table,
@@ -42,7 +51,15 @@ var _default = (v, opt) => {
 
   const field = path[0];
   const attrDef = dataType.schema[field];
-  if (!attrDef) throw new _errors.BadRequestError(`Non-existent field: ${col}.${field}`);
+
+  if (!attrDef) {
+    throw new _errors.ValidationError({
+      path: context,
+      value: v,
+      message: `Field does not exist: ${col}.${field}`
+    });
+  }
+
   return dataTypeTypes[attrDef.type].cast(lit, _objectSpread({}, opt, {
     attr: attrDef
   }));

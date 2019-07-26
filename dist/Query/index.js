@@ -13,8 +13,11 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+async function _ref() {// TODO
+}
+
 class Query {
-  constructor(obj, table, options = {}) {
+  constructor(obj, options = {}) {
     this.update = fn => {
       const newValue = fn(this.parsed);
       if (!newValue || typeof newValue !== 'object') throw new Error('Invalid update function! Must return an object.');
@@ -30,22 +33,17 @@ class Query {
       count = true
     } = {}) => {
       const fn = count ? 'findAndCountAll' : 'findAll';
-      return this.table[fn](_objectSpread({
+      return this.options.table[fn](_objectSpread({
         raw: true
       }, this.parsed));
     };
 
-    this.executeStream = async () => {// TODO
-    };
-
+    this.executeStream = _ref;
     if (!obj) throw new Error('Missing query!');
-    if (!table) throw new Error('Missing table!');
+    if (!options.table) throw new Error('Missing table!');
     this.input = obj;
-    this.table = table;
     this.options = options;
-    this.parsed = (0, _parse.default)(obj, _objectSpread({
-      table
-    }, options));
+    this.parsed = (0, _parse.default)(obj, options);
   }
 
 }

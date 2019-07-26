@@ -3,15 +3,15 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-var _postgres = _interopRequireDefault(require("connections/postgres"));
-
-var _errors = require("sutro/dist/errors");
-
-var _aliases = _interopRequireDefault(require("connections/postgres/aliases"));
-
-var _toString = require("../util/toString");
+var _aliases = _interopRequireDefault(require("../Connection/aliases"));
 
 var _getJSONField = _interopRequireDefault(require("../util/getJSONField"));
+
+var _castFields = _interopRequireDefault(require("../util/castFields"));
+
+var _errors = require("../errors");
+
+var _isPureObject = _interopRequireDefault(require("is-pure-object"));
 
 var _QueryValue = _interopRequireDefault(require("../QueryValue"));
 
@@ -25,16 +25,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 const reserved = new Set(Object.keys(_aliases.default));
 
-const isObject = x => typeof x === 'object' && x !== null && !(x instanceof RegExp) && !(x instanceof Error) && !(x instanceof Date);
-
 const isQueryValue = v => v && (v.function || v.field || v.as);
 
 var _default = (obj, opt) => {
   const {
-    dataType,
     table,
-    fieldLimit
-  } = opt; // recursively walk a filter object and replace query values with the real thing
+    context = [],
+    fieldLimit = Object.keys(table.rawAttributes)
+  } = opt;
+  const error = new _errors.ValidationError(); // recursively walk a filter object and replace query values with the real thing
 
   const transformValues = (v, parent = '') => {
     if (isQueryValue(v)) return new _QueryValue.default(v, _objectSpread({}, opt, {
@@ -43,52 +42,41 @@ var _default = (obj, opt) => {
 
     if (Array.isArray(v)) return v.map(i => transformValues(i, parent));
 
-    if (isObject(v)) {
-      return Object.keys(v).reduce((p, k) => {
-        let fullPath; // verify
+    function _ref(p, k) {
+      let fullPath; // verify
 
-        if (!reserved.has(k)) {
-          fullPath = `${parent}${parent ? '.' : ''}${k}`;
+      if (!reserved.has(k)) {
+        fullPath = `${parent}${parent ? '.' : ''}${k}`;
 
-          if (fullPath.includes('.')) {
-            (0, _getJSONField.default)(fullPath, opt); // performs the check, don't need the value
-          } else {
-            if (fieldLimit && !fieldLimit.includes(fullPath)) throw new _errors.BadRequestError(`Non-existent field: ${fullPath}`);
+        if (fullPath.includes('.')) {
+          (0, _getJSONField.default)(fullPath, opt); // performs the check, don't need the value
+        } else {
+          if (fieldLimit && !fieldLimit.includes(fullPath)) {
+            error.add({
+              path: [...context, 'filter'],
+              value: k,
+              message: `Non-existent field: ${fullPath}`
+            });
+            return p;
           }
         }
+      }
 
-        p[k] = transformValues(v[k], fullPath || parent);
-        return p;
-      }, {});
+      p[k] = transformValues(v[k], fullPath || parent);
+      return p;
+    }
+
+    if ((0, _isPureObject.default)(v)) {
+      return Object.keys(v).reduce(_ref, {});
     }
 
     return v;
-  }; // turn where object into string with fields casted
-
-
-  const castFields = v => {
-    if (Array.isArray(v)) v = {
-      $and: v // convert it
-
-    };
-    if (!dataType) return v; // no casting required!
-
-    const str = (0, _toString.where)({
-      value: v,
-      table
-    });
-    const regex = new RegExp(`"${table.resource}"\\."(\\w*)"#>>'{(\\w*)}'`, 'g');
-    const redone = str.replace(regex, (match, col, field) => {
-      const lit = (0, _getJSONField.default)(`${col}.${field}`, opt);
-      return (0, _toString.value)({
-        value: lit,
-        table
-      });
-    });
-    return _postgres.default.literal(redone);
   };
 
-  return castFields(transformValues(obj));
+  const transformed = transformValues(obj); // turn where object into string with fields casted
+
+  if (!error.isEmpty()) throw error;
+  return (0, _castFields.default)(transformed, opt, table);
 };
 
 exports.default = _default;

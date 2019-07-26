@@ -9,7 +9,6 @@ var _sequelize = require("sequelize");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// TODO: convert to use plain sequelize info, not custom table
 var _default = (geo, {
   table,
   column = table.name

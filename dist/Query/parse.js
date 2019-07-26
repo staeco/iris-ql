@@ -3,6 +3,8 @@
 exports.__esModule = true;
 exports.default = void 0;
 
+var _lodash = require("lodash");
+
 var _isPureObject = _interopRequireDefault(require("is-pure-object"));
 
 var _sequelize = require("sequelize");
@@ -19,19 +21,32 @@ var _number = _interopRequireDefault(require("../util/iffy/number"));
 
 var _stringArray = _interopRequireDefault(require("../util/iffy/stringArray"));
 
+var _Filter = _interopRequireDefault(require("../Filter"));
+
+var _Ordering = _interopRequireDefault(require("../Ordering"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-//import { forEach } from 'lodash'
-//import Filter from '../Filter'
-//import Ordering from '../Ordering'
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var _default = (query, opt = {}) => {
-  const errors = [];
+  const error = new _errors.ValidationError();
   const {
-    table
+    table,
+    context = []
   } = opt;
-  if (!opt.table) throw new Error('Missing table!');
+  if (!table) throw new Error('Missing table!');
   const attrs = table.rawAttributes;
-  const initialFieldLimit = opt.fieldLimit || Object.keys(attrs); // options we pass on, default in fieldLimit
+  const initialFieldLimit = opt.fieldLimit || Object.keys(attrs);
+
+  const popt = _objectSpread({}, opt, {
+    fieldLimit: initialFieldLimit // options we pass on, default in fieldLimit
+
+  });
 
   const out = {
     where: [{} // very dumb fix for https://github.com/sequelize/sequelize/issues/10142
@@ -40,22 +55,26 @@ var _default = (query, opt = {}) => {
 
   };
 
+  function _ref(k) {
+    return attrs[k].searchable;
+  }
+
   if (query.search) {
-    const searchable = initialFieldLimit.filter(k => attrs[k].searchable);
+    const searchable = initialFieldLimit.filter(_ref);
     const isSearchable = searchable.length !== 0;
     const isValid = typeof query.search === 'string';
 
     if (!isValid) {
-      errors.push({
-        path: ['search'],
+      error.add({
+        path: [...context, 'search'],
         value: query.search,
         message: 'Must be a string.'
       });
     }
 
     if (!isSearchable) {
-      errors.push({
-        path: ['search'],
+      error.add({
+        path: [...context, 'search'],
         value: query.search,
         message: 'Endpoint does not support search.'
       });
@@ -89,8 +108,8 @@ var _default = (query, opt = {}) => {
         }]
       });
     } catch (err) {
-      errors.push({
-        path: ['before'],
+      error.add({
+        path: [...context, 'before'],
         value: query.before,
         message: 'Not a valid date!'
       });
@@ -112,8 +131,8 @@ var _default = (query, opt = {}) => {
         }]
       });
     } catch (err) {
-      errors.push({
-        path: ['after'],
+      error.add({
+        path: [...context, 'after'],
         value: query.after,
         message: 'Not a valid date!'
       });
@@ -123,8 +142,8 @@ var _default = (query, opt = {}) => {
 
   if (query.within) {
     if (!(0, _isPureObject.default)(query.within)) {
-      errors.push({
-        path: ['within'],
+      error.add({
+        path: [...context, 'within'],
         value: query.within,
         message: 'Must be an object.'
       });
@@ -145,32 +164,32 @@ var _default = (query, opt = {}) => {
       const ymaxIssue = (0, _isValidCoordinate.lat)(actualYMax);
 
       if (xminIssue !== true) {
-        errors.push({
-          path: ['within', 'xmin'],
+        error.add({
+          path: [...context, 'within', 'xmin'],
           value: xmin,
           message: xminIssue
         });
       }
 
       if (yminIssue !== true) {
-        errors.push({
-          path: ['within', 'ymin'],
+        error.add({
+          path: [...context, 'within', 'ymin'],
           value: ymin,
           message: yminIssue
         });
       }
 
       if (xmaxIssue !== true) {
-        errors.push({
-          path: ['within', 'xmax'],
+        error.add({
+          path: [...context, 'within', 'xmax'],
           value: xmax,
           message: xmaxIssue
         });
       }
 
       if (ymaxIssue !== true) {
-        errors.push({
-          path: ['within', 'ymax'],
+        error.add({
+          path: [...context, 'within', 'ymax'],
           value: ymax,
           message: ymaxIssue
         });
@@ -186,8 +205,8 @@ var _default = (query, opt = {}) => {
 
   if (query.intersects) {
     if (!(0, _isPureObject.default)(query.intersects)) {
-      errors.push({
-        path: ['intersects'],
+      error.add({
+        path: [...context, 'intersects'],
         value: query.intersects,
         message: 'Must be an object.'
       });
@@ -202,16 +221,16 @@ var _default = (query, opt = {}) => {
       const lonIssue = (0, _isValidCoordinate.lon)(actualX);
 
       if (lonIssue !== true) {
-        errors.push({
-          path: ['intersects', 'x'],
+        error.add({
+          path: [...context, 'intersects', 'x'],
           value: x,
           message: lonIssue
         });
       }
 
       if (latIssue !== true) {
-        errors.push({
-          path: ['intersects', 'y'],
+        error.add({
+          path: [...context, 'intersects', 'y'],
           value: y,
           message: latIssue
         });
@@ -224,21 +243,23 @@ var _default = (query, opt = {}) => {
   } // exclusions
 
 
+  function _ref2(k, idx) {
+    const [first] = k.split('.');
+
+    if (!first || !attrs[first] || !initialFieldLimit.includes(first)) {
+      error.add({
+        path: [...context, 'exclusions', idx],
+        value: k,
+        message: 'Invalid exclusion.'
+      });
+      return null;
+    }
+
+    return k;
+  }
+
   if (query.exclusions) {
-    const parsed = (0, _stringArray.default)(query.exclusions).map((k, idx) => {
-      const [first] = k.split('.');
-
-      if (!first || !attrs[first] || !initialFieldLimit.includes(first)) {
-        errors.push({
-          path: ['exclusions', idx],
-          value: k,
-          message: 'Invalid exclusion.'
-        });
-        return null;
-      }
-
-      return k;
-    });
+    const parsed = (0, _stringArray.default)(query.exclusions).map(_ref2);
     out.attributes = {
       exclude: parsed
     };
@@ -249,8 +270,8 @@ var _default = (query, opt = {}) => {
     try {
       out.limit = (0, _number.default)(query.limit);
     } catch (err) {
-      errors.push({
-        path: ['limit'],
+      error.add({
+        path: [...context, 'limit'],
         value: query.limit,
         message: 'Invalid limit.'
       });
@@ -262,84 +283,57 @@ var _default = (query, opt = {}) => {
     try {
       out.offset = (0, _number.default)(query.offset);
     } catch (err) {
-      errors.push({
-        path: ['offset'],
+      error.add({
+        path: [...context, 'offset'],
         value: query.offset,
         message: 'Invalid offset.'
       });
     }
-  } // further items have the ability to use new aggregations
+  } // filterings
 
-  /*
-  const withNewFields = {
-    ...opt,
-    fieldLimit: initialFieldLimit.concat(attrs.map((i) => i[1]))
-  }
-   // filterings
+
   if (query.filters) {
     if (typeof query.filters !== 'object') {
-      errors.push({
-        path: [ 'filters' ],
+      error.add({
+        path: [...context, 'filters'],
         value: query.filters,
         message: 'Must be an object or array.'
-      })
+      });
     } else {
-      out.where.push(parseFilter(query.filters, popt))
+      try {
+        out.where.push(new _Filter.default(query.filters, _objectSpread({}, popt, {
+          context: [...context, 'filters']
+        })).value());
+      } catch (err) {
+        error.add(err);
+      }
+    }
+  } // ordering
+
+
+  function _ref3(v, idx) {
+    try {
+      out.order.push(new _Ordering.default(v, _objectSpread({}, popt, {
+        context: [...context, 'orderings', idx]
+      })).value());
+    } catch (err) {
+      error.add(err);
     }
   }
-  */
-  // ordering
 
-  /*
   if (query.orderings) {
     if (!Array.isArray(query.orderings)) {
-      errors.push({
-        path: [ 'orderings' ],
+      error.add({
+        path: [...context, 'orderings'],
         value: query.orderings,
         message: 'Must be an array.'
-      })
+      });
     } else {
-      forEach(query.orderings, ({ value, direction }={}, idx) => {
-        const isDirectionValid = direction === 'asc' || direction === 'desc'
-        if (!value) {
-          errors.push({
-            path: [ 'orderings', idx, 'value' ],
-            value,
-            message: 'Missing ordering value.'
-          })
-        }
-        if (!direction) {
-          errors.push({
-            path: [ 'orderings', idx, 'direction' ],
-            value: direction,
-            message: 'Missing ordering direction.'
-          })
-        }
-        if (!isDirectionValid) {
-          errors.push({
-            path: [ 'orderings', idx, 'direction' ],
-            value: direction,
-            message: 'Invalid ordering direction - must be asc or desc.'
-          })
-        }
-         if (direction && value && isDirectionValid) {
-          try {
-            out.order.push([ parseQueryValue(value, popt), direction ])
-          } catch (err) {
-            errors.push({
-              path: [ 'orderings', idx, 'value' ],
-              value,
-              message: err.message
-            })
-          }
-        }
-      })
+      (0, _lodash.forEach)(query.orderings, _ref3);
     }
   }
-  */
 
-
-  if (errors.length !== 0) throw new _errors.ValidationError(errors);
+  if (!error.isEmpty()) throw error;
   return out;
 };
 

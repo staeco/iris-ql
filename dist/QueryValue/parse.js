@@ -5,6 +5,8 @@ exports.default = void 0;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
+var _isPureObject = _interopRequireDefault(require("is-pure-object"));
+
 var _errors = require("../errors");
 
 var funcs = _interopRequireWildcard(require("../functions"));
@@ -23,26 +25,70 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 const baseParse = (v, opt) => {
   const {
-    fieldLimit,
-    castJSON = true
+    fieldLimit = Object.keys(opt.table.rawAttributes),
+    castJSON = true,
+    context = []
   } = opt;
   if (v == null) return null;
 
+  function _ref(i, idx) {
+    return parse(i, _objectSpread({}, opt, {
+      context: [...context, 'arguments', idx]
+    }));
+  }
+
   if (v.function) {
-    if (typeof v.function !== 'string') throw new _errors.BadRequestError('Invalid function name');
+    if (typeof v.function !== 'string') {
+      throw new _errors.ValidationError({
+        path: [...context, 'function'],
+        value: v.function,
+        message: 'Must be a string.'
+      });
+    }
+
     const func = funcs[v.function];
     const args = v.arguments || [];
-    if (!func) throw new _errors.BadRequestError(`Invalid function name - ${v.function}`);
-    if (!Array.isArray(args)) throw new _errors.BadRequestError(`Invalid function arguments for ${v.function}`);
-    return func(...args.map(i => parse(i, opt)));
+
+    if (!func) {
+      throw new _errors.ValidationError({
+        path: [...context, 'function'],
+        value: v.function,
+        message: 'Function does not exist'
+      });
+    }
+
+    if (!Array.isArray(args)) {
+      throw new _errors.ValidationError({
+        path: [...context, 'arguments'],
+        value: v.function,
+        message: 'Must be an array.'
+      });
+    }
+
+    return func(...args.map(_ref));
   }
 
   if (v.field) {
-    if (typeof v.field !== 'string') throw new _errors.BadRequestError('Invalid field name');
+    if (typeof v.field !== 'string') {
+      throw new _errors.ValidationError({
+        path: [...context, 'field'],
+        value: v.field,
+        message: 'Must be a string.'
+      });
+    }
+
     if (v.field.includes('.')) return (0, _getJSONField.default)(v.field, _objectSpread({}, opt, {
       cast: castJSON
     }));
-    if (fieldLimit && !fieldLimit.includes(v.field)) throw new _errors.BadRequestError(`Non-existent field: ${v.field}`);
+
+    if (fieldLimit && !fieldLimit.includes(v.field)) {
+      throw new _errors.ValidationError({
+        path: [...context, 'field'],
+        value: v.field,
+        message: 'Field does not exist.'
+      });
+    }
+
     return _sequelize.default.col(v.field);
   }
 
@@ -54,14 +100,32 @@ const baseParse = (v, opt) => {
     return slit;
   }
 
-  if (typeof v === 'object') throw new _errors.BadRequestError('Query object given was invalid');
+  if (!(0, _isPureObject.default)(v)) {
+    throw new _errors.ValidationError({
+      path: context,
+      value: v,
+      message: 'Must be a function, field, string, or object.'
+    });
+  }
+
   return v;
 };
 
-const parse = (v, ...rest) => {
-  const ret = baseParse(v, ...rest);
+const parse = (v, opt) => {
+  const {
+    context = []
+  } = opt;
+  const ret = baseParse(v, opt);
   if (!v.as) return ret;
-  if (typeof v.as !== 'string') throw new _errors.BadRequestError('as value given was invalid');
+
+  if (typeof v.as !== 'string') {
+    throw new _errors.ValidationError({
+      path: [...context, 'as'],
+      value: v.as,
+      message: 'Must be a string.'
+    });
+  }
+
   return _sequelize.default.cast(ret, v.as);
 };
 

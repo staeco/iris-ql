@@ -10,7 +10,11 @@ const inspectOptions = {
   breakLength: Infinity
 };
 
-const serializeIssues = fields => fields.map(f => `\n - ${(0, _util.inspect)(f, inspectOptions)}`);
+function _ref(f) {
+  return `\n - ${(0, _util.inspect)(f, inspectOptions)}`;
+}
+
+const serializeIssues = fields => fields.map(_ref);
 
 const codes = {
   badRequest: 400,
@@ -24,12 +28,11 @@ exports.codes = codes;
 class BadRequestError extends Error {
   constructor(message = 'Bad Request', status = codes.badRequest) {
     super(message);
+
+    this.toString = () => `${super.toString()} (HTTP ${this.status})`;
+
     this.message = message;
     this.status = status;
-  }
-
-  toString() {
-    return `${super.toString()} (HTTP ${this.status})`;
   }
 
 }
@@ -40,6 +43,26 @@ class ValidationError extends BadRequestError {
   constructor(message, fields) {
     super();
 
+    this.add = err => {
+      if (err.fields) {
+        this.fields.push(...err.fields);
+        return this;
+      }
+
+      if (err instanceof Error) throw err;
+      this.fields.push(err);
+      return this;
+    };
+
+    this.isEmpty = () => this.fields.length === 0;
+
+    this.toString = () => {
+      const original = super.toString();
+      if (this.isEmpty()) return original; // no custom validation
+
+      return `${original}\nIssues:${serializeIssues(this.fields)}`;
+    };
+
     if (message && fields) {
       this.message = message;
       this.fields = fields;
@@ -48,13 +71,9 @@ class ValidationError extends BadRequestError {
     if (message && !fields) {
       this.fields = message;
     }
-  }
 
-  toString() {
-    const original = super.toString();
-    if (!this.fields) return original; // no custom validation
-
-    return `${original}\nIssues:${serializeIssues(this.fields)}`;
+    if (!this.fields) this.fields = [];
+    if (!Array.isArray(this.fields)) this.fields = [this.fields];
   }
 
 }

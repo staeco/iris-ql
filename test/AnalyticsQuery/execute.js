@@ -26,24 +26,4 @@ describe('AnalyticsQuery#execute', () => {
     res.length.should.eql(3)
     res[0].count.should.eql(1)
   })
-  it('should return aggregation errors correctly', async () => {
-    const query = new AnalyticsQuery({
-      aggregations: [
-        {
-          value: { function: 'count' },
-          alias: 'count'
-        },
-        {
-          value: { field: 'name' },
-          alias: 'name'
-        }
-      ],
-      groupings: [
-        { field: 'name' }
-      ]
-    }, { table: user })
-    const res = await query.execute()
-    should.exist(res)
-    console.log(res)
-  })
 })

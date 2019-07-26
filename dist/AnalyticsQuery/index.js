@@ -13,8 +13,11 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-class Query {
-  constructor(obj, table, options = {}) {
+async function _ref() {// TODO
+}
+
+class AnalyticsQuery {
+  constructor(obj, options = {}) {
     this.update = fn => {
       const newValue = fn(this.parsed);
       if (!newValue || typeof newValue !== 'object') throw new Error('Invalid update function! Must return an object.');
@@ -26,25 +29,20 @@ class Query {
 
     this.toJSON = () => this.input;
 
-    this.execute = async () => this.table.findAll(_objectSpread({
+    this.execute = async () => this.options.table.findAll(_objectSpread({
       raw: true
     }, this.parsed));
 
-    this.executeStream = async () => {// TODO
-    };
-
-    if (!obj) throw new Error('Missing query!');
-    if (!table) throw new Error('Missing table!');
+    this.executeStream = _ref;
+    if (!obj) throw new Error('Missing value!');
+    if (!options.table) throw new Error('Missing table!');
     this.input = obj;
-    this.table = table;
     this.options = options;
-    this.parsed = (0, _parse.default)(obj, _objectSpread({
-      table
-    }, options));
+    this.parsed = (0, _parse.default)(obj, options);
     if (!this.parsed.group || this.parsed.group.length === 0) throw new Error('Missing groupings!');
   }
 
 }
 
-exports.default = Query;
+exports.default = AnalyticsQuery;
 module.exports = exports.default;
