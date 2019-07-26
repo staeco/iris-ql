@@ -64,6 +64,14 @@ var _default = (query = {}, opt) => {
       message: 'Must be an array.'
     });
   } else {
+    if (query.aggregations.length === 0) {
+      error.add({
+        path: [...context, 'aggregations'],
+        value: query.aggregations,
+        message: 'Must have at least one aggregation.'
+      });
+    }
+
     attrs = query.aggregations.map(_ref);
   }
 

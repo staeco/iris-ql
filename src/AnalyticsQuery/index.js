@@ -7,7 +7,6 @@ export default class AnalyticsQuery {
     this.input = obj
     this.options = options
     this.parsed = parse(obj, options)
-    if (!this.parsed.group || this.parsed.group.length === 0) throw new Error('Missing groupings!')
   }
   update = (fn) => {
     if (typeof fn !== 'function') throw new Error('Missing update function!')

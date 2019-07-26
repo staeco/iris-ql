@@ -40,7 +40,6 @@ class AnalyticsQuery {
     this.input = obj;
     this.options = options;
     this.parsed = (0, _parse.default)(obj, options);
-    if (!this.parsed.group || this.parsed.group.length === 0) throw new Error('Missing groupings!');
   }
 
 }
