@@ -39,7 +39,6 @@ var _default = (query, opt = {}) => {
     table,
     context = []
   } = opt;
-  if (!table) throw new Error('Missing table!');
   const attrs = table.rawAttributes;
   const initialFieldLimit = opt.fieldLimit || Object.keys(attrs);
 
@@ -260,7 +259,7 @@ var _default = (query, opt = {}) => {
 
   if (query.exclusions) {
     const parsed = (0, _stringArray.default)(query.exclusions).map(_ref2);
-    out.attributes = {
+    if (parsed.length !== 0) out.attributes = {
       exclude: parsed
     };
   } // limit
@@ -279,7 +278,7 @@ var _default = (query, opt = {}) => {
   } // offset
 
 
-  if (query.offset) {
+  if (typeof query.offset !== 'undefined') {
     try {
       out.offset = (0, _number.default)(query.offset);
     } catch (err) {
@@ -293,7 +292,7 @@ var _default = (query, opt = {}) => {
 
 
   if (query.filters) {
-    if (typeof query.filters !== 'object') {
+    if (!(0, _isPureObject.default)(query.filters) && !Array.isArray(query.filters)) {
       error.add({
         path: [...context, 'filters'],
         value: query.filters,

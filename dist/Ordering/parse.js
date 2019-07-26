@@ -22,10 +22,8 @@ var _default = ({
   const error = new _errors.ValidationError();
   let out;
   const {
-    table,
     context = []
   } = opt;
-  if (!table) throw new Error('Missing table!');
   const isDirectionValid = direction === 'asc' || direction === 'desc';
 
   if (!value) {

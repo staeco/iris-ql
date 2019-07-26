@@ -25,6 +25,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 const baseParse = (v, opt) => {
   const {
+    table,
     fieldLimit = Object.keys(opt.table.rawAttributes),
     castJSON = true,
     context = []
@@ -92,8 +93,8 @@ const baseParse = (v, opt) => {
     return _sequelize.default.col(v.field);
   }
 
-  if (typeof v === 'string') {
-    const slit = _sequelize.default.literal(_sequelize.default.escape(v));
+  if (typeof v === 'string' || typeof v === 'number') {
+    const slit = _sequelize.default.literal(table.sequelize.escape(v));
 
     slit.raw = v; // expose raw value so functions can optionally take this as an argument
 
@@ -104,9 +105,10 @@ const baseParse = (v, opt) => {
     throw new _errors.ValidationError({
       path: context,
       value: v,
-      message: 'Must be a function, field, string, or object.'
+      message: 'Must be a function, field, string, number, or object.'
     });
-  }
+  } // TODO: is allowing an object here a security issue?
+
 
   return v;
 };

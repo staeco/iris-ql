@@ -26,7 +26,7 @@ var _default = (a, opt) => {
     table,
     context = []
   } = opt;
-  if (!table) throw new Error('Missing table!');
+  let agg, parsedFilters;
   const error = new _errors.ValidationError();
 
   if (!(0, _isPureObject.default)(a)) {
@@ -35,7 +35,7 @@ var _default = (a, opt) => {
       value: a,
       message: 'Must be an object.'
     });
-    return null;
+    throw error; // dont even bother continuing
   }
 
   if (!a.alias) {
@@ -44,7 +44,6 @@ var _default = (a, opt) => {
       value: a.alias,
       message: 'Missing alias!'
     });
-    return null;
   } else if (typeof a.alias !== 'string') {
     error.add({
       path: [...context, 'alias'],
@@ -59,7 +58,15 @@ var _default = (a, opt) => {
       value: a.value,
       message: 'Missing value!'
     });
-    return null;
+    throw error; // dont even bother continuing
+  }
+
+  try {
+    agg = new _QueryValue.default(a.value, _objectSpread({}, opt, {
+      context: [...context, 'value']
+    })).value();
+  } catch (err) {
+    error.add(err);
   }
 
   if (a.filters && !(0, _isPureObject.default)(a.filters) && !Array.isArray(a.filters)) {
@@ -68,16 +75,6 @@ var _default = (a, opt) => {
       value: a.filters,
       message: 'Must be an object or array.'
     });
-  }
-
-  let agg, parsedFilters;
-
-  try {
-    agg = new _QueryValue.default(a.value, _objectSpread({}, opt, {
-      context: [...context, 'value']
-    })).value();
-  } catch (err) {
-    error.add(err);
   }
 
   try {

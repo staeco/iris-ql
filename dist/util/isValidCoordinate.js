@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.default = exports.lon = exports.lat = void 0;
+exports.lon = exports.lat = void 0;
 
 const lat = lat => {
   if (typeof lat !== 'number') return `Latitude not a number, got ${typeof lat}`;
@@ -20,15 +20,3 @@ const lon = lon => {
 };
 
 exports.lon = lon;
-
-var _default = ([lonVal, latVal]) => {
-  const latv = lat(latVal);
-  if (typeof latv === 'string') return latv;
-  const lonv = lon(lonVal);
-  if (typeof lonv === 'string') return lonv;
-  if (lonVal === 0 && latVal === 0) return 'Longitude and latitude were both 0'; // null island
-
-  return true;
-};
-
-exports.default = _default;

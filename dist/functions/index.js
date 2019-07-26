@@ -9,8 +9,6 @@ var _isPureObject = _interopRequireDefault(require("is-pure-object"));
 
 var _errors = require("../errors");
 
-var _toString = require("../util/toString");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const numeric = v => _sequelize.default.cast(v, 'numeric');
@@ -134,9 +132,7 @@ const interval = (start, end) => _sequelize.default.fn('sub', ms(end), ms(start)
 
 exports.interval = interval;
 
-const ms = v => numeric(_sequelize.default.literal(`extract(epoch from ${(0, _toString.value)({
-  value: v
-})}) * 1000`));
+const ms = v => _sequelize.default.fn('time_to_ms', v);
 
 exports.ms = ms;
 

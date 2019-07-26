@@ -19,6 +19,7 @@ async function _ref() {// TODO
 class Query {
   constructor(obj, options = {}) {
     this.update = fn => {
+      if (typeof fn !== 'function') throw new Error('Missing update function!');
       const newValue = fn(this.parsed);
       if (!newValue || typeof newValue !== 'object') throw new Error('Invalid update function! Must return an object.');
       this.parsed = newValue;

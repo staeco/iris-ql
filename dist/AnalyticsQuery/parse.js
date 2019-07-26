@@ -29,7 +29,6 @@ var _default = (query = {}, opt) => {
     table,
     context = []
   } = opt;
-  if (!table) throw new Error('Missing table!');
   const error = new _errors.ValidationError();
   let attrs;
   const initialFieldLimit = Object.keys(table.rawAttributes); // if user specified a timezone, tack it on so downstream stuff in types/query knows about it

@@ -53,9 +53,9 @@ var _default = (obj, opt) => {
         } else {
           if (fieldLimit && !fieldLimit.includes(fullPath)) {
             error.add({
-              path: [...context, 'filter'],
+              path: [...context, ...fullPath.split('.')],
               value: k,
-              message: `Non-existent field: ${fullPath}`
+              message: `Field does not exist.`
             });
             return p;
           }
