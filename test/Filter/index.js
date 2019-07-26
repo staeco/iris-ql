@@ -34,4 +34,14 @@ describe('Filter', () => {
     should.exist(query.toJSON())
     should.exist(query.input)
   })
+  it('should work with mixed functions and aliases', async () => {
+    const query = new Filter({
+      createdAt: {
+        $lte: { function: 'now' }
+      }
+    } , { table: user })
+    should.exist(query.value())
+    should.exist(query.toJSON())
+    should.exist(query.input)
+  })
 })

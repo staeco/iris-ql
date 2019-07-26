@@ -30,4 +30,58 @@ describe('Query#options#intersects', () => {
     res.rows.length.should.equal(1)
     res.rows[0].location.coordinates.should.eql([ 5, 5 ])
   })
+  it('should validate coordinate max', async () => {
+    const point = {
+      x: 1000,
+      y: 1000
+    }
+    try {
+      new Query({ intersects: point, limit: 1 }, { table: store })
+    } catch (err) {
+      err.fields.should.eql([
+        {
+          message: 'Longitude greater than 180',
+          path: [
+            'intersects',
+            'x'
+          ],
+          value: 1000
+        },
+        {
+          message: 'Latitude greater than 90',
+          path: [
+            'intersects',
+            'y'
+          ],
+          value: 1000
+        } ])
+    }
+  })
+  it('should validate coordinate min', async () => {
+    const point = {
+      x: -1000,
+      y: -1000
+    }
+    try {
+      new Query({ intersects: point, limit: 1 }, { table: store })
+    } catch (err) {
+      err.fields.should.eql([
+        {
+          message: 'Longitude less than -180',
+          path: [
+            'intersects',
+            'x'
+          ],
+          value: -1000
+        },
+        {
+          message: 'Latitude less than -90',
+          path: [
+            'intersects',
+            'y'
+          ],
+          value: -1000
+        } ])
+    }
+  })
 })

@@ -3,7 +3,7 @@ import { Connection } from '../../src'
 import db from '../fixtures/db'
 
 describe('Connection', () => {
-  it('should construct', async () => {
+  it('should construct from existing', async () => {
     should.exist(new Connection(db))
   })
 })

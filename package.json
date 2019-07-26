@@ -35,6 +35,7 @@
       "src/**/*.js"
     ],
     "all": true,
+    "skip-full": true,
     "check-coverage": true
   },
   "peerDependencies": {

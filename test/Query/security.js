@@ -1,6 +1,6 @@
 import should from 'should'
-import { Connection, Query } from '../../../src'
-import db from '../../fixtures/db'
+import { Connection, Query } from '../../src'
+import db from '../fixtures/db'
 
 const filterRes = [
   { settings: { '%; union select authToken': 1 } },
@@ -21,7 +21,7 @@ const searchError = [
   // { authToken: { $eq: 'test' } }
 ]
 
-describe('Query#options inections', () => {
+describe('Query#security', () => {
   const conn = new Connection(db)
   const { user } = conn.tables()
 

@@ -11,12 +11,3 @@ export const lon = (lon) => {
   if (lon > 180) return 'Longitude greater than 180'
   return true
 }
-
-export default ([ lonVal, latVal ]) => {
-  const latv = lat(latVal)
-  if (typeof latv === 'string') return latv
-  const lonv = lon(lonVal)
-  if (typeof lonv === 'string') return lonv
-  if (lonVal === 0 && latVal === 0) return 'Longitude and latitude were both 0' // null island
-  return true
-}
