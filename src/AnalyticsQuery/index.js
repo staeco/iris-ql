@@ -10,6 +10,7 @@ export default class AnalyticsQuery {
     if (!this.parsed.group || this.parsed.group.length === 0) throw new Error('Missing groupings!')
   }
   update = (fn) => {
+    if (typeof fn !== 'function') throw new Error('Missing update function!')
     const newValue = fn(this.parsed)
     if (!newValue || typeof newValue !== 'object') throw new Error('Invalid update function! Must return an object.')
     this.parsed = newValue

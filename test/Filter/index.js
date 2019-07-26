@@ -5,6 +5,11 @@ import db from '../fixtures/db'
 describe('Filter', () => {
   const conn = new Connection(db)
   const { user } = conn.tables()
+  it('should blow up on invalid options', async () => {
+    should.throws(() => new Filter({ name: { $ne: null } }, { table: null }))
+    should.throws(() => new Filter({ name: { $ne: null } }))
+    should.throws(() => new Filter(null, { table: user }))
+  })
   it('should work with basic aliases', async () => {
     const query = new Filter({ name: { $ne: null } }, { table: user })
     should.exist(query.value())

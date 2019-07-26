@@ -9,6 +9,7 @@ export default class Query {
     this.parsed = parse(obj, options)
   }
   update = (fn) => {
+    if (typeof fn !== 'function') throw new Error('Missing update function!')
     const newValue = fn(this.parsed)
     if (!newValue || typeof newValue !== 'object') throw new Error('Invalid update function! Must return an object.')
     this.parsed = newValue
