@@ -46,9 +46,9 @@ export default (query={}, opt) => {
 
   if (!error.isEmpty()) throw error // bail before going further if basics failed
 
-  const fieldLimit = initialFieldLimit.concat(attrs.filter((v) => !!v).map((i) => i[1]))
+  const fieldLimit = initialFieldLimit.concat(attrs.map((i) => i[1]))
   const nopt = { ...opt, fieldLimit }
-  let out
+  let out = {}
   try {
     out = new Query(query, nopt).value()
   } catch (err) {

@@ -64,7 +64,6 @@ export default (a, opt) => {
   } catch (err) {
     error.add(err)
   }
-  if (!agg) return null
   if (!error.isEmpty()) throw error
   return [
     parsedFilters ? aggregateWithFilter({ aggregation: agg, filters: parsedFilters, table }) : agg,

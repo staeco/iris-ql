@@ -55,7 +55,7 @@ const baseParse = (v, opt) => {
       throw new ValidationError({
         path: [ ...context, 'field' ],
         value: v.field,
-        message: 'Field does not exist'
+        message: 'Field does not exist.'
       })
     }
     return types.col(v.field)
