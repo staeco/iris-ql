@@ -8,6 +8,7 @@ describe('Query#options#after', () => {
 
   it('should work for valid after values', async () => {
     should.exist(new Query({ after: '' }, { table: user }))
+    should.exist(new Query({ after: null }, { table: user }))
     should.exist(new Query({ after: new Date().toISOString() }, { table: user }))
   })
   it('should return 400 on bad after', async () => {

@@ -10,6 +10,8 @@ describe('Query#options#exclusions', () => {
     should.exist(new Query({ exclusions: [] }, { table: user }))
     should.exist(new Query({ exclusions: [ 'id' ] }, { table: user }))
     should.exist(new Query({ exclusions: '' }, { table: user }))
+    should.exist(new Query({ exclusions: null }, { table: user }))
+    should.exist(new Query({ exclusions: 'id,name' }, { table: user }))
   })
   it('should return 400 on bad exclusions', async () => {
     should.throws(() => new Query({ exclusions: {} }, { table: user }))

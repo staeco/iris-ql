@@ -8,6 +8,7 @@ describe('Query#options#before', () => {
 
   it('should work for valid before values', async () => {
     should.exist(new Query({ before: '' }, { table: user }))
+    should.exist(new Query({ before: null }, { table: user }))
     should.exist(new Query({ before: new Date().toISOString() }, { table: user }))
   })
   it('should return 400 on bad before', async () => {

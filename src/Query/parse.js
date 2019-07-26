@@ -189,7 +189,7 @@ export default (query, opt={}) => {
       }
       return k
     })
-    out.attributes = { exclude: parsed }
+    if (parsed.length !== 0) out.attributes = { exclude: parsed }
   }
 
   // limit
@@ -206,7 +206,7 @@ export default (query, opt={}) => {
   }
 
   // offset
-  if (query.offset) {
+  if (typeof query.offset !== 'undefined') {
     try {
       out.offset = parseIffyNumber(query.offset)
     } catch (err) {

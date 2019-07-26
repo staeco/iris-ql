@@ -10,6 +10,7 @@ describe('Query#options#limit', () => {
     should.exist(new Query({ limit: 1 }, { table: user }))
     should.exist(new Query({ limit: '1' }, { table: user }))
     should.exist(new Query({ limit: '' }, { table: user }))
+    should.exist(new Query({ limit: null }, { table: user }))
   })
   it('should return 400 on bad limits', async () => {
     should.throws(() => new Query({ limit: {} }, { table: user }))
