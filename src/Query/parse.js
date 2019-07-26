@@ -11,7 +11,7 @@ import Filter from '../Filter'
 import Ordering from '../Ordering'
 
 export default (query, opt={}) => {
-  const errors = []
+  const error = new ValidationError()
   const { table, context=[] } = opt
   if (!table) throw new Error('Missing table!')
   const attrs = table.rawAttributes
@@ -35,14 +35,14 @@ export default (query, opt={}) => {
     const isSearchable = searchable.length !== 0
     const isValid = typeof query.search === 'string'
     if (!isValid) {
-      errors.push({
+      error.add({
         path: [ ...context, 'search' ],
         value: query.search,
         message: 'Must be a string.'
       })
     }
     if (!isSearchable) {
-      errors.push({
+      error.add({
         path: [ ...context, 'search' ],
         value: query.search,
         message: 'Endpoint does not support search.'
@@ -67,7 +67,7 @@ export default (query, opt={}) => {
         ]
       })
     } catch (err) {
-      errors.push({
+      error.add({
         path: [ ...context, 'before' ],
         value: query.before,
         message: 'Not a valid date!'
@@ -84,7 +84,7 @@ export default (query, opt={}) => {
         ]
       })
     } catch (err) {
-      errors.push({
+      error.add({
         path: [ ...context, 'after' ],
         value: query.after,
         message: 'Not a valid date!'
@@ -95,7 +95,7 @@ export default (query, opt={}) => {
   // if they defined a geo bounding box
   if (query.within) {
     if (!isObject(query.within)) {
-      errors.push({
+      error.add({
         path: [ ...context, 'within' ],
         value: query.within,
         message: 'Must be an object.'
@@ -111,28 +111,28 @@ export default (query, opt={}) => {
       const yminIssue = lat(actualYMin)
       const ymaxIssue = lat(actualYMax)
       if (xminIssue !== true) {
-        errors.push({
+        error.add({
           path: [ ...context, 'within', 'xmin' ],
           value: xmin,
           message: xminIssue
         })
       }
       if (yminIssue !== true) {
-        errors.push({
+        error.add({
           path: [ ...context, 'within', 'ymin' ],
           value: ymin,
           message: yminIssue
         })
       }
       if (xmaxIssue !== true) {
-        errors.push({
+        error.add({
           path: [ ...context, 'within', 'xmax' ],
           value: xmax,
           message: xmaxIssue
         })
       }
       if (ymaxIssue !== true) {
-        errors.push({
+        error.add({
           path: [ ...context, 'within', 'ymax' ],
           value: ymax,
           message: ymaxIssue
@@ -146,7 +146,7 @@ export default (query, opt={}) => {
   // if they defined a point
   if (query.intersects) {
     if (!isObject(query.intersects)) {
-      errors.push({
+      error.add({
         path: [ ...context, 'intersects' ],
         value: query.intersects,
         message: 'Must be an object.'
@@ -158,14 +158,14 @@ export default (query, opt={}) => {
       const latIssue = lat(actualY)
       const lonIssue = lon(actualX)
       if (lonIssue !== true) {
-        errors.push({
+        error.add({
           path: [ ...context, 'intersects', 'x' ],
           value: x,
           message: lonIssue
         })
       }
       if (latIssue !== true) {
-        errors.push({
+        error.add({
           path: [ ...context, 'intersects', 'y' ],
           value: y,
           message: latIssue
@@ -180,7 +180,7 @@ export default (query, opt={}) => {
     const parsed = parseIffyStringArray(query.exclusions).map((k, idx) => {
       const [ first ] = k.split('.')
       if (!first || !attrs[first] || !initialFieldLimit.includes(first)) {
-        errors.push({
+        error.add({
           path: [ ...context, 'exclusions', idx ],
           value: k,
           message: 'Invalid exclusion.'
@@ -197,7 +197,7 @@ export default (query, opt={}) => {
     try {
       out.limit = parseIffyNumber(query.limit)
     } catch (err) {
-      errors.push({
+      error.add({
         path: [ ...context, 'limit' ],
         value: query.limit,
         message: 'Invalid limit.'
@@ -210,7 +210,7 @@ export default (query, opt={}) => {
     try {
       out.offset = parseIffyNumber(query.offset)
     } catch (err) {
-      errors.push({
+      error.add({
         path: [ ...context, 'offset' ],
         value: query.offset,
         message: 'Invalid offset.'
@@ -221,37 +221,45 @@ export default (query, opt={}) => {
   // filterings
   if (query.filters) {
     if (typeof query.filters !== 'object') {
-      errors.push({
+      error.add({
         path: [ ...context, 'filters' ],
         value: query.filters,
         message: 'Must be an object or array.'
       })
     } else {
-      out.where.push(new Filter(query.filters, {
-        ...popt,
-        context: [ ...context, 'filters' ]
-      }).value())
+      try {
+        out.where.push(new Filter(query.filters, {
+          ...popt,
+          context: [ ...context, 'filters' ]
+        }).value())
+      } catch (err) {
+        error.add(err)
+      }
     }
   }
 
   // ordering
   if (query.orderings) {
     if (!Array.isArray(query.orderings)) {
-      errors.push({
+      error.add({
         path: [ ...context, 'orderings' ],
         value: query.orderings,
         message: 'Must be an array.'
       })
     } else {
       forEach(query.orderings, (v, idx) => {
-        out.order.push(new Ordering(v, {
-          ...popt,
-          context: [ ...context, 'orderings', idx ]
-        }).value())
+        try {
+          out.order.push(new Ordering(v, {
+            ...popt,
+            context: [ ...context, 'orderings', idx ]
+          }).value())
+        } catch (err) {
+          error.add(err)
+        }
       })
     }
   }
 
-  if (errors.length !== 0) throw new ValidationError(errors)
+  if (!error.isEmpty()) throw error
   return out
 }

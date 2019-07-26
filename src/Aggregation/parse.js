@@ -1,15 +1,16 @@
 import isObject from 'is-pure-object'
 import QueryValue from '../QueryValue'
 import Filter from '../Filter'
-import { ValidationError, merge } from '../errors'
+import { ValidationError } from '../errors'
 import aggregateWithFilter from '../util/aggregateWithFilter'
 
 export default (a, opt) => {
   const { table, context=[] } = opt
   if (!table) throw new Error('Missing table!')
-  const errors = []
+  const error = new ValidationError()
+
   if (!isObject(a)) {
-    errors.push({
+    error.add({
       path: context,
       value: a,
       message: 'Must be an object.'
@@ -17,21 +18,21 @@ export default (a, opt) => {
     return null
   }
   if (!a.alias) {
-    errors.push({
+    error.add({
       path: [ ...context, 'alias' ],
       value: a.alias,
       message: 'Missing alias!'
     })
     return null
   } else if (typeof a.alias !== 'string') {
-    errors.push({
+    error.add({
       path: [ ...context, 'alias' ],
       value: a.alias,
       message: 'Must be a string.'
     })
   }
   if (!a.value) {
-    errors.push({
+    error.add({
       path: [ ...context, 'value' ],
       value: a.value,
       message: 'Missing value!'
@@ -39,7 +40,7 @@ export default (a, opt) => {
     return null
   }
   if (a.filters && !isObject(a.filters) && !Array.isArray(a.filters)) {
-    errors.push({
+    error.add({
       path: [ ...context, 'filters' ],
       value: a.filters,
       message: 'Must be an object or array.'
@@ -53,7 +54,7 @@ export default (a, opt) => {
       context: [ ...context, 'value' ]
     }).value()
   } catch (err) {
-    merge(errors, err)
+    error.add(err)
   }
   try {
     parsedFilters = a.filters && new Filter(a.filters, {
@@ -61,10 +62,10 @@ export default (a, opt) => {
       context: [ ...context, 'filters' ]
     }).value()
   } catch (err) {
-    merge(errors, err)
+    error.add(err)
   }
   if (!agg) return null
-  if (errors.length !== 0) throw new ValidationError(errors)
+  if (!error.isEmpty()) throw error
   return [
     parsedFilters ? aggregateWithFilter({ aggregation: agg, filters: parsedFilters, table }) : agg,
     a.alias

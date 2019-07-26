@@ -10,8 +10,12 @@ const reserved = new Set(Object.keys(pgAliases))
 const isQueryValue = (v) => v && (v.function || v.field || v.as)
 
 export default (obj, opt) => {
-  const { table, context=[], fieldLimit } = opt
-  const errors = []
+  const {
+    table,
+    context = [],
+    fieldLimit = Object.keys(table.rawAttributes)
+  } = opt
+  const error = new ValidationError()
   // recursively walk a filter object and replace query values with the real thing
   const transformValues = (v, parent='') => {
     if (isQueryValue(v)) return new QueryValue(v, { ...opt, castJSON: false }).value() // keep it raw, we cast it all later
@@ -26,8 +30,7 @@ export default (obj, opt) => {
             getJSONField(fullPath, opt) // performs the check, don't need the value
           } else {
             if (fieldLimit && !fieldLimit.includes(fullPath)) {
-              console.log(fieldLimit, fullPath)
-              errors.push({
+              error.add({
                 path: [ ...context, 'filter' ],
                 value: k,
                 message: `Non-existent field: ${fullPath}`
@@ -46,6 +49,6 @@ export default (obj, opt) => {
   const transformed = transformValues(obj)
 
   // turn where object into string with fields casted
-  if (errors.length !== 0) throw new ValidationError(errors)
+  if (!error.isEmpty()) throw error
   return castFields(transformed, opt, table)
 }

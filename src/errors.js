@@ -8,14 +8,6 @@ const inspectOptions = {
 const serializeIssues = (fields) =>
   fields.map((f) => `\n - ${inspect(f, inspectOptions)}`)
 
-export const merge = (errors, err) => {
-  if (err.fields) {
-    errors.push(...err.fields) // bubble up nested errors
-    return
-  }
-  throw err
-}
-
 export const codes = {
   badRequest: 400,
   unauthorized: 401,
@@ -30,9 +22,8 @@ export class BadRequestError extends Error {
     this.message = message
     this.status = status
   }
-  toString() {
-    return `${super.toString()} (HTTP ${this.status})`
-  }
+  toString = () =>
+    `${super.toString()} (HTTP ${this.status})`
 }
 
 export class ValidationError extends BadRequestError {
@@ -45,10 +36,23 @@ export class ValidationError extends BadRequestError {
     if (message && !fields) {
       this.fields = message
     }
+    if (!this.fields) this.fields = []
+    if (!Array.isArray(this.fields)) this.fields = [ this.fields ]
   }
-  toString() {
+  add = (err) => {
+    if (err.fields) {
+      this.fields.push(...err.fields)
+      return this
+    }
+    if (err instanceof Error) throw err
+    this.fields.push(err)
+    return this
+  }
+  isEmpty = () =>
+    this.fields.length === 0
+  toString = () => {
     const original = super.toString()
-    if (!this.fields) return original // no custom validation
+    if (this.isEmpty()) return original // no custom validation
     return `${original}\nIssues:${serializeIssues(this.fields)}`
   }
 }

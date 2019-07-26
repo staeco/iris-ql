@@ -1,20 +1,20 @@
 import Query from '../Query'
 import QueryValue from '../QueryValue'
 import Aggregation from '../Aggregation'
-import { ValidationError, merge } from '../errors'
+import { ValidationError } from '../errors'
 
 // this is an extension of parseQuery that allows for aggregations and groupings
 export default (query={}, opt) => {
   const { table, context=[] } = opt
   if (!table) throw new Error('Missing table!')
-  const errors = []
+  const error = new ValidationError()
   let attrs
   const initialFieldLimit = Object.keys(table.rawAttributes)
 
   // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
   if (query.timezone) {
     if (typeof query.timezone !== 'string') {
-      errors.push({
+      error.add({
         path: [ ...context, 'timezone' ],
         value: query.timezone,
         message: 'Must be a string.'
@@ -25,7 +25,7 @@ export default (query={}, opt) => {
     }
   }
   if (!Array.isArray(query.aggregations)) {
-    errors.push({
+    error.add({
       path: [ ...context, 'aggregations' ],
       value: query.aggregations,
       message: 'Must be an array.'
@@ -38,24 +38,25 @@ export default (query={}, opt) => {
           context: [ ...context, 'aggregations', idx ]
         }).value()
       } catch (err) {
-        merge(errors, err)
+        error.add(err)
         return null
       }
     })
   }
-  if (errors.length !== 0) throw new ValidationError(errors) // bail before going further if basics failed
 
-  const fieldLimit = initialFieldLimit.concat(attrs.map((i) => i[1]))
+  if (!error.isEmpty()) throw error // bail before going further if basics failed
+
+  const fieldLimit = initialFieldLimit.concat(attrs.filter((v) => !!v).map((i) => i[1]))
   const nopt = { ...opt, fieldLimit }
   let out
   try {
     out = new Query(query, nopt).value()
   } catch (err) {
-    merge(errors, err)
+    error.add(err)
   }
   if (query.groupings) {
     if (!Array.isArray(query.groupings)) {
-      errors.push({
+      error.add({
         path: [ ...context, 'groupings' ],
         value: query.groupings,
         message: 'Must be an array.'
@@ -68,7 +69,7 @@ export default (query={}, opt) => {
             context: [ ...context, 'groupings', idx ]
           }).value()
         } catch (err) {
-          merge(errors, err)
+          error.add(err)
           return null
         }
       })
@@ -76,6 +77,6 @@ export default (query={}, opt) => {
   }
   out.attributes = attrs
 
-  if (errors.length !== 0) throw new ValidationError(errors)
+  if (!error.isEmpty()) throw error
   return out
 }
