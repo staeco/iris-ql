@@ -173,13 +173,35 @@ db.define('user', {
         msg: 'Must not be empty'
       }
     }
+  },
+  settings: {
+    type: types.JSON,
+    allowNull: true,
+    searchable: false,
+    label: 'Settings',
+    api: {
+      creatable: true,
+      readable: true,
+      updatable: true
+    }
+  },
+  settingsb: {
+    type: types.JSONB,
+    allowNull: true,
+    searchable: false,
+    label: 'Settings B',
+    api: {
+      creatable: true,
+      readable: true,
+      updatable: true
+    }
   }
 }, {
   timestamps: true,
   freezeTableName: true,
   scopes: {
     public: {
-      attributes: [ 'id', 'createdAt', 'name' ]
+      attributes: [ 'id', 'createdAt', 'name', 'settings' ]
     }
   }
 })
