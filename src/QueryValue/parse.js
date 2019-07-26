@@ -16,7 +16,7 @@ const baseParse = (v, opt) => {
       throw new ValidationError({
         path: [ ...context, 'function' ],
         value: v.function,
-        message: 'Invalid value'
+        message: 'Must be a string.'
       })
     }
     const func = funcs[v.function]
@@ -32,7 +32,7 @@ const baseParse = (v, opt) => {
       throw new ValidationError({
         path: [ ...context, 'arguments' ],
         value: v.function,
-        message: 'Invalid value'
+        message: 'Must be an array.'
       })
     }
     return func(...args.map((i, idx) =>
@@ -47,7 +47,7 @@ const baseParse = (v, opt) => {
       throw new ValidationError({
         path: [ ...context, 'field' ],
         value: v.field,
-        message: 'Invalid value'
+        message: 'Must be a string.'
       })
     }
     if (v.field.includes('.')) return getJSONField(v.field, { ...opt, cast: castJSON })
@@ -69,7 +69,7 @@ const baseParse = (v, opt) => {
     throw new ValidationError({
       path: context,
       value: v,
-      message: 'Invalid value'
+      message: 'Must be a function, field, string, or object.'
     })
   }
   return v
@@ -83,7 +83,7 @@ const parse = (v, opt) => {
     throw new ValidationError({
       path: [ ...context, 'as' ],
       value: v.as,
-      message: 'Invalid value!'
+      message: 'Must be a string.'
     })
   }
   return types.cast(ret, v.as)
