@@ -8,6 +8,14 @@ const inspectOptions = {
 const serializeIssues = (fields) =>
   fields.map((f) => `\n - ${inspect(f, inspectOptions)}`)
 
+export const merge = (errors, err) => {
+  if (err.fields) {
+    errors.push(...err.fields) // bubble up nested errors
+    return
+  }
+  throw err
+}
+
 export const codes = {
   badRequest: 400,
   unauthorized: 401,

@@ -1,9 +1,7 @@
-import isObject from 'is-pure-object'
 import Query from '../Query'
 import QueryValue from '../QueryValue'
-import Filter from '../Filter'
-import { ValidationError } from '../errors'
-import aggregateWithFilter from '../util/aggregateWithFilter'
+import Aggregation from '../Aggregation'
+import { ValidationError, merge } from '../errors'
 
 // this is an extension of parseQuery that allows for aggregations and groupings
 export default (query={}, opt) => {
@@ -34,76 +32,27 @@ export default (query={}, opt) => {
     })
   } else {
     attrs = query.aggregations.map((a, idx) => {
-      if (!isObject(a)) {
-        errors.push({
-          path: [ ...context, 'aggregations', idx ],
-          value: a,
-          message: 'Must be an object.'
-        })
-        return null
-      }
-      if (!a.alias) {
-        errors.push({
-          path: [ ...context, 'aggregations', idx, 'alias' ],
-          value: a.alias,
-          message: 'Missing alias!'
-        })
-        return null
-      } else if (typeof a.alias !== 'string') {
-        errors.push({
-          path: [ ...context, 'aggregations', idx, 'alias' ],
-          value: a.alias,
-          message: 'Must be a string.'
-        })
-      }
-      if (!a.value) {
-        errors.push({
-          path: [ ...context, 'aggregations', idx, 'value' ],
-          value: a.value,
-          message: 'Missing value!'
-        })
-        return null
-      }
-      if (a.filters && !isObject(a.filters) && !Array.isArray(a.filters)) {
-        errors.push({
-          path: [ ...context, 'aggregations', idx, 'filters' ],
-          value: a.filters,
-          message: 'Must be an object or array.'
-        })
-      }
-
-      let agg, parsedFilters
       try {
-        agg = new QueryValue(a.value, opt).value()
+        return new Aggregation(a, {
+          ...opt,
+          context: [ ...context, 'aggregations', idx ]
+        }).value()
       } catch (err) {
-        errors.push({
-          path: [ ...context, 'aggregations', idx, 'value' ],
-          value: a.value,
-          message: err.message
-        })
+        merge(errors, err)
+        return null
       }
-      try {
-        parsedFilters = a.filters && new Filter(a.filters, opt).value()
-      } catch (err) {
-        errors.push({
-          path: [ ...context, 'aggregations', idx, 'filters' ],
-          value: a.filters,
-          message: err.message
-        })
-      }
-      if (!agg) return null
-      return [
-        parsedFilters ? aggregateWithFilter({ aggregation: agg, filters: parsedFilters, table }) : agg,
-        a.alias
-      ]
     })
   }
   if (errors.length !== 0) throw new ValidationError(errors) // bail before going further if basics failed
 
   const fieldLimit = initialFieldLimit.concat(attrs.map((i) => i[1]))
   const nopt = { ...opt, fieldLimit }
-  const out = new Query(query, nopt).value()
-
+  let out
+  try {
+    out = new Query(query, nopt).value()
+  } catch (err) {
+    merge(errors, err)
+  }
   if (query.groupings) {
     if (!Array.isArray(query.groupings)) {
       errors.push({
@@ -114,13 +63,12 @@ export default (query={}, opt) => {
     } else {
       out.group = query.groupings.map((i, idx) => {
         try {
-          return new QueryValue(i, nopt).value()
+          return new QueryValue(i, {
+            ...nopt,
+            context: [ ...context, 'groupings', idx ]
+          }).value()
         } catch (err) {
-          errors.push({
-            path: [ ...context, 'groupings', idx ],
-            value: i,
-            message: err.message
-          })
+          merge(errors, err)
           return null
         }
       })
