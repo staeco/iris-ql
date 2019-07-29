@@ -1,4 +1,3 @@
-import { forEach } from 'lodash'
 import isObject from 'is-pure-object'
 import { fn } from 'sequelize'
 import { lat, lon } from '../util/isValidCoordinate'
@@ -244,7 +243,7 @@ export default (query, opt={}) => {
         message: 'Must be an array.'
       })
     } else {
-      forEach(query.orderings, (v, idx) => {
+      query.orderings.forEach((v, idx) => {
         try {
           out.order.push(new Ordering(v, {
             ...opt,

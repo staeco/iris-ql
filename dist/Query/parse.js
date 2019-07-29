@@ -3,8 +3,6 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-var _lodash = require("lodash");
-
 var _isPureObject = _interopRequireDefault(require("is-pure-object"));
 
 var _sequelize = require("sequelize");
@@ -327,7 +325,7 @@ var _default = (query, opt = {}) => {
         message: 'Must be an array.'
       });
     } else {
-      (0, _lodash.forEach)(query.orderings, _ref3);
+      query.orderings.forEach(_ref3);
     }
   }
 
