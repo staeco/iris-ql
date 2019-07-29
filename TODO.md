@@ -1,7 +1,3 @@
-## Features
-
-- Streaming modes
-
 ## General
 
 - Test every code path
@@ -10,6 +6,9 @@
 ## Future
 
 - Standalone function tests
+- Support counting in executeStream
+- Test every code path
+- More SQL injection tests
 - Remove `toString` wherever possible
 - Function type safety
 - Flesh out casting more, prevent invalid castings and add type safety

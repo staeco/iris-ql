@@ -1,4 +1,6 @@
 import parse from './parse'
+import exportStream from '../util/export'
+
 
 export default class AnalyticsQuery {
   constructor(obj, options={}) {
@@ -23,7 +25,12 @@ export default class AnalyticsQuery {
       ...this.value()
     })
 
-  executeStream = async () => {
-    // TODO
-  }
+  executeStream = async ({ format, transform }={}) =>
+    exportStream({
+      analytics: true,
+      format,
+      transform,
+      table: this.options.table,
+      value: this.value()
+    })
 }

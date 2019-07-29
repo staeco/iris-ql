@@ -11,3 +11,6 @@ export const jsonPath = ({ column, table, path }) => {
     .replace(/\)$/, '')
   return `"${table.name}".${ncol}`
 }
+
+export const select = ({ value, table }) =>
+  table.sequelize.dialect.QueryGenerator.selectQuery(table.name, value, table)

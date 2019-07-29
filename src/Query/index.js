@@ -1,4 +1,5 @@
 import parse from './parse'
+import exportStream from '../util/export'
 
 export default class Query {
   constructor(obj, options={}) {
@@ -24,7 +25,11 @@ export default class Query {
       ...this.value()
     })
   }
-  executeStream = async () => {
-    // TODO
-  }
+  executeStream = async ({ format, transform }={}) =>
+    exportStream({
+      format,
+      transform,
+      table: this.options.table,
+      value: this.value()
+    })
 }

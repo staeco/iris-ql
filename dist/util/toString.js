@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.jsonPath = exports.value = exports.where = void 0;
+exports.select = exports.jsonPath = exports.value = exports.where = void 0;
 
 const where = ({
   value,
@@ -28,3 +28,10 @@ const jsonPath = ({
 };
 
 exports.jsonPath = jsonPath;
+
+const select = ({
+  value,
+  table
+}) => table.sequelize.dialect.QueryGenerator.selectQuery(table.name, value, table);
+
+exports.select = select;
