@@ -5,8 +5,6 @@ exports.multipolygon = exports.polygon = exports.multiline = exports.line = expo
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
-var _toString = require("../util/toString");
-
 var _errors = require("../errors");
 
 var _moment = _interopRequireDefault(require("moment"));
@@ -70,13 +68,9 @@ const date = {
   cast: (txt, {
     timezone
   }) => {
-    const base = _sequelize.default.fn('to_timestamp', txt, 'YYYY-MM-DD"T"HH24:MI:SS"Z"');
-
-    if (!timezone) return base;
+    if (!timezone) return _sequelize.default.fn('parse_iso', txt);
     if (!zones.has(timezone)) throw new _errors.BadRequestError('Not a valid timezone');
-    return _sequelize.default.literal(`${(0, _toString.value)({
-      value: base
-    })} AT TIME ZONE '${timezone}'`);
+    return _sequelize.default.fn('parse_iso', txt, timezone);
   } // geo (EPSG:4979 / WGS84)
 
 };

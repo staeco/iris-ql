@@ -6,8 +6,8 @@ export default class QueryValue {
     if (!options.table) throw new Error('Missing table!')
     this.input = obj
     this.options = options
-    this.parsed = parse(obj, options)
+    this._parsed = parse(obj, options)
   }
-  value = () => this.parsed
+  value = () => this._parsed
   toJSON = () => this.input
 }

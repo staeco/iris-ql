@@ -20,26 +20,26 @@ class AnalyticsQuery {
   constructor(obj, options = {}) {
     this.update = fn => {
       if (typeof fn !== 'function') throw new Error('Missing update function!');
-      const newValue = fn(this.parsed);
+      const newValue = fn(this._parsed);
       if (!newValue || typeof newValue !== 'object') throw new Error('Invalid update function! Must return an object.');
-      this.parsed = newValue;
+      this._parsed = newValue;
       return this;
     };
 
-    this.value = () => this.parsed;
+    this.value = () => this._parsed;
 
     this.toJSON = () => this.input;
 
     this.execute = async () => this.options.table.findAll(_objectSpread({
       raw: true
-    }, this.parsed));
+    }, this.value()));
 
     this.executeStream = _ref;
     if (!obj) throw new Error('Missing value!');
     if (!options.table) throw new Error('Missing table!');
     this.input = obj;
     this.options = options;
-    this.parsed = (0, _parse.default)(obj, options);
+    this._parsed = (0, _parse.default)(obj, options);
   }
 
 }

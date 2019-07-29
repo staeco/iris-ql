@@ -11,7 +11,7 @@ var _getJSONField = _interopRequireDefault(require("./getJSONField"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _default = (v, opt, table) => {
+var _default = (v, opt) => {
   if (Array.isArray(v)) v = {
     $and: v // convert it
 
@@ -20,14 +20,14 @@ var _default = (v, opt, table) => {
 
   const str = (0, _toString.where)({
     value: v,
-    table
+    table: opt.table
   });
-  const regex = new RegExp(`"${table.resource}"\\."(\\w*)"#>>'{(\\w*)}'`, 'g');
+  const regex = new RegExp(`"${opt.table.name}"\\."(\\w*)"#>>'{(\\w*)}'`, 'g');
   const redone = str.replace(regex, (match, col, field) => {
     const lit = (0, _getJSONField.default)(`${col}.${field}`, opt);
     return (0, _toString.value)({
       value: lit,
-      table
+      table: opt.table
     });
   });
   return _sequelize.default.literal(redone);

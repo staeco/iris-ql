@@ -76,7 +76,7 @@ var _default = (obj, opt) => {
   const transformed = transformValues(obj); // turn where object into string with fields casted
 
   if (!error.isEmpty()) throw error;
-  return (0, _castFields.default)(transformed, opt, table);
+  return (0, _castFields.default)(transformed, opt);
 };
 
 exports.default = _default;

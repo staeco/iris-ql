@@ -9,7 +9,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 class QueryValue {
   constructor(obj, options = {}) {
-    this.value = () => this.parsed;
+    this.value = () => this._parsed;
 
     this.toJSON = () => this.input;
 
@@ -17,7 +17,7 @@ class QueryValue {
     if (!options.table) throw new Error('Missing table!');
     this.input = obj;
     this.options = options;
-    this.parsed = (0, _parse.default)(obj, options);
+    this._parsed = (0, _parse.default)(obj, options);
   }
 
 }

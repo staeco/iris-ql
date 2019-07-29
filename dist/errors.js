@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.ValidationError = exports.BadRequestError = exports.codes = void 0;
+exports.ValidationError = exports.BadRequestError = void 0;
 
 var _util = require("util");
 
@@ -16,17 +16,8 @@ function _ref(f) {
 
 const serializeIssues = fields => fields.map(_ref);
 
-const codes = {
-  badRequest: 400,
-  unauthorized: 401,
-  forbidden: 403,
-  notFound: 404,
-  serverError: 500
-};
-exports.codes = codes;
-
 class BadRequestError extends Error {
-  constructor(message = 'Bad Request', status = codes.badRequest) {
+  constructor(message = 'Bad Request', status = 400) {
     super(message);
 
     this.toString = () => `${super.toString()} (HTTP ${this.status})`;
@@ -40,7 +31,7 @@ class BadRequestError extends Error {
 exports.BadRequestError = BadRequestError;
 
 class ValidationError extends BadRequestError {
-  constructor(message, fields) {
+  constructor(fields = []) {
     super();
 
     this.add = err => {
@@ -63,16 +54,7 @@ class ValidationError extends BadRequestError {
       return `${original}\nIssues:${serializeIssues(this.fields)}`;
     };
 
-    if (message && fields) {
-      this.message = message;
-      this.fields = fields;
-    }
-
-    if (message && !fields) {
-      this.fields = message;
-    }
-
-    if (!this.fields) this.fields = [];
+    this.fields = fields;
     if (!Array.isArray(this.fields)) this.fields = [this.fields];
   }
 

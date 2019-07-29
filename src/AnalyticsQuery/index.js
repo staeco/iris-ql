@@ -6,21 +6,21 @@ export default class AnalyticsQuery {
     if (!options.table) throw new Error('Missing table!')
     this.input = obj
     this.options = options
-    this.parsed = parse(obj, options)
+    this._parsed = parse(obj, options)
   }
   update = (fn) => {
     if (typeof fn !== 'function') throw new Error('Missing update function!')
-    const newValue = fn(this.parsed)
+    const newValue = fn(this._parsed)
     if (!newValue || typeof newValue !== 'object') throw new Error('Invalid update function! Must return an object.')
-    this.parsed = newValue
+    this._parsed = newValue
     return this
   }
-  value = () => this.parsed
+  value = () => this._parsed
   toJSON = () => this.input
   execute = async () =>
     this.options.table.findAll({
       raw: true,
-      ...this.parsed
+      ...this.value()
     })
   executeStream = async () => {
     // TODO
