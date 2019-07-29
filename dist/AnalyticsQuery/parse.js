@@ -11,6 +11,8 @@ var _Aggregation = _interopRequireDefault(require("../Aggregation"));
 
 var _errors = require("../errors");
 
+var _getScopedAttributes = _interopRequireDefault(require("../util/getScopedAttributes"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -20,6 +22,10 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _ref2(i) {
+  return !!i;
+}
+
+function _ref3(i) {
   return i[1];
 }
 
@@ -30,8 +36,8 @@ var _default = (query = {}, opt) => {
     context = []
   } = opt;
   const error = new _errors.ValidationError();
-  let attrs;
-  const initialFieldLimit = Object.keys(table.rawAttributes); // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
+  let attrs = [];
+  const initialFieldLimit = opt.fieldLimit || Object.keys((0, _getScopedAttributes.default)(table)); // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
 
   if (query.timezone) {
     if (typeof query.timezone !== 'string') {
@@ -49,6 +55,7 @@ var _default = (query = {}, opt) => {
   function _ref(a, idx) {
     try {
       return new _Aggregation.default(a, _objectSpread({}, opt, {
+        fieldLimit: initialFieldLimit,
         context: [...context, 'aggregations', idx]
       })).value();
     } catch (err) {
@@ -75,9 +82,7 @@ var _default = (query = {}, opt) => {
     attrs = query.aggregations.map(_ref);
   }
 
-  if (!error.isEmpty()) throw error; // bail before going further if basics failed
-
-  const fieldLimit = initialFieldLimit.concat(attrs.map(_ref2));
+  const fieldLimit = initialFieldLimit.concat(attrs.filter(_ref2).map(_ref3));
 
   const nopt = _objectSpread({}, opt, {
     fieldLimit
@@ -91,7 +96,7 @@ var _default = (query = {}, opt) => {
     error.add(err);
   }
 
-  function _ref3(i, idx) {
+  function _ref4(i, idx) {
     try {
       return new _QueryValue.default(i, _objectSpread({}, nopt, {
         context: [...context, 'groupings', idx]
@@ -110,12 +115,12 @@ var _default = (query = {}, opt) => {
         message: 'Must be an array.'
       });
     } else {
-      out.group = query.groupings.map(_ref3);
+      out.group = query.groupings.map(_ref4);
     }
   }
 
-  out.attributes = attrs;
   if (!error.isEmpty()) throw error;
+  out.attributes = attrs;
   return out;
 };
 

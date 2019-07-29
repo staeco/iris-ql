@@ -21,6 +21,8 @@ var _number = _interopRequireDefault(require("../util/iffy/number"));
 
 var _stringArray = _interopRequireDefault(require("../util/iffy/stringArray"));
 
+var _getScopedAttributes = _interopRequireDefault(require("../util/getScopedAttributes"));
+
 var _Filter = _interopRequireDefault(require("../Filter"));
 
 var _Ordering = _interopRequireDefault(require("../Ordering"));
@@ -39,13 +41,8 @@ var _default = (query, opt = {}) => {
     table,
     context = []
   } = opt;
-  const attrs = table.rawAttributes;
-  const initialFieldLimit = opt.fieldLimit || Object.keys(attrs);
-
-  const popt = _objectSpread({}, opt, {
-    fieldLimit: initialFieldLimit // options we pass on, default in fieldLimit
-
-  });
+  const attrs = (0, _getScopedAttributes.default)(table);
+  const initialFieldLimit = opt.fieldLimit || Object.keys(attrs); // options we pass on, default in fieldLimit
 
   const out = {
     where: [{} // very dumb fix for https://github.com/sequelize/sequelize/issues/10142
@@ -300,7 +297,8 @@ var _default = (query, opt = {}) => {
       });
     } else {
       try {
-        out.where.push(new _Filter.default(query.filters, _objectSpread({}, popt, {
+        out.where.push(new _Filter.default(query.filters, _objectSpread({}, opt, {
+          fieldLimit: initialFieldLimit,
           context: [...context, 'filters']
         })).value());
       } catch (err) {
@@ -312,7 +310,8 @@ var _default = (query, opt = {}) => {
 
   function _ref3(v, idx) {
     try {
-      out.order.push(new _Ordering.default(v, _objectSpread({}, popt, {
+      out.order.push(new _Ordering.default(v, _objectSpread({}, opt, {
+        fieldLimit: initialFieldLimit,
         context: [...context, 'orderings', idx]
       })).value());
     } catch (err) {

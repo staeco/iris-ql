@@ -7,18 +7,15 @@ import { ValidationError } from '../errors'
 import parseIffyDate from '../util/iffy/date'
 import parseIffyNumber from '../util/iffy/number'
 import parseIffyStringArray from '../util/iffy/stringArray'
+import getScopedAttributes from '../util/getScopedAttributes'
 import Filter from '../Filter'
 import Ordering from '../Ordering'
 
 export default (query, opt={}) => {
   const error = new ValidationError()
   const { table, context=[] } = opt
-  const attrs = table.rawAttributes
+  const attrs = getScopedAttributes(table)
   const initialFieldLimit = opt.fieldLimit || Object.keys(attrs)
-  const popt = {
-    ...opt,
-    fieldLimit: initialFieldLimit
-  }
 
   // options we pass on, default in fieldLimit
   const out = {
@@ -228,7 +225,8 @@ export default (query, opt={}) => {
     } else {
       try {
         out.where.push(new Filter(query.filters, {
-          ...popt,
+          ...opt,
+          fieldLimit: initialFieldLimit,
           context: [ ...context, 'filters' ]
         }).value())
       } catch (err) {
@@ -249,7 +247,8 @@ export default (query, opt={}) => {
       forEach(query.orderings, (v, idx) => {
         try {
           out.order.push(new Ordering(v, {
-            ...popt,
+            ...opt,
+            fieldLimit: initialFieldLimit,
             context: [ ...context, 'orderings', idx ]
           }).value())
         } catch (err) {

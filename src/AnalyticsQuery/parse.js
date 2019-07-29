@@ -2,13 +2,14 @@ import Query from '../Query'
 import QueryValue from '../QueryValue'
 import Aggregation from '../Aggregation'
 import { ValidationError } from '../errors'
+import getScopedAttributes from '../util/getScopedAttributes'
 
 // this is an extension of parseQuery that allows for aggregations and groupings
 export default (query={}, opt) => {
   const { table, context=[] } = opt
   const error = new ValidationError()
-  let attrs
-  const initialFieldLimit = Object.keys(table.rawAttributes)
+  let attrs = []
+  const initialFieldLimit = opt.fieldLimit || Object.keys(getScopedAttributes(table))
 
   // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
   if (query.timezone) {
@@ -41,6 +42,7 @@ export default (query={}, opt) => {
       try {
         return new Aggregation(a, {
           ...opt,
+          fieldLimit: initialFieldLimit,
           context: [ ...context, 'aggregations', idx ]
         }).value()
       } catch (err) {
@@ -50,9 +52,7 @@ export default (query={}, opt) => {
     })
   }
 
-  if (!error.isEmpty()) throw error // bail before going further if basics failed
-
-  const fieldLimit = initialFieldLimit.concat(attrs.map((i) => i[1]))
+  const fieldLimit = initialFieldLimit.concat(attrs.filter((i) => !!i).map((i) => i[1]))
   const nopt = { ...opt, fieldLimit }
   let out = {}
   try {
@@ -81,8 +81,8 @@ export default (query={}, opt) => {
       })
     }
   }
-  out.attributes = attrs
-
   if (!error.isEmpty()) throw error
+
+  out.attributes = attrs
   return out
 }
