@@ -29,7 +29,6 @@ describe('AnalyticsQuery', () => {
         ]
       }, { table: user.scope('public') })
     } catch (err) {
-      console.log(err)
       err.fields.should.eql([
         {
           path: [ 'aggregations', 1, 'value', 'field' ],

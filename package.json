@@ -1,6 +1,6 @@
 {
   "name": "iris-ql",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "User friendly API query language",
   "main": "dist/index.js",
   "keywords": [],
@@ -43,7 +43,6 @@
     "sequelize": ">=5"
   },
   "resolutions": {
-    "end-of-stream": "github:isaacs/end-of-stream#custom-stream-premature-close-fix",
     "pg-cursor": "github:contra/node-pg-cursor#patch-1"
   },
   "devDependencies": {

@@ -5,6 +5,7 @@
 
 # iris-ql [![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][npm-url] [![Build Status][travis-image]][travis-url]
 
+Iris is a safe and user-friendly query system for building flexible APIs with intuitive UIs to match.
 
 ## Install
 
@@ -12,11 +13,76 @@
 npm install iris-ql --save
 ```
 
-## Example
+## Basic Example
 
 ```js
-TODO - WIP
+import { Query } from 'iris-ql'
+
+// Find all crimes by criminal 1 or 2 after 2017
+const query = new Query({
+  limit: 100,
+  filters: {
+    createdAt: { $gt: '2017-05-13T00:00:00.000Z' },
+    $or: [
+      { name: 'Criminal 1' },
+      { name: 'Criminal 2' }
+    ]
+  },
+  orderings: [
+    { value: { field: 'createdAt' }, direction: 'desc' }
+  ]
+}, { table: crime })
+
+const results = await query.execute()
 ```
+
+## Analytics Example
+
+```js
+import { AnalyticsQuery } from 'iris-ql'
+
+// get a time series of all 911 calls
+const crimeTimeSeries = new AnalyticsQuery({
+  filters: {
+    data: {
+      receivedAt: { $ne: null }
+    }
+  },
+  aggregations: [
+    { value: { function: 'count' }, alias: 'total' },
+    {
+      alias: 'day',
+      value: {
+        function: 'truncate',
+        arguments: [
+          'day',
+          { field: 'data.receivedAt' }
+        ]
+      }
+    }
+  ],
+  orderings: [
+    { value: { field: 'day' }, direction: 'desc' }
+  ],
+  groupings: [
+    { field: 'day' }
+  ]
+}, { table: emergencyCall })
+
+const results = await crimeTimeSeries.execute()
+
+/*
+[
+  { total: 20, day: '2017-05-13T00:00:00.000Z' },
+  { total: 3, day: '2017-05-14T00:00:00.000Z' },
+  { total: 2, day: '2017-05-15T00:00:00.000Z' }
+]
+*/
+```
+
+## API
+
+TODO
 
 ## DB Support
 
