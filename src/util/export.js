@@ -41,10 +41,17 @@ export default async ({ table, value, format, transform, analytics=false }) => {
 
   // prep work findAll usually does
   if (!analytics) {
-    table._injectScope(nv)
-    table._conformIncludes(nv, table)
-    table._expandAttributes(nv)
-    table._expandIncludeAll(nv)
+    // sequelize < 5.10
+    if (table._conformOptions) {
+      table._injectScope(nv)
+      table._conformOptions(nv, table)
+      table._expandIncludeAll(nv)
+    } else {
+      table._injectScope(nv)
+      table._conformIncludes(nv, table)
+      table._expandAttributes(nv)
+      table._expandIncludeAll(nv)
+    }
   }
 
   const sql = select({ value: nv, table })

@@ -69,13 +69,22 @@ var _default = async ({
 
 
   if (!analytics) {
-    table._injectScope(nv);
+    // sequelize < 5.10
+    if (table._conformOptions) {
+      table._injectScope(nv);
 
-    table._conformIncludes(nv, table);
+      table._conformOptions(nv, table);
 
-    table._expandAttributes(nv);
+      table._expandIncludeAll(nv);
+    } else {
+      table._injectScope(nv);
 
-    table._expandIncludeAll(nv);
+      table._conformIncludes(nv, table);
+
+      table._expandAttributes(nv);
+
+      table._expandIncludeAll(nv);
+    }
   }
 
   const sql = (0, _toString.select)({
