@@ -17,10 +17,10 @@ export default class Query {
   }
   value = () => this._parsed
   toJSON = () => this.input
-  execute = async ({ count=true }={}) => {
+  execute = async ({ count=true, raw=false }={}) => {
     const fn = count ? 'findAndCountAll' : 'findAll'
     return this.options.table[fn]({
-      raw: true,
+      raw,
       ...this.value()
     })
   }

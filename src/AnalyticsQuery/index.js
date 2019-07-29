@@ -22,6 +22,7 @@ export default class AnalyticsQuery {
       raw: true,
       ...this.value()
     })
+
   executeStream = async () => {
     // TODO
   }

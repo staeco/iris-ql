@@ -31,11 +31,12 @@ class Query {
     this.toJSON = () => this.input;
 
     this.execute = async ({
-      count = true
+      count = true,
+      raw = false
     } = {}) => {
       const fn = count ? 'findAndCountAll' : 'findAll';
       return this.options.table[fn](_objectSpread({
-        raw: true
+        raw
       }, this.value()));
     };
 

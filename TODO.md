@@ -1,13 +1,15 @@
 ## Features
 
+- Streaming modes
+
 ## General
 
 - Test every code path
 - SQL injection tests
-- Standalone function tests
 
 ## Future
 
+- Standalone function tests
 - Remove `toString` wherever possible
 - Function type safety
 - Flesh out casting more, prevent invalid castings and add type safety
