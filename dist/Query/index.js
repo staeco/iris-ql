@@ -50,7 +50,7 @@ class Query {
     });
 
     if (!obj) throw new Error('Missing query!');
-    if (!options.table) throw new Error('Missing table!');
+    if (!options.table || !options.table.rawAttributes) throw new Error('Missing table!');
     this.input = obj;
     this.options = options;
     this._parsed = (0, _parse.default)(obj, options);
