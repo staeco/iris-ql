@@ -1,0 +1,124 @@
+{
+  "id": "911-call",
+  "name": "911 Call",
+  "notes": "Represents an inbound call or message to a 911 dispatch center.",
+  "category": "safety",
+  "official": true,
+  "visibility": "public",
+  "schema": {
+    "receivedAt": {
+      "name": "Received",
+      "type": "date",
+      "notes": "Date/time the call was received.",
+      "validation": {
+        "required": true
+      }
+    },
+    "dispatchedAt": {
+      "name": "Dispatched",
+      "type": "date",
+      "notes": "Date/time units were dispatched."
+    },
+    "arrivedAt": {
+      "name": "Arrived",
+      "type": "date",
+      "notes": "Date/time units arrived on scene."
+    },
+    "units": {
+      "name": "Units",
+      "type": "array",
+      "notes": "List of units dispatched to the scene.",
+      "validation": {
+        "notEmpty": true,
+        "maxItems": 2048
+      },
+      "items": {
+        "name": "Unit ID",
+        "type": "text",
+        "validation": {
+          "required": true,
+          "notEmpty": true,
+          "maxLength": 2048
+        }
+      }
+    },
+    "officers": {
+      "name": "Officers",
+      "type": "array",
+      "notes": "List of officers dispatched to the scene.",
+      "validation": {
+        "notEmpty": true,
+        "maxItems": 2048
+      },
+      "items": {
+        "name": "Officer ID",
+        "type": "text",
+        "validation": {
+          "required": true,
+          "notEmpty": true,
+          "maxLength": 2048
+        }
+      }
+    },
+    "code": {
+      "name": "Code",
+      "type": "text",
+      "notes": "Specific code describing the type of call.",
+      "validation": {
+        "notEmpty": true,
+        "maxLength": 2048
+      }
+    },
+    "type": {
+      "name": "Type",
+      "type": "text",
+      "notes": "Categorization of the call by the dispatcher.",
+      "validation": {
+        "notEmpty": true,
+        "maxLength": 2048
+      }
+    },
+    "notes": {
+      "name": "Notes",
+      "type": "text",
+      "notes": "Description or further notes about the call.",
+      "validation": {
+        "notEmpty": true
+      }
+    },
+    "images": {
+      "name": "Images",
+      "type": "array",
+      "notes": "List of images related to the call.",
+      "validation": {
+        "notEmpty": true,
+        "maxItems": 2048
+      },
+      "items": {
+        "name": "Image",
+        "type": "text",
+        "validation": {
+          "required": true,
+          "image": true
+        }
+      }
+    },
+    "address": {
+      "name": "Address",
+      "type": "text",
+      "notes": "Physical address where the call originated from or where units were dispatched.",
+      "validation": {
+        "notEmpty": true,
+        "maxLength": 2048
+      }
+    },
+    "location": {
+      "name": "Location",
+      "type": "point",
+      "notes": "Location where the call originated from or where units were dispatched.",
+      "validation": {
+        "required": true
+      }
+    }
+  }
+}

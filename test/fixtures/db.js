@@ -330,4 +330,99 @@ db.define('store', {
   }
 })
 
+db.define('datum', {
+  id: {
+    type: types.UUID,
+    defaultValue: types.UUIDV4,
+    primaryKey: true,
+    allowNull: false,
+    label: 'ID',
+    notes: 'Unique ID',
+    api: {
+      creatable: false,
+      readable: true,
+      updatable: false
+    },
+    validate: {
+      notNull: {
+        msg: 'This field is required'
+      },
+      isUUID: {
+        args: 4,
+        msg: 'Must be a valid UUID'
+      }
+    }
+  },
+  createdAt: {
+    type: types.DATE,
+    allowNull: false,
+    defaultValue: types.NOW,
+    label: 'Created',
+    notes: 'Date and time this data was created',
+    api: {
+      creatable: false,
+      readable: true,
+      updatable: false
+    },
+    validate: {
+      notNull: {
+        msg: 'This field is required'
+      },
+      isDate: {
+        msg: 'Must be a valid date'
+      }
+    }
+  },
+  updatedAt: {
+    type: types.DATE,
+    allowNull: false,
+    defaultValue: types.NOW,
+    label: 'Last Modified',
+    notes: 'Date and time this data was last updated',
+    api: {
+      creatable: false,
+      readable: true,
+      updatable: false
+    },
+    validate: {
+      notNull: {
+        msg: 'This field is required'
+      },
+      isDate: {
+        msg: 'Must be a valid date'
+      }
+    }
+  },
+  data: {
+    type: types.JSONB,
+    allowNull: true,
+    label: 'Data',
+    notes: 'Properties of the datum',
+    api: {
+      creatable: false,
+      readable: true,
+      updatable: false
+    }
+  },
+  geometry: {
+    type: types.GEOGRAPHY,
+    allowNull: true,
+    label: 'Geometry',
+    notes: 'Geometry of the datum',
+    api: {
+      creatable: false,
+      readable: true,
+      updatable: false
+    }
+  }
+}, {
+  timestamps: true,
+  freezeTableName: true,
+  scopes: {
+    public: {
+      attributes: [ 'id', 'createdAt', 'name', 'type' ]
+    }
+  }
+})
+
 export default db
