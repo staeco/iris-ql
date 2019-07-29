@@ -1,6 +1,5 @@
 import should from 'should'
 import * as types from '../../src/types'
-import db from '../fixtures/db'
 
 describe('Types', () => {
   it('should have a test func on each type', () => {

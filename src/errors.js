@@ -8,16 +8,8 @@ const inspectOptions = {
 const serializeIssues = (fields) =>
   fields.map((f) => `\n - ${inspect(f, inspectOptions)}`)
 
-export const codes = {
-  badRequest: 400,
-  unauthorized: 401,
-  forbidden: 403,
-  notFound: 404,
-  serverError: 500
-}
-
 export class BadRequestError extends Error {
-  constructor(message='Bad Request', status=codes.badRequest) {
+  constructor(message='Bad Request', status=400) {
     super(message)
     this.message = message
     this.status = status
@@ -27,16 +19,9 @@ export class BadRequestError extends Error {
 }
 
 export class ValidationError extends BadRequestError {
-  constructor(message, fields) {
+  constructor(fields=[]) {
     super()
-    if (message && fields) {
-      this.message = message
-      this.fields = fields
-    }
-    if (message && !fields) {
-      this.fields = message
-    }
-    if (!this.fields) this.fields = []
+    this.fields = fields
     if (!Array.isArray(this.fields)) this.fields = [ this.fields ]
   }
   add = (err) => {

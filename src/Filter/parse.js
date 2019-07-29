@@ -50,5 +50,5 @@ export default (obj, opt) => {
 
   // turn where object into string with fields casted
   if (!error.isEmpty()) throw error
-  return castFields(transformed, opt, table)
+  return castFields(transformed, opt)
 }
