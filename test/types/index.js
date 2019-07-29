@@ -121,13 +121,19 @@ describe('Types', () => {
   })
 
   it('should cast a date', () => {
-    const d = 'Fri Jul 26 2019 13:21:53 GMT-0700 (Mountain Standard Time)'
+    const d = '2019-07-29T15:57:02.156Z'
     should.throws(() => types.date.cast(''))
     const t1 = types.date.cast(d, { timezone: undefined })
-    should(t1.fn).equal('to_timestamp')
+    should(t1.fn).equal('parse_iso')
     should(t1.args[0]).equal(d)
 
     should.throws(() => types.date.cast(d, { timezone: 'invalid' }))
+
+    const t2 = types.date.cast(d, { timezone: 'America/New_York' })
+    should(t2.args).eql([
+      d,
+      'America/New_York'
+    ])
   })
 
   it('should cast point', () => {

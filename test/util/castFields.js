@@ -7,13 +7,13 @@ describe('util#castFields', () => {
   const conn = new Connection(db)
   const { user } = conn.tables()
 
-  it('should skip casting when no data type exists', () => {
+  it('should skip casting when no data type specified', () => {
     const t = castFields({ id: '' }, { table: user })
-    should(t.val).equal('"user"."id" = \'\'')
+    should(t).eql({ id: '' })
   })
 
   it('should accept array of fields as input', () => {
     const t = castFields([ { id: '' } ], { table: user })
-    should(t.val).equal('("user"."id" = \'\')')
+    should(t).eql({ $and: [ { id: '' } ] })
   })
 })

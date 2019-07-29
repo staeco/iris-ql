@@ -1,5 +1,4 @@
 import types from 'sequelize'
-import { value } from '../util/toString'
 import { BadRequestError } from '../errors'
 import moment from 'moment'
 import isNumber from 'is-number'
@@ -53,10 +52,9 @@ export const date = {
   name: 'Date/Time',
   test: (v) => moment(v, moment.ISO_8601).isValid(),
   cast: (txt, { timezone }) => {
-    const base = types.fn('to_timestamp', txt, 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
-    if (!timezone) return base
+    if (!timezone) return types.fn('parse_iso', txt)
     if (!zones.has(timezone)) throw new BadRequestError('Not a valid timezone')
-    return types.literal(`${value({ value: base })} AT TIME ZONE '${timezone}'`)
+    return types.fn('parse_iso', txt, timezone)
   }
 }
 
