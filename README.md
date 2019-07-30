@@ -84,6 +84,22 @@ const results = await crimeTimeSeries.execute()
 
 TODO
 
+## Streaming Mode
+
+If you intend on using streaming mode, you should also add this to your package.json:
+
+```json
+"resolutions": {
+  "pg-cursor": "github:contra/node-pg-cursor#patch-1",
+  "end-of-stream": "github:isaacs/end-of-stream#custom-stream-premature-close-fix"
+},
+```
+
+- pg-cursor has an upstream issue with DB types not being used correctly on cursors
+- end-of-stream has an upstream issue dealing with premature close errors
+
+This note will be removed/updated if either fixes are merged.
+
 ## DB Support
 
 Currently only works with Postgres. In the future, the database layer will be broken out into adapters and multiple stores will be supported.
