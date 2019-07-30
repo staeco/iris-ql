@@ -198,7 +198,6 @@ db.define('user', {
   }
 }, {
   timestamps: true,
-  freezeTableName: true,
   scopes: {
     public: {
       attributes: [ 'id', 'createdAt', 'name', 'settings' ]
@@ -322,10 +321,9 @@ db.define('store', {
   }
 }, {
   timestamps: true,
-  freezeTableName: true,
   scopes: {
     public: {
-      attributes: [ 'id', 'createdAt', 'name', 'type' ]
+      attributes: [ 'id', 'createdAt', 'name', 'type', 'location' ]
     }
   }
 })
@@ -417,10 +415,9 @@ db.define('datum', {
   }
 }, {
   timestamps: true,
-  freezeTableName: true,
   scopes: {
     public: {
-      attributes: [ 'id', 'createdAt', 'name', 'type' ]
+      attributes: [ 'id', 'createdAt', 'data', 'geometry' ]
     }
   }
 })

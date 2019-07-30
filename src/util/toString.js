@@ -13,4 +13,4 @@ export const jsonPath = ({ column, table, path }) => {
 }
 
 export const select = ({ value, table }) =>
-  table.sequelize.dialect.QueryGenerator.selectQuery(table.name, value, table)
+  table.sequelize.dialect.QueryGenerator.selectQuery(table.getTableName(), value, table)

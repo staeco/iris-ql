@@ -32,6 +32,6 @@ exports.jsonPath = jsonPath;
 const select = ({
   value,
   table
-}) => table.sequelize.dialect.QueryGenerator.selectQuery(table.name, value, table);
+}) => table.sequelize.dialect.QueryGenerator.selectQuery(table.getTableName(), value, table);
 
 exports.select = select;

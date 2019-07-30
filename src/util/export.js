@@ -57,7 +57,9 @@ export default async ({ table, value, format, transform, analytics=false }) => {
   const sql = select({ value: nv, table })
   const src = await streamable(table, sql, transform)
   if (!format) return src
-  const out = pump(src, format())
+  const out = pump(src, format(), (err) => {
+    if (err) out.emit('error', err)
+  })
   out.contentType = format.contentType
   return out
 }

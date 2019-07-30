@@ -1,4 +1,5 @@
 import should from 'should'
+import types from 'sequelize'
 import { Connection, Query } from '../../src'
 import db from '../fixtures/db'
 import collect from 'get-stream'
@@ -12,7 +13,7 @@ json.extension = 'json'
 
 describe('Query#execute', () => {
   const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user, datum } = conn.tables()
   it('should execute with scope', async () => {
     const query = new Query({ limit: 1 }, { table: user.scope('public') })
     const stream = await query.executeStream()
@@ -71,5 +72,42 @@ describe('Query#execute', () => {
     parsed.length.should.equal(1)
     should.not.exist(parsed[0].authToken)
     should.exist(parsed[0].name)
+  })
+  it('should execute with proper table name', async () => {
+    const query = new Query({ limit: 1 }, { table: datum.scope('public') })
+    const stream = await query.executeStream({
+      format: json
+    })
+    should(stream.contentType).eql(json.contentType)
+    const res = await collect(stream)
+    should(typeof res).eql('string')
+    const parsed = JSON.parse(res)
+    parsed.length.should.equal(1)
+    should.not.exist(parsed[0].updatedAt)
+    should.exist(parsed[0].geometry)
+  })
+  it('should report errors correctly', async () => {
+    const fauxTable = db.define('noExist', {
+      id: {
+        type: types.UUID,
+        primaryKey: true,
+        allowNull: false
+      }
+    }, {
+      freezeTableName: true
+    })
+
+    const query = new Query({ limit: 1 }, { table: fauxTable })
+    const stream = await query.executeStream({
+      format: json
+    })
+    should(stream.contentType).eql(json.contentType)
+    try {
+      await collect(stream)
+    } catch (err) {
+      should(err.message).match('relation "noExist" does not exist')
+      return
+    }
+    throw new Error('Did not throw!')
   })
 })

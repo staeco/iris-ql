@@ -93,7 +93,9 @@ var _default = async ({
   });
   const src = await streamable(table, sql, transform);
   if (!format) return src;
-  const out = (0, _pump.default)(src, format());
+  const out = (0, _pump.default)(src, format(), err => {
+    if (err) out.emit('error', err);
+  });
   out.contentType = format.contentType;
   return out;
 };

@@ -1,7 +1,4 @@
-## General
-
-- Test every code path
-- SQL injection tests
+- Docs
 
 ## Future
 
