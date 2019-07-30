@@ -5,7 +5,7 @@
 
 # iris-ql [![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][npm-url] [![Build Status][travis-image]][travis-url]
 
-Iris is a safe and user-friendly query system for building flexible APIs with intuitive UIs to match.
+Iris is a safe and user-friendly query system for building flexible APIs with intuitive UIs to match. Check out the docs folder to get started!
 
 ## Install
 
@@ -79,10 +79,6 @@ const results = await crimeTimeSeries.execute()
 ]
 */
 ```
-
-## API
-
-TODO
 
 ## Streaming Mode
 
