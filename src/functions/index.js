@@ -61,7 +61,7 @@ export const multiply = (a, b) =>
   types.fn('mult', numeric(a), numeric(b))
 export const divide = (a, b) =>
   types.fn('div', numeric(a), numeric(b))
-export const modulus = (a, b) =>
+export const remainder = (a, b) =>
   types.fn('mod', numeric(a), numeric(b))
 
 // time
@@ -84,7 +84,7 @@ export const extract = (part, f) => {
   if (!p) throw new BadRequestError('extract() expects a valid part argument')
   return types.fn('date_part', p, f)
 }
-export const format = (fmt, f) => types.fn('to_char', f, fmt)
+//export const format = (fmt, f) => types.fn('to_char', f, fmt)
 
 // geospatial
 export const area = (f) => types.fn('ST_Area', types.cast(f, 'geography'))

@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.boundingBox = exports.geojson = exports.distance = exports.intersects = exports.length = exports.area = exports.format = exports.extract = exports.truncate = exports.ms = exports.interval = exports.lastYear = exports.lastMonth = exports.lastWeek = exports.now = exports.modulus = exports.divide = exports.multiply = exports.subtract = exports.add = exports.eq = exports.lte = exports.gte = exports.lt = exports.gt = exports.count = exports.median = exports.average = exports.sum = exports.max = exports.min = exports.expand = void 0;
+exports.boundingBox = exports.geojson = exports.distance = exports.intersects = exports.length = exports.area = exports.extract = exports.truncate = exports.ms = exports.interval = exports.lastYear = exports.lastMonth = exports.lastWeek = exports.now = exports.remainder = exports.divide = exports.multiply = exports.subtract = exports.add = exports.eq = exports.lte = exports.gte = exports.lt = exports.gt = exports.count = exports.median = exports.average = exports.sum = exports.max = exports.min = exports.expand = void 0;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
@@ -107,10 +107,10 @@ const divide = (a, b) => _sequelize.default.fn('div', numeric(a), numeric(b));
 
 exports.divide = divide;
 
-const modulus = (a, b) => _sequelize.default.fn('mod', numeric(a), numeric(b)); // time
+const remainder = (a, b) => _sequelize.default.fn('mod', numeric(a), numeric(b)); // time
 
 
-exports.modulus = modulus;
+exports.remainder = remainder;
 
 const now = () => _sequelize.default.fn('now');
 
@@ -148,14 +148,11 @@ const extract = (part, f) => {
   const p = parts[part && part.raw];
   if (!p) throw new _errors.BadRequestError('extract() expects a valid part argument');
   return _sequelize.default.fn('date_part', p, f);
-};
+}; //export const format = (fmt, f) => types.fn('to_char', f, fmt)
+// geospatial
+
 
 exports.extract = extract;
-
-const format = (fmt, f) => _sequelize.default.fn('to_char', f, fmt); // geospatial
-
-
-exports.format = format;
 
 const area = f => _sequelize.default.fn('ST_Area', _sequelize.default.cast(f, 'geography'));
 

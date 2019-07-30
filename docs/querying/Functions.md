@@ -151,19 +151,146 @@ Returns true/false if argument A is equal to argument B.
 
 ## Math
 
-### add(numeric, numeric) -> numeric
-### subtract(numeric, numeric) -> numeric
-### divide(numeric, numeric) -> numeric
-### modulus(numeric, numeric) -> numeric
+### add(A numeric, B numeric) -> numeric
+
+Adds argument A and argument B together.
+
+```js
+{
+  function: 'add',
+  arguments: [
+    { field: 'taxes' }, // A
+    { field: 'fare' } // B
+  ]
+}
+```
+
+### subtract(A numeric, B numeric) -> numeric
+
+Subtracts argument B from argument A.
+
+```js
+{
+  function: 'subtract',
+  arguments: [
+    { field: 'cost' }, // A
+    { field: 'taxes' } // B
+  ]
+}
+```
+
+### multiply(A numeric, B numeric) -> numeric
+
+Multiply argument A by argument B.
+
+```js
+{
+  function: 'multiply',
+  arguments: [
+    { field: 'tax' }, // A
+    { field: 'passengers' } // B
+  ]
+}
+```
+
+### divide(A numeric, B numeric) -> numeric
+
+Divides argument A by argument B.
+
+```js
+{
+  function: 'divide',
+  arguments: [
+    { field: 'cost' }, // A
+    { field: 'passengers' } // B
+  ]
+}
+```
+
+### remainder(A numeric, B numeric) -> numeric
+
+Returns the remainder left over when argument A is divided by argument B.
+
+```js
+{
+  function: 'remainder',
+  arguments: [
+    { field: 'cost' }, // A
+    { field: 'passengers' } // B
+  ]
+}
+```
 
 ## Time
 
 ### now() -> date
+
+Returns the current date.
+
+```js
+{
+  function: 'now'
+}
+```
+
 ### lastWeek() -> date
+
+Returns the current date minus 7 days.
+
+```js
+{
+  function: 'lastWeek'
+}
+```
+
 ### lastMonth() -> date
+
+Returns the current date minus 1 month.
+
+```js
+{
+  function: 'lastMonth'
+}
+```
+
 ### lastYear() -> date
-### interval(Start date, End date) -> numeric
+
+Returns the current date minus 1 year.
+
+```js
+{
+  function: 'lastYear'
+}
+```
+
+### interval(start date, end date) -> numeric
+
+Returns the difference in millisecond between the start and end date.
+
+```js
+{
+  function: 'interval',
+  arguments: [
+    { field: 'startedAt' },
+    { field: 'endedAt' }
+  ]
+}
+```
+
 ### ms(date) -> numeric
+
+Returns the millisecond value of a date.
+
+```js
+{
+  function: 'ms',
+  arguments: [
+    { field: 'startedAt' },
+    { field: 'endedAt' }
+  ]
+}
+```
+
 ### truncate(precision text, date) -> date
 ### extract(part text, date) -> numeric
 ### format(format text, date) -> text
@@ -171,12 +298,87 @@ Returns true/false if argument A is equal to argument B.
 ## Geospatial
 
 ### area(polygon/multipolygon) -> numeric
+
+Returns the area of a polygon or multipolygon in meters.
+
+```js
+{
+  function: 'area',
+  arguments: [
+    { field: 'shape' }
+  ]
+}
+```
+
 ### length(linestring/multilinestring) -> numeric
-### length(linestring/multilinestring) -> numeric
-### intersects(A geometry, B geometry) -> boolean
+
+Returns the total length of a LineString or MultiLineString in meters.
+
+```js
+{
+  function: 'length',
+  arguments: [
+    { field: 'path' }
+  ]
+}
+```
+
 ### distance(A geometry, B geometry) -> numeric
+
+Returns the distance between two geometries in meters.
+
+```js
+{
+  function: 'distance',
+  arguments: [
+    { field: 'startLocation' },
+    { field: 'endLocation' }
+  ]
+}
+```
+
+### intersects(A geometry, B geometry) -> boolean
+
+Returns true/false if geometry A intersects with geometry B.
+
+```js
+{
+  function: 'intersects',
+  arguments: [
+    { field: 'path' },
+    { field: 'zone' }
+  ]
+}
+```
+
 ### geojson(text) -> geometry
+
+Returns a geometry from GeoJSON text.
+
+```js
+{
+  function: 'geojson',
+  arguments: [
+    '{"type":"Point","coordinates":[1,1]}'
+  ]
+}
+```
+
 ### boundingBox(xmin numeric, ymin numeric, xmax numeric, ymax numeric) -> geometry
+
+Returns true/false if geometry A intersects with geometry B.
+
+```js
+{
+  function: 'boundingBox',
+  arguments: [
+    0, // xmin
+    0, // ymin
+    20, // xmax
+    20 // ymax
+  ]
+}
+```
 
 ## Special
 
