@@ -13,7 +13,6 @@ pids
 logs
 results
 
-yarn.lock
 npm-shrinkwrap.json
 npm-debug.log
 node_modules

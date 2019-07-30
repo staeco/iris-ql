@@ -3,6 +3,10 @@ node_js:
   - "10"
   - "11"
   - "12"
+cache:
+  yarn: true
+  directories:
+    - node_modules
 before_install:
   - sudo apt-get update
   - sudo apt-get --yes remove postgresql\*

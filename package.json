@@ -43,8 +43,7 @@
     "sequelize": ">=5"
   },
   "resolutions": {
-    "pg-cursor": "github:contra/node-pg-cursor#patch-1",
-    "end-of-stream": "github:isaacs/end-of-stream#custom-stream-premature-close-fix"
+    "pg-cursor": "github:contra/node-pg-cursor#patch-1"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
