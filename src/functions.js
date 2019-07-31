@@ -1,6 +1,6 @@
 import types from 'sequelize'
 import isObject from 'is-pure-object'
-import { BadRequestError } from '../errors'
+import { BadRequestError } from './errors'
 
 const numeric = (v) => types.cast(v, 'numeric')
 const truncates = {

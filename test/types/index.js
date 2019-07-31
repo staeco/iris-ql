@@ -1,7 +1,7 @@
 import should from 'should'
 import * as types from '../../src/types'
 
-describe('Types', () => {
+describe('types', () => {
   it('should have a test func on each type', () => {
     should(typeof types.any.test).equal('function')
     should(typeof types.text.test).equal('function')

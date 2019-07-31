@@ -1,10 +1,9 @@
 import should from 'should'
-import { Connection, Query } from '../../../src'
+import { Query } from '../../../src'
 import db from '../../fixtures/db'
 
 describe('Query#options#within', () => {
-  const conn = new Connection(db)
-  const { store } = conn.tables()
+  const { store } = db.models
 
   it('should work for valid within values', async () => {
     should.exist(new Query({ within: { xmax: 0, ymax: 0, xmin: 0, ymin: 0 } }, { table: store }))

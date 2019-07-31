@@ -1,11 +1,10 @@
 import should from 'should'
 import aggregateWithFilter from '../../src/util/aggregateWithFilter'
-import { Connection, Aggregation, Filter } from '../../src'
+import { Aggregation, Filter } from '../../src'
 import db from '../fixtures/db'
 
 describe('util#aggregateWithFilter', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user } = db.models
 
   const agg = new Aggregation({
     value: { function: 'now' },

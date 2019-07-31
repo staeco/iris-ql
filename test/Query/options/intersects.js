@@ -1,10 +1,9 @@
 import should from 'should'
-import { Connection, Query } from '../../../src'
+import { Query } from '../../../src'
 import db from '../../fixtures/db'
 
 describe('Query#options#intersects', () => {
-  const conn = new Connection(db)
-  const { store } = conn.tables()
+  const { store } = db.models
 
   it('should work for valid intersects values', async () => {
     should.exist(new Query({ intersects: { x: 0, y: 0 } }, { table: store }))

@@ -1,10 +1,9 @@
 import should from 'should'
-import { Connection, AnalyticsQuery } from '../../../src'
+import { AnalyticsQuery } from '../../../src'
 import db from '../../fixtures/db'
 
 describe('AnalyticsQuery#options#groupings', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user } = db.models
   it('should execute with a field', async () => {
     const query = new AnalyticsQuery({
       aggregations: [

@@ -1,10 +1,9 @@
 import should from 'should'
-import { Connection, Query } from '../../../src'
+import { Query } from '../../../src'
 import db from '../../fixtures/db'
 
 describe('Query#options#limit', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user } = db.models
 
   it('should work for valid limit values', async () => {
     should.exist(new Query({ limit: 1 }, { table: user }))

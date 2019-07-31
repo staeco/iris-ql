@@ -1,16 +1,15 @@
 import should from 'should'
-import { Connection, Filter } from '../../src'
+import { Filter } from '../../src'
 import db from '../fixtures/db'
 
 describe('Filter', () => {
-  const conn = new Connection(db)
-  const { user, datum } = conn.tables()
+  const { user, datum } = db.models
   it('should blow up on invalid options', async () => {
     should.throws(() => new Filter({ name: { $ne: null } }, { table: null }))
     should.throws(() => new Filter({ name: { $ne: null } }))
     should.throws(() => new Filter(null, { table: user }))
   })
-  it('should work with basic aliases', async () => {
+  it('should work with basic operators', async () => {
     const query = new Filter({ name: { $ne: null } }, { table: user })
     should.exist(query.value())
     should.exist(query.toJSON())
@@ -39,7 +38,7 @@ describe('Filter', () => {
     should.exist(query.toJSON())
     should.exist(query.input)
   })
-  it('should work with mixed functions and aliases', async () => {
+  it('should work with mixed functions and operators', async () => {
     const query = new Filter({
       createdAt: {
         $lte: { function: 'now' }

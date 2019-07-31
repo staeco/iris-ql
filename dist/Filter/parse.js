@@ -3,7 +3,7 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-var _aliases = _interopRequireDefault(require("../Connection/aliases"));
+var _operators = _interopRequireDefault(require("../operators"));
 
 var _getJSONField = _interopRequireDefault(require("../util/getJSONField"));
 
@@ -23,7 +23,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-const reserved = new Set(Object.keys(_aliases.default));
+const reserved = new Set(Object.keys(_operators.default));
 
 const isQueryValue = v => v && (v.function || v.field || v.as);
 

@@ -1,11 +1,9 @@
 import should from 'should'
 import intersects from '../../src/util/intersects'
-import { Connection } from '../../src'
 import db from '../fixtures/db'
 
 describe('util#intersects', () => {
-  const conn = new Connection(db)
-  const { user, store } = conn.tables()
+  const { user, store } = db.models
 
   it('should return error', () => {
     should.throws(() => intersects({}))

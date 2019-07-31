@@ -1,5 +1,5 @@
 import should from 'should'
-import { Connection, Query } from '../../src'
+import { Query } from '../../src'
 import db from '../fixtures/db'
 
 const filterRes = [
@@ -22,8 +22,7 @@ const searchError = [
 ]
 
 describe('Query#security', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user } = db.models
 
   filterRes.forEach((param, k) => {
     it(`should not return results for filter injections ${k}`, async () => {

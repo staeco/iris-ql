@@ -1,12 +1,11 @@
 import should from 'should'
-import { Connection, AnalyticsQuery } from '../../src'
+import { AnalyticsQuery } from '../../src'
 import db from '../fixtures/db'
 import { crimeTimeSeries, crimePerOfficer } from '../fixtures/analytics'
 import dataType from '../fixtures/911-call'
 
 describe('AnalyticsQuery#execute', () => {
-  const conn = new Connection(db)
-  const { user, datum } = conn.tables()
+  const { user, datum } = db.models
   it('should execute', async () => {
     const query = new AnalyticsQuery({
       aggregations: [

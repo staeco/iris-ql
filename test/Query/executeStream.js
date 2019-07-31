@@ -1,6 +1,6 @@
 import should from 'should'
 import types from 'sequelize'
-import { Connection, Query } from '../../src'
+import { Query } from '../../src'
 import db from '../fixtures/db'
 import collect from 'get-stream'
 import JSONStream from 'JSONStream'
@@ -12,8 +12,7 @@ json.contentType = 'application/json'
 json.extension = 'json'
 
 describe('Query#execute', () => {
-  const conn = new Connection(db)
-  const { user, datum } = conn.tables()
+  const { user, datum } = db.models
   it('should execute with scope', async () => {
     const query = new Query({ limit: 1 }, { table: user.scope('public') })
     const stream = await query.executeStream()

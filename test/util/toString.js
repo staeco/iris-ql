@@ -1,7 +1,6 @@
 import should from 'should'
 import { where, value, jsonPath } from '../../src/util/toString'
 import getJSONField from '../../src/util/getJSONField'
-import { Connection } from '../../src'
 import db from '../fixtures/db'
 
 const dataType = {
@@ -12,10 +11,8 @@ const dataType = {
   }
 }
 
-
 describe('util#toString', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user } = db.models
 
   it('should return a where string', () => {
     const t = where({ value: { id: '' }, table: user })

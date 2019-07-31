@@ -2,7 +2,7 @@ import Sequelize from 'sequelize'
 import pg from 'pg'
 import { plural, singular } from 'pluralize'
 import { underscore } from 'inflection'
-import aliases from './aliases'
+import operators from './operators'
 
 // fix bugs with sequelize or node-pg
 pg.defaults.parseInt8 = true // does bigint
@@ -19,7 +19,7 @@ Sequelize.Validator.notNull = function (item) {
 const defaultOptions = {
   logging: false,
   native: false,
-  operatorsAliases: aliases
+  operatorsAliases: operators
 }
 export default (url, opt={}) => {
   if (typeof url === 'object') {

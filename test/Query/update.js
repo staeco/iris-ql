@@ -1,10 +1,9 @@
 import should from 'should'
-import { Connection, Query } from '../../src'
+import { Query } from '../../src'
 import db from '../fixtures/db'
 
 describe('Query#update', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user } = db.models
   it('should throw on bad function', async () => {
     const query = new Query({ limit: 1 }, { table: user.scope('public') })
     should.throws(() => query.update(null))

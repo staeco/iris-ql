@@ -1,11 +1,11 @@
-import pgAliases from '../Connection/aliases'
+import operators from '../operators'
 import getJSONField from '../util/getJSONField'
 import castFields from '../util/castFields'
 import { ValidationError } from '../errors'
 import isObject from 'is-pure-object'
 import QueryValue from '../QueryValue'
 
-const reserved = new Set(Object.keys(pgAliases))
+const reserved = new Set(Object.keys(operators))
 
 const isQueryValue = (v) => v && (v.function || v.field || v.as)
 

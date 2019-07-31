@@ -1,6 +1,5 @@
 import should from 'should'
 import getJSONField from '../../src/util/getJSONField'
-import { Connection } from '../../src'
 import db from '../fixtures/db'
 
 const dataType = {
@@ -12,8 +11,7 @@ const dataType = {
 }
 
 describe('util#getJSONField', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user } = db.models
 
   it('should return json fields', () => {
     const t = getJSONField('settings.id', { table: user, subSchemas: { settings: dataType.schema } })

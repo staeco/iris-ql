@@ -1,10 +1,9 @@
 import should from 'should'
-import { Connection, Aggregation } from '../../src'
+import { Aggregation } from '../../src'
 import db from '../fixtures/db'
 
 describe('Aggregation', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user } = db.models
   it('should blow up on invalid options', async () => {
     should.throws(() => new Aggregation({ value: { field: 'name' }, alias: 'name' }, { table: null }))
     should.throws(() => new Aggregation({ value: { field: 'name' }, alias: 'name' }))

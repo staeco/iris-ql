@@ -1,10 +1,9 @@
 import should from 'should'
-import { Connection, AnalyticsQuery } from '../../src'
+import { AnalyticsQuery } from '../../src'
 import db from '../fixtures/db'
 
 describe('AnalyticsQuery#execute', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user } = db.models
   it('should throw on bad function', async () => {
     const query = new AnalyticsQuery({
       aggregations: [

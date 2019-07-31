@@ -1,11 +1,9 @@
 import should from 'should'
 import castFields from '../../src/util/castFields'
-import { Connection } from '../../src'
 import db from '../fixtures/db'
 
 describe('util#castFields', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user } = db.models
 
   it('should skip casting when no data type specified', () => {
     const t = castFields({ id: '' }, { table: user })

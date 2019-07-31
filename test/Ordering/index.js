@@ -1,11 +1,10 @@
 import should from 'should'
-import { Connection, Ordering } from '../../src'
+import { Ordering } from '../../src'
 import parse from '../../src/Ordering/parse'
 import db from '../fixtures/db'
 
 describe('Ordering', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+  const { user } = db.models
   it('should blow up on invalid options', async () => {
     should.throws(() => new Ordering())
     should.throws(() => new Ordering({}))
@@ -27,8 +26,8 @@ describe('Ordering', () => {
 })
 
 describe('Ordering#parse', () => {
-  const conn = new Connection(db)
-  const { user } = conn.tables()
+
+  const { user } = db.models
   it('should blow up on invalid options', async () => {
     should.throws(() => parse())
     should.throws(() => parse({}))
