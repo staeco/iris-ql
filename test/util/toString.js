@@ -4,6 +4,15 @@ import getJSONField from '../../src/util/getJSONField'
 import { Connection } from '../../src'
 import db from '../fixtures/db'
 
+const dataType = {
+  schema: {
+    id: {
+      type: 'any'
+    }
+  }
+}
+
+
 describe('util#toString', () => {
   const conn = new Connection(db)
   const { user } = conn.tables()
@@ -19,7 +28,7 @@ describe('util#toString', () => {
   })
 
   it('should return a value string', () => {
-    const val = getJSONField('settings.id', { table: user })
+    const val = getJSONField('settings.id', { table: user, subSchemas: { settings: dataType.schema } })
     const t = value({ value: val, table: user })
     should(t).equal(`"user"."settings"#>>'{id}'`)
   })

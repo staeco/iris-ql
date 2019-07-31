@@ -7,7 +7,6 @@
 - More SQL injection tests
 - Remove `toString` wherever possible
 - Flesh out casting more, prevent invalid castings and add type safety
-- "dataType" option should have to specify the prop, and should be named "subtypes" or something + allow multiple
 - Move searchable into something else
 - Handle includes?
 

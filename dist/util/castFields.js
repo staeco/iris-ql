@@ -16,13 +16,13 @@ var _default = (v, opt) => {
     $and: v // convert it
 
   };
-  if (!opt.dataType) return v; // no casting required!
-
   const str = (0, _toString.where)({
     value: v,
     table: opt.table
   });
   const regex = new RegExp(`"${opt.table.name}"\\."(\\w*)"#>>'{(\\w*)}'`, 'g');
+  if (!regex.test(str)) return v; // no work needed, keep the same value
+
   const redone = str.replace(regex, (match, col, field) => {
     const lit = (0, _getJSONField.default)(`${col}.${field}`, opt);
     return (0, _toString.value)({

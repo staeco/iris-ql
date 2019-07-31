@@ -1,34 +1,50 @@
-import { literal } from 'sequelize'
+import types from 'sequelize'
 import { jsonPath } from './toString'
-import * as dataTypeTypes from '../types'
+import * as schemaTypes from '../types'
 import { ValidationError } from '../errors'
 
-// TODO: convert to use plain sequelize info, not custom table
 export default (v, opt) => {
   const {
     context = [],
-    dataType,
+    subSchemas = {},
     table,
     fieldLimit = Object.keys(table.rawAttributes),
     cast = true
   } = opt
   const path = v.split('.')
   const col = path.shift()
-  if (fieldLimit && !fieldLimit.includes(col)) {
+  const colInfo = table.rawAttributes[col]
+  if (fieldLimit && !fieldLimit.includes(col) || !colInfo) {
     throw new ValidationError({
       path: context,
       value: v,
       message: `Field does not exist: ${col}`
     })
   }
-  const lit = literal(jsonPath({ column: col, table, path }))
-  if (!dataType || !cast) return lit // non-dataType json fields, or asked to keep it raw
+  if (!(colInfo.type instanceof types.JSONB || colInfo.type instanceof types.JSON)) {
+    throw new ValidationError({
+      path: context,
+      value: v,
+      message: `Field is not JSON: ${col}`
+    })
+  }
+  const lit = types.literal(jsonPath({ column: col, table, path }))
+  const schema = subSchemas[col] || colInfo.subSchema
+  if (!schema) {
+    // did not give sufficient info to query json objects safely!
+    throw new ValidationError({
+      path: context,
+      value: v,
+      message: `Field is not queryable: ${col}`
+    })
+  }
+  if (!cast) return lit // asked to keep it raw
 
-  // if a dataType is specified, check the type of the field to see if it needs casting
+  // if a schema is specified, check the type of the field to see if it needs casting
   // this is because pg treats all json values as text, so we need to explicitly cast types for things
   // to work the way we expect
   const field = path[0]
-  const attrDef = dataType.schema[field]
+  const attrDef = schema[field]
   if (!attrDef) {
     throw new ValidationError({
       path: context,
@@ -36,5 +52,5 @@ export default (v, opt) => {
       message: `Field does not exist: ${col}.${field}`
     })
   }
-  return dataTypeTypes[attrDef.type].cast(lit, { ...opt, attr: attrDef })
+  return schemaTypes[attrDef.type].cast(lit, { ...opt, attr: attrDef })
 }

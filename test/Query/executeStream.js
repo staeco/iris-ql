@@ -86,7 +86,6 @@ describe('Query#execute', () => {
     should.not.exist(parsed[0].updatedAt)
     should.exist(parsed[0].geometry)
     should(parsed[0].geometry.type).equal('Point')
-    console.log(parsed[0])
   })
   it('should report errors correctly', async () => {
     const fauxTable = db.define('noExist', {
