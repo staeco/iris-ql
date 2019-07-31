@@ -15,18 +15,18 @@ describe('util#toString', () => {
   const { user } = db.models
 
   it('should return a where string', () => {
-    const t = where({ value: { id: '' }, table: user })
+    const t = where({ value: { id: '' }, model: user })
     should(t).equal(`"user"."id" = ''`)
   })
 
   it('should return a jsonPath string', () => {
-    const t = jsonPath({ column: 'settings', table: user, path: 'settings.id' })
+    const t = jsonPath({ column: 'settings', model: user, path: 'settings.id' })
     should(t).equal(`"user"."settings"#>>'{settings,id}'`)
   })
 
   it('should return a value string', () => {
-    const val = getJSONField('settings.id', { table: user, subSchemas: { settings: dataType.schema } })
-    const t = value({ value: val, table: user })
+    const val = getJSONField('settings.id', { model: user, subSchemas: { settings: dataType.schema } })
+    const t = value({ value: val, model: user })
     should(t).equal(`"user"."settings"#>>'{id}'`)
   })
 })

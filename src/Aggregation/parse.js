@@ -5,7 +5,7 @@ import { ValidationError } from '../errors'
 import aggregateWithFilter from '../util/aggregateWithFilter'
 
 export default (a, opt) => {
-  const { table, context=[] } = opt
+  const { model, context=[] } = opt
   let agg, parsedFilters
   const error = new ValidationError()
 
@@ -65,7 +65,7 @@ export default (a, opt) => {
   }
   if (!error.isEmpty()) throw error
   return [
-    parsedFilters ? aggregateWithFilter({ aggregation: agg, filters: parsedFilters, table }) : agg,
+    parsedFilters ? aggregateWithFilter({ aggregation: agg, filters: parsedFilters, model }) : agg,
     a.alias
   ]
 }

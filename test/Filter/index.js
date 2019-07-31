@@ -5,12 +5,12 @@ import db from '../fixtures/db'
 describe('Filter', () => {
   const { user, datum } = db.models
   it('should blow up on invalid options', async () => {
-    should.throws(() => new Filter({ name: { $ne: null } }, { table: null }))
+    should.throws(() => new Filter({ name: { $ne: null } }, { model: null }))
     should.throws(() => new Filter({ name: { $ne: null } }))
-    should.throws(() => new Filter(null, { table: user }))
+    should.throws(() => new Filter(null, { model: user }))
   })
   it('should work with basic operators', async () => {
-    const query = new Filter({ name: { $ne: null } }, { table: user })
+    const query = new Filter({ name: { $ne: null } }, { model: user })
     should.exist(query.value())
     should.exist(query.toJSON())
     should.exist(query.input)
@@ -21,7 +21,7 @@ describe('Filter', () => {
       arguments: [
         3, 1
       ]
-    } , { table: user })
+    } , { model: user })
     should.exist(query.value())
     should.exist(query.toJSON())
     should.exist(query.input)
@@ -33,7 +33,7 @@ describe('Filter', () => {
         3,
         { function: 'now' }
       ]
-    } , { table: user })
+    } , { model: user })
     should.exist(query.value())
     should.exist(query.toJSON())
     should.exist(query.input)
@@ -43,7 +43,7 @@ describe('Filter', () => {
       createdAt: {
         $lte: { function: 'now' }
       }
-    } , { table: user })
+    } , { model: user })
     should.exist(query.value())
     should.exist(query.toJSON())
     should.exist(query.input)
@@ -53,7 +53,7 @@ describe('Filter', () => {
       'data.startedAt': {
         $lte: { function: 'now' }
       }
-    } , { table: datum }))
+    } , { model: datum }))
   })
   it('should work with JSON subkeys when schema provided', async () => {
     const query = new Filter({
@@ -61,7 +61,7 @@ describe('Filter', () => {
         $lte: { function: 'now' }
       }
     }, {
-      table: datum,
+      model: datum,
       subSchemas: {
         data: {
           startedAt: {

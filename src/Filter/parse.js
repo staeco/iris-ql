@@ -11,9 +11,9 @@ const isQueryValue = (v) => v && (v.function || v.field || v.as)
 
 export default (obj, opt) => {
   const {
-    table,
+    model,
     context = [],
-    fieldLimit = Object.keys(table.rawAttributes)
+    fieldLimit = Object.keys(model.rawAttributes)
   } = opt
   const error = new ValidationError()
   // recursively walk a filter object and replace query values with the real thing

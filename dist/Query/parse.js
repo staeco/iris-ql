@@ -36,10 +36,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var _default = (query, opt = {}) => {
   const error = new _errors.ValidationError();
   const {
-    table,
+    model,
     context = []
   } = opt;
-  const attrs = (0, _getScopedAttributes.default)(table);
+  const attrs = (0, _getScopedAttributes.default)(model);
   const initialFieldLimit = opt.fieldLimit || Object.keys(attrs); // options we pass on, default in fieldLimit
 
   const out = {
@@ -191,7 +191,7 @@ var _default = (query, opt = {}) => {
 
       const box = (0, _sequelize.fn)('ST_MakeEnvelope', actualXMin, actualYMin, actualXMax, actualYMax);
       out.where.push((0, _intersects.default)(box, {
-        table
+        model
       }));
     }
   } // if they defined a point
@@ -231,7 +231,7 @@ var _default = (query, opt = {}) => {
       }
 
       out.where.push((0, _intersects.default)((0, _sequelize.fn)('ST_Point', actualX, actualY), {
-        table
+        model
       }));
     }
   } // exclusions

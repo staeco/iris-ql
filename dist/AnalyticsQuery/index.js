@@ -29,7 +29,7 @@ class AnalyticsQuery {
 
     this.toJSON = () => this.input;
 
-    this.execute = async () => this.options.table.findAll(_objectSpread({
+    this.execute = async () => this.options.model.findAll(_objectSpread({
       raw: true
     }, this.value()));
 
@@ -40,12 +40,12 @@ class AnalyticsQuery {
       analytics: true,
       format,
       transform,
-      table: this.options.table,
+      model: this.options.model,
       value: this.value()
     });
 
     if (!obj) throw new Error('Missing value!');
-    if (!options.table || !options.table.rawAttributes) throw new Error('Missing table!');
+    if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
     this.input = obj;
     this.options = options;
     this._parsed = (0, _parse.default)(obj, options);

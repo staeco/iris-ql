@@ -21,19 +21,19 @@ describe('AnalyticsQuery#execute', () => {
       groupings: [
         { field: 'name' }
       ]
-    }, { table: user })
+    }, { model: user })
     const res = await query.execute()
     should.exist(res)
     res.length.should.eql(3)
     res[0].count.should.eql(1)
   })
   it('should get crime time series', async () => {
-    const query = new AnalyticsQuery(crimeTimeSeries, { table: datum, subSchemas: { data: dataType.schema } })
+    const query = new AnalyticsQuery(crimeTimeSeries, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()
     should(res).eql([ { total: 2, day: new Date('2017-05-15T00:00:00.000Z') } ])
   })
   it('should get crime per officer', async () => {
-    const query = new AnalyticsQuery(crimePerOfficer, { table: datum, subSchemas: { data: dataType.schema } })
+    const query = new AnalyticsQuery(crimePerOfficer, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()
     should(res).eql([
       { total: 2, pre70s: 0, weekly: 2, officer: 'Smith' },

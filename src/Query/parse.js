@@ -12,8 +12,8 @@ import Ordering from '../Ordering'
 
 export default (query, opt={}) => {
   const error = new ValidationError()
-  const { table, context=[] } = opt
-  const attrs = getScopedAttributes(table)
+  const { model, context=[] } = opt
+  const attrs = getScopedAttributes(model)
   const initialFieldLimit = opt.fieldLimit || Object.keys(attrs)
 
   // options we pass on, default in fieldLimit
@@ -134,7 +134,7 @@ export default (query, opt={}) => {
         })
       }
       const box = fn('ST_MakeEnvelope', actualXMin, actualYMin, actualXMax, actualYMax)
-      out.where.push(intersects(box, { table }))
+      out.where.push(intersects(box, { model }))
     }
   }
 
@@ -166,7 +166,7 @@ export default (query, opt={}) => {
           message: latIssue
         })
       }
-      out.where.push(intersects(fn('ST_Point', actualX, actualY), { table }))
+      out.where.push(intersects(fn('ST_Point', actualX, actualY), { model }))
     }
   }
 

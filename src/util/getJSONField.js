@@ -7,13 +7,13 @@ export default (v, opt) => {
   const {
     context = [],
     subSchemas = {},
-    table,
-    fieldLimit = Object.keys(table.rawAttributes),
+    model,
+    fieldLimit = Object.keys(model.rawAttributes),
     cast = true
   } = opt
   const path = v.split('.')
   const col = path.shift()
-  const colInfo = table.rawAttributes[col]
+  const colInfo = model.rawAttributes[col]
   if (fieldLimit && !fieldLimit.includes(col) || !colInfo) {
     throw new ValidationError({
       path: context,
@@ -28,7 +28,7 @@ export default (v, opt) => {
       message: `Field is not JSON: ${col}`
     })
   }
-  const lit = types.literal(jsonPath({ column: col, table, path }))
+  const lit = types.literal(jsonPath({ column: col, model, path }))
   const schema = subSchemas[col] || colInfo.subSchema
   if (!schema) {
     // did not give sufficient info to query json objects safely!

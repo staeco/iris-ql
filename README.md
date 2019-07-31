@@ -31,7 +31,7 @@ const query = new Query({
   orderings: [
     { value: { field: 'createdAt' }, direction: 'desc' }
   ]
-}, { table: crime })
+}, { model: crime })
 
 const results = await query.execute()
 ```
@@ -67,7 +67,7 @@ const crimeTimeSeries = new AnalyticsQuery({
   groupings: [
     { field: 'day' }
   ]
-}, { table: emergencyCall })
+}, { model: emergencyCall })
 
 const results = await crimeTimeSeries.execute()
 

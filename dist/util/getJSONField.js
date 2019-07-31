@@ -25,13 +25,13 @@ var _default = (v, opt) => {
   const {
     context = [],
     subSchemas = {},
-    table,
-    fieldLimit = Object.keys(table.rawAttributes),
+    model,
+    fieldLimit = Object.keys(model.rawAttributes),
     cast = true
   } = opt;
   const path = v.split('.');
   const col = path.shift();
-  const colInfo = table.rawAttributes[col];
+  const colInfo = model.rawAttributes[col];
 
   if (fieldLimit && !fieldLimit.includes(col) || !colInfo) {
     throw new _errors.ValidationError({
@@ -51,7 +51,7 @@ var _default = (v, opt) => {
 
   const lit = _sequelize.default.literal((0, _toString.jsonPath)({
     column: col,
-    table,
+    model,
     path
   }));
 

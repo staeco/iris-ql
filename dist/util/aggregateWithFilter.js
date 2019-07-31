@@ -14,17 +14,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var _default = ({
   aggregation,
   filters,
-  table
+  model
 }) => {
   if (!filters) throw new _errors.BadRequestError('Missing filters');
   if (!aggregation) throw new _errors.BadRequestError('Missing aggregation');
   const query = (0, _toString.where)({
     value: filters,
-    table
+    model
   });
   const agg = (0, _toString.value)({
     value: aggregation,
-    table
+    model
   });
   return _sequelize.default.literal(`${agg} FILTER (WHERE ${query})`);
 };

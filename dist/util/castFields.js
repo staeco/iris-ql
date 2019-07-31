@@ -18,16 +18,16 @@ var _default = (v, opt) => {
   };
   const str = (0, _toString.where)({
     value: v,
-    table: opt.table
+    model: opt.model
   });
-  const regex = new RegExp(`"${opt.table.name}"\\."(\\w*)"#>>'{(\\w*)}'`, 'g');
+  const regex = new RegExp(`"${opt.model.name}"\\."(\\w*)"#>>'{(\\w*)}'`, 'g');
   if (!regex.test(str)) return v; // no work needed, keep the same value
 
   const redone = str.replace(regex, (match, col, field) => {
     const lit = (0, _getJSONField.default)(`${col}.${field}`, opt);
     return (0, _toString.value)({
       value: lit,
-      table: opt.table
+      model: opt.model
     });
   });
   return _sequelize.default.literal(redone);

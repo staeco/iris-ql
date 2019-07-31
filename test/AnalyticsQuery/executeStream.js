@@ -25,7 +25,7 @@ describe('AnalyticsQuery#executeStream', () => {
       groupings: [
         { field: 'name' }
       ]
-    }, { table: user.scope('public') })
+    }, { model: user.scope('public') })
     const stream = await query.executeStream()
     const res = await collect.array(stream)
     res.length.should.equal(3)
@@ -45,7 +45,7 @@ describe('AnalyticsQuery#executeStream', () => {
       groupings: [
         { field: 'name' }
       ]
-    }, { table: user.scope('public') })
+    }, { model: user.scope('public') })
     const stream = await query.executeStream({
       transform: (v) => ({
         ...v,
@@ -73,7 +73,7 @@ describe('AnalyticsQuery#executeStream', () => {
       groupings: [
         { field: 'name' }
       ]
-    }, { table: user.scope('public') })
+    }, { model: user.scope('public') })
     const stream = await query.executeStream({
       format: json
     })

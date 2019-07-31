@@ -4,7 +4,7 @@ import exportStream from '../util/export'
 export default class Query {
   constructor(obj, options={}) {
     if (!obj) throw new Error('Missing query!')
-    if (!options.table || !options.table.rawAttributes) throw new Error('Missing table!')
+    if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
     this.input = obj
     this.options = options
     this._parsed = parse(obj, options)
@@ -20,7 +20,7 @@ export default class Query {
   toJSON = () => this.input
   execute = async ({ count=true, raw=false }={}) => {
     const fn = count ? 'findAndCountAll' : 'findAll'
-    return this.options.table[fn]({
+    return this.options.model[fn]({
       raw,
       ...this.value()
     })
@@ -29,7 +29,7 @@ export default class Query {
     exportStream({
       format,
       transform,
-      table: this.options.table,
+      model: this.options.model,
       value: this.value()
     })
 }

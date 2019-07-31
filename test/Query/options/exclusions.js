@@ -6,19 +6,19 @@ describe('Query#options#exclusions', () => {
   const { user } = db.models
 
   it('should work for valid exclusions values', async () => {
-    should.exist(new Query({ exclusions: [] }, { table: user }))
-    should.exist(new Query({ exclusions: [ 'id' ] }, { table: user }))
-    should.exist(new Query({ exclusions: '' }, { table: user }))
-    should.exist(new Query({ exclusions: null }, { table: user }))
-    should.exist(new Query({ exclusions: 'id,name' }, { table: user }))
+    should.exist(new Query({ exclusions: [] }, { model: user }))
+    should.exist(new Query({ exclusions: [ 'id' ] }, { model: user }))
+    should.exist(new Query({ exclusions: '' }, { model: user }))
+    should.exist(new Query({ exclusions: null }, { model: user }))
+    should.exist(new Query({ exclusions: 'id,name' }, { model: user }))
   })
   it('should return 400 on bad exclusions', async () => {
-    should.throws(() => new Query({ exclusions: {} }, { table: user }))
-    should.throws(() => new Query({ exclusions: 'blahblah' }, { table: user }))
-    should.throws(() => new Query({ exclusions: [ 'field-does-not-exist' ] }, { table: user }))
+    should.throws(() => new Query({ exclusions: {} }, { model: user }))
+    should.throws(() => new Query({ exclusions: 'blahblah' }, { model: user }))
+    should.throws(() => new Query({ exclusions: [ 'field-does-not-exist' ] }, { model: user }))
   })
   it('should execute with exclusions', async () => {
-    const query = new Query({ exclusions: [ 'id' ], limit: 1 }, { table: user })
+    const query = new Query({ exclusions: [ 'id' ], limit: 1 }, { model: user })
     const res = await query.execute()
     should.exist(res.count)
     should.exist(res.rows)

@@ -12,9 +12,9 @@ const searchRes = [
   "') union select authToken from users -- %",
   '%; union select authToken',
   'test%; UNION SELECT * FROM "users" --',
-  '/*%; drop table users',
-  '/*%; drop table users',
-  `[]/*%; drop table users""`
+  '/*%; drop model users',
+  '/*%; drop model users',
+  `[]/*%; drop model users""`
 ]
 const searchError = [
   '\''
@@ -27,7 +27,7 @@ describe('Query#security', () => {
   filterRes.forEach((param, k) => {
     it(`should not return results for filter injections ${k}`, async () => {
       try {
-        const query = new Query({ filters: param }, { table: user.scope('public') })
+        const query = new Query({ filters: param }, { model: user.scope('public') })
         const res = await query.execute()
         should(res.rows.length).equal(0)
       } catch (err) {
@@ -39,7 +39,7 @@ describe('Query#security', () => {
   searchRes.forEach((param, k) => {
     it(`should not return results for search injections ${k}`, async () => {
       try {
-        const query = new Query({ search: param }, { table: user })
+        const query = new Query({ search: param }, { model: user })
         const res = await query.execute()
         should(res.rows.length).equal(0)
       } catch (err) {
@@ -50,7 +50,7 @@ describe('Query#security', () => {
 
   searchError.forEach((param, k) => {
     it(`should return error for search injections ${k}`, async () => {
-      should.throws(() => new Query({ filters: param }, { table: user.scope('public') }))
+      should.throws(() => new Query({ filters: param }, { model: user.scope('public') }))
     })
   })
 })

@@ -25,8 +25,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 const baseParse = (v, opt) => {
   const {
-    table,
-    fieldLimit = Object.keys(opt.table.rawAttributes),
+    model,
+    fieldLimit = Object.keys(opt.model.rawAttributes),
     castJSON = true,
     context = []
   } = opt;
@@ -94,7 +94,7 @@ const baseParse = (v, opt) => {
   }
 
   if (typeof v === 'string' || typeof v === 'number') {
-    const slit = _sequelize.default.literal(table.sequelize.escape(v));
+    const slit = _sequelize.default.literal(model.sequelize.escape(v));
 
     slit.raw = v; // expose raw value so functions can optionally take this as an argument
 

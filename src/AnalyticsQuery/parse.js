@@ -6,10 +6,10 @@ import getScopedAttributes from '../util/getScopedAttributes'
 
 // this is an extension of parseQuery that allows for aggregations and groupings
 export default (query={}, opt) => {
-  const { table, context=[] } = opt
+  const { model, context=[] } = opt
   const error = new ValidationError()
   let attrs = []
-  const initialFieldLimit = opt.fieldLimit || Object.keys(getScopedAttributes(table))
+  const initialFieldLimit = opt.fieldLimit || Object.keys(getScopedAttributes(model))
 
   // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
   if (query.timezone) {

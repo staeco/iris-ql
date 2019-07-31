@@ -32,8 +32,8 @@ function _ref2() {
   return null;
 }
 
-const streamable = async (table, sql, transform) => {
-  const conn = await table.sequelize.connectionManager.getConnection({
+const streamable = async (model, sql, transform) => {
+  const conn = await model.sequelize.connectionManager.getConnection({
     type: 'SELECT'
   }); // a not so fun hack to tie our sequelize types into this raw cursor
 
@@ -46,7 +46,7 @@ const streamable = async (table, sql, transform) => {
   const modifier = transform ? _through.default.obj((obj, _, cb) => cb(null, transform(obj))) : _through.default.obj();
 
   function _ref3() {
-    table.sequelize.connectionManager.releaseConnection(conn).then(_ref).catch(_ref2);
+    model.sequelize.connectionManager.releaseConnection(conn).then(_ref).catch(_ref2);
   }
 
   const end = err => {
@@ -59,7 +59,7 @@ const streamable = async (table, sql, transform) => {
 };
 
 var _default = async ({
-  table,
+  model,
   value,
   format,
   transform,
@@ -70,28 +70,28 @@ var _default = async ({
 
   if (!analytics) {
     // sequelize < 5.10
-    if (table._conformOptions) {
-      table._injectScope(nv);
+    if (model._conformOptions) {
+      model._injectScope(nv);
 
-      table._conformOptions(nv, table);
+      model._conformOptions(nv, model);
 
-      table._expandIncludeAll(nv);
+      model._expandIncludeAll(nv);
     } else {
-      table._injectScope(nv);
+      model._injectScope(nv);
 
-      table._conformIncludes(nv, table);
+      model._conformIncludes(nv, model);
 
-      table._expandAttributes(nv);
+      model._expandAttributes(nv);
 
-      table._expandIncludeAll(nv);
+      model._expandIncludeAll(nv);
     }
   }
 
   const sql = (0, _toString.select)({
     value: nv,
-    table
+    model
   });
-  const src = await streamable(table, sql, transform);
+  const src = await streamable(model, sql, transform);
   if (!format) return src;
   const out = (0, _pump.default)(src, format(), err => {
     if (err) out.emit('error', err);

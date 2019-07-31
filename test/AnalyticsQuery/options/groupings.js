@@ -19,7 +19,7 @@ describe('AnalyticsQuery#options#groupings', () => {
       groupings: [
         { field: 'name' }
       ]
-    }, { table: user })
+    }, { model: user })
     const res = await query.execute()
     should.exist(res)
     res.length.should.eql(3)
@@ -41,7 +41,7 @@ describe('AnalyticsQuery#options#groupings', () => {
         groupings: [
           { field: 'does-not-exist' }
         ]
-      }, { table: user })
+      }, { model: user })
     } catch (err) {
       should.exist(err)
       should.exist(err.fields)
@@ -73,7 +73,7 @@ describe('AnalyticsQuery#options#groupings', () => {
             arguments: [ { field: 'yo' } ]
           }
         ]
-      }, { table: user })
+      }, { model: user })
     } catch (err) {
       should.exist(err)
       should.exist(err.fields)

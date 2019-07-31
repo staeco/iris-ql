@@ -14,18 +14,18 @@ describe('util#getJSONField', () => {
   const { user } = db.models
 
   it('should return json fields', () => {
-    const t = getJSONField('settings.id', { table: user, subSchemas: { settings: dataType.schema } })
+    const t = getJSONField('settings.id', { model: user, subSchemas: { settings: dataType.schema } })
     should(t.val).equal('"user"."settings"#>>\'{id}\'')
   })
 
   it('should return json fields with subSchema', () => {
-    const t = getJSONField('settings.id', { table: user, subSchemas: { settings: dataType.schema } })
+    const t = getJSONField('settings.id', { model: user, subSchemas: { settings: dataType.schema } })
     should(t.val).equal('"user"."settings"#>>\'{id}\'')
   })
 
   it('should error if root field does not exist', () => {
     try {
-      getJSONField('noExist.id', { context: [ 'path' ], table: user, subSchemas: { settings: dataType.schema } })
+      getJSONField('noExist.id', { context: [ 'path' ], model: user, subSchemas: { settings: dataType.schema } })
     } catch (err) {
       err.fields.should.eql([
         {
@@ -39,7 +39,7 @@ describe('util#getJSONField', () => {
 
   it('should error if primary field subschema does not exist', () => {
     try {
-      getJSONField('settings.noExist', { context: [ 'path' ], table: user })
+      getJSONField('settings.noExist', { context: [ 'path' ], model: user })
     } catch (err) {
       err.fields.should.eql([
         {
@@ -53,7 +53,7 @@ describe('util#getJSONField', () => {
 
   it('should error if sub field does not exist', () => {
     try {
-      getJSONField('settings.noExist', { context: [ 'path' ], table: user, subSchemas: { settings: dataType.schema } })
+      getJSONField('settings.noExist', { context: [ 'path' ], model: user, subSchemas: { settings: dataType.schema } })
     } catch (err) {
       err.fields.should.eql([
         {

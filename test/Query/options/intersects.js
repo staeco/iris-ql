@@ -6,22 +6,22 @@ describe('Query#options#intersects', () => {
   const { store } = db.models
 
   it('should work for valid intersects values', async () => {
-    should.exist(new Query({ intersects: { x: 0, y: 0 } }, { table: store }))
-    should.exist(new Query({ intersects: '' }, { table: store }))
+    should.exist(new Query({ intersects: { x: 0, y: 0 } }, { model: store }))
+    should.exist(new Query({ intersects: '' }, { model: store }))
   })
   it('should return 400 on bad intersects', async () => {
-    should.throws(() => new Query({ intersects: {} }, { table: store }))
-    should.throws(() => new Query({ intersects: 'blahblah' }, { table: store }))
-    should.throws(() => new Query({ intersects: [ 'eee' ] }, { table: store }))
-    should.throws(() => new Query({ intersects: [] }, { table: store }))
-    should.throws(() => new Query({ intersects: [ '1', '2' ] }, { table: store }))
+    should.throws(() => new Query({ intersects: {} }, { model: store }))
+    should.throws(() => new Query({ intersects: 'blahblah' }, { model: store }))
+    should.throws(() => new Query({ intersects: [ 'eee' ] }, { model: store }))
+    should.throws(() => new Query({ intersects: [] }, { model: store }))
+    should.throws(() => new Query({ intersects: [ '1', '2' ] }, { model: store }))
   })
   it('should execute with intersects', async () => {
     const point = {
       x: 5,
       y: 5
     }
-    const query = new Query({ intersects: point, limit: 1 }, { table: store })
+    const query = new Query({ intersects: point, limit: 1 }, { model: store })
     const res = await query.execute()
     should.exist(res.count)
     should.exist(res.rows)
@@ -35,7 +35,7 @@ describe('Query#options#intersects', () => {
       y: 1000
     }
     try {
-      new Query({ intersects: point, limit: 1 }, { table: store })
+      new Query({ intersects: point, limit: 1 }, { model: store })
     } catch (err) {
       err.fields.should.eql([
         {
@@ -62,7 +62,7 @@ describe('Query#options#intersects', () => {
       y: -1000
     }
     try {
-      new Query({ intersects: point, limit: 1 }, { table: store })
+      new Query({ intersects: point, limit: 1 }, { model: store })
     } catch (err) {
       err.fields.should.eql([
         {

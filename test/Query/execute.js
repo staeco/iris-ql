@@ -5,14 +5,14 @@ import db from '../fixtures/db'
 describe('Query#execute', () => {
   const { user } = db.models
   it('should execute with count off', async () => {
-    const query = new Query({ limit: 1 }, { table: user })
+    const query = new Query({ limit: 1 }, { model: user })
     const res = await query.execute({ count: false })
     should.exist(res)
     res.length.should.equal(1)
     should.exist(res[0].authToken)
   })
   it('should execute with scope', async () => {
-    const query = new Query({ limit: 1 }, { table: user.scope('public') })
+    const query = new Query({ limit: 1 }, { model: user.scope('public') })
     const res = await query.execute()
     should.exist(res.count)
     should.exist(res.rows)

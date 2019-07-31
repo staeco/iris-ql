@@ -14,7 +14,7 @@ json.extension = 'json'
 describe('Query#execute', () => {
   const { user, datum } = db.models
   it('should execute with scope', async () => {
-    const query = new Query({ limit: 1 }, { table: user.scope('public') })
+    const query = new Query({ limit: 1 }, { model: user.scope('public') })
     const stream = await query.executeStream()
     const res = await collect.array(stream)
     res.length.should.equal(1)
@@ -22,7 +22,7 @@ describe('Query#execute', () => {
     should.exist(res[0].name)
   })
   it('should execute with transform', async () => {
-    const query = new Query({ limit: 1 }, { table: user })
+    const query = new Query({ limit: 1 }, { model: user })
 
     // without transform
     const stream = await query.executeStream()
@@ -44,7 +44,7 @@ describe('Query#execute', () => {
     should.exist(res2[0].name)
   })
   it('should execute with format', async () => {
-    const query = new Query({ limit: 1 }, { table: user.scope('public') })
+    const query = new Query({ limit: 1 }, { model: user.scope('public') })
     const stream = await query.executeStream({
       format: json
     })
@@ -57,7 +57,7 @@ describe('Query#execute', () => {
     should.exist(parsed[0].name)
   })
   it('should work with format and pumpify', async () => {
-    const query = new Query({ limit: 1 }, { table: user.scope('public') })
+    const query = new Query({ limit: 1 }, { model: user.scope('public') })
     const stream = await query.executeStream({
       format: json
     })
@@ -72,8 +72,8 @@ describe('Query#execute', () => {
     should.not.exist(parsed[0].authToken)
     should.exist(parsed[0].name)
   })
-  it('should execute with proper table name', async () => {
-    const query = new Query({ limit: 1 }, { table: datum.scope('public') })
+  it('should execute with proper model name', async () => {
+    const query = new Query({ limit: 1 }, { model: datum.scope('public') })
     const stream = await query.executeStream({
       format: json
     })
@@ -97,7 +97,7 @@ describe('Query#execute', () => {
       freezeTableName: true
     })
 
-    const query = new Query({ limit: 1 }, { table: fauxTable })
+    const query = new Query({ limit: 1 }, { model: fauxTable })
     const stream = await query.executeStream({
       format: json
     })

@@ -12,9 +12,9 @@ db.define('user', {
     label: 'ID',
     notes: 'Unique ID',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -33,9 +33,9 @@ db.define('user', {
     label: 'Created',
     notes: 'Date and time this data was created',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -53,9 +53,9 @@ db.define('user', {
     label: 'Last Modified',
     notes: 'Date and time this data was last updated',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -69,9 +69,9 @@ db.define('user', {
   role: {
     type: new types.VIRTUAL(types.TEXT),
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     },
     get: () => 'cool-user',
     label: 'Role'
@@ -82,9 +82,9 @@ db.define('user', {
     allowNull: false,
     label: 'Verified',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -98,9 +98,9 @@ db.define('user', {
     searchable: true,
     label: 'Name',
     api: {
-      creatable: true,
+      creamodel: true,
       readable: true,
-      updatable: true
+      updamodel: true
     },
     validate: {
       notEmpty: {
@@ -117,9 +117,9 @@ db.define('user', {
     allowNull: false,
     unique: 'user_email_idx',
     api: {
-      creatable: true,
+      creamodel: true,
       readable: true,
-      updatable: true
+      updamodel: true
     },
     validate: {
       isEmail: true,
@@ -142,9 +142,9 @@ db.define('user', {
     label: 'Login ID',
     unique: 'auth_idx',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: false,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -161,9 +161,9 @@ db.define('user', {
     label: 'Login Token',
     unique: 'auth_idx',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: false,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -180,9 +180,9 @@ db.define('user', {
     searchable: false,
     label: 'Settings',
     api: {
-      creatable: true,
+      creamodel: true,
       readable: true,
-      updatable: true
+      updamodel: true
     }
   },
   settingsb: {
@@ -191,9 +191,9 @@ db.define('user', {
     searchable: false,
     label: 'Settings B',
     api: {
-      creatable: true,
+      creamodel: true,
       readable: true,
-      updatable: true
+      updamodel: true
     }
   }
 }, {
@@ -214,9 +214,9 @@ db.define('store', {
     label: 'ID',
     notes: 'Unique ID',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -235,9 +235,9 @@ db.define('store', {
     label: 'Created',
     notes: 'Date and time this data was created',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -255,9 +255,9 @@ db.define('store', {
     label: 'Last Modified',
     notes: 'Date and time this data was last updated',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -274,9 +274,9 @@ db.define('store', {
     searchable: true,
     label: 'Name',
     api: {
-      creatable: true,
+      creamodel: true,
       readable: true,
-      updatable: true
+      updamodel: true
     },
     validate: {
       notEmpty: {
@@ -294,9 +294,9 @@ db.define('store', {
     searchable: true,
     label: 'Type',
     api: {
-      creatable: true,
+      creamodel: true,
       readable: true,
-      updatable: true
+      updamodel: true
     },
     validate: {
       notEmpty: {
@@ -314,9 +314,9 @@ db.define('store', {
     label: 'Location',
     notes: 'Location of the store',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     }
   }
 }, {
@@ -337,9 +337,9 @@ db.define('datum', {
     label: 'ID',
     notes: 'Unique ID',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -358,9 +358,9 @@ db.define('datum', {
     label: 'Created',
     notes: 'Date and time this data was created',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -378,9 +378,9 @@ db.define('datum', {
     label: 'Last Modified',
     notes: 'Date and time this data was last updated',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     },
     validate: {
       notNull: {
@@ -397,9 +397,9 @@ db.define('datum', {
     label: 'Data',
     notes: 'Properties of the datum',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     }
   },
   geometry: {
@@ -408,9 +408,9 @@ db.define('datum', {
     label: 'Geometry',
     notes: 'Geometry of the datum',
     api: {
-      creatable: false,
+      creamodel: false,
       readable: true,
-      updatable: false
+      updamodel: false
     }
   }
 }, {

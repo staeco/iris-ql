@@ -5,9 +5,9 @@ import db from '../fixtures/db'
 describe('Query', () => {
   const { user } = db.models
   it('should blow up on invalid options', async () => {
-    should.throws(() => new Query({ limit: 1 }, { table: null }))
+    should.throws(() => new Query({ limit: 1 }, { model: null }))
     should.throws(() => new Query({ limit: 1 }))
-    should.throws(() => new Query(null, { table: user }))
+    should.throws(() => new Query(null, { model: user }))
   })
   it('should not be able to access out of scope variables', async () => {
     try {
@@ -15,7 +15,7 @@ describe('Query', () => {
         filters: {
           authToken: '123'
         }
-      }, { table: user.scope('public') })
+      }, { model: user.scope('public') })
     } catch (err) {
       err.fields.should.eql([ {
         path: [ 'filters', 'authToken' ],

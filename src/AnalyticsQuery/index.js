@@ -5,7 +5,7 @@ import exportStream from '../util/export'
 export default class AnalyticsQuery {
   constructor(obj, options={}) {
     if (!obj) throw new Error('Missing value!')
-    if (!options.table || !options.table.rawAttributes) throw new Error('Missing table!')
+    if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
     this.input = obj
     this.options = options
     this._parsed = parse(obj, options)
@@ -20,7 +20,7 @@ export default class AnalyticsQuery {
   value = () => this._parsed
   toJSON = () => this.input
   execute = async () =>
-    this.options.table.findAll({
+    this.options.model.findAll({
       raw: true,
       ...this.value()
     })
@@ -30,7 +30,7 @@ export default class AnalyticsQuery {
       analytics: true,
       format,
       transform,
-      table: this.options.table,
+      model: this.options.model,
       value: this.value()
     })
 }

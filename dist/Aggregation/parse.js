@@ -23,7 +23,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var _default = (a, opt) => {
   const {
-    table,
+    model,
     context = []
   } = opt;
   let agg, parsedFilters;
@@ -89,7 +89,7 @@ var _default = (a, opt) => {
   return [parsedFilters ? (0, _aggregateWithFilter.default)({
     aggregation: agg,
     filters: parsedFilters,
-    table
+    model
   }) : agg, a.alias];
 };
 

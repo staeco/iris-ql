@@ -34,7 +34,7 @@ class Query {
       raw = false
     } = {}) => {
       const fn = count ? 'findAndCountAll' : 'findAll';
-      return this.options.table[fn](_objectSpread({
+      return this.options.model[fn](_objectSpread({
         raw
       }, this.value()));
     };
@@ -45,12 +45,12 @@ class Query {
     } = {}) => (0, _export.default)({
       format,
       transform,
-      table: this.options.table,
+      model: this.options.model,
       value: this.value()
     });
 
     if (!obj) throw new Error('Missing query!');
-    if (!options.table || !options.table.rawAttributes) throw new Error('Missing table!');
+    if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
     this.input = obj;
     this.options = options;
     this._parsed = (0, _parse.default)(obj, options);

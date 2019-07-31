@@ -7,8 +7,8 @@ var _sequelize = _interopRequireDefault(require("sequelize"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _default = table => {
-  const attrs = table.rawAttributes;
+var _default = model => {
+  const attrs = model.rawAttributes;
   const ret = Object.keys(attrs).filter(k => {
     const {
       type

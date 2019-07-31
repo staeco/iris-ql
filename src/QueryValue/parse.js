@@ -6,8 +6,8 @@ import getJSONField from '../util/getJSONField'
 
 const baseParse = (v, opt) => {
   const {
-    table,
-    fieldLimit = Object.keys(opt.table.rawAttributes),
+    model,
+    fieldLimit = Object.keys(opt.model.rawAttributes),
     castJSON = true,
     context = []
   } = opt
@@ -62,7 +62,7 @@ const baseParse = (v, opt) => {
     return types.col(v.field)
   }
   if (typeof v === 'string' || typeof v === 'number') {
-    const slit = types.literal(table.sequelize.escape(v))
+    const slit = types.literal(model.sequelize.escape(v))
     slit.raw = v // expose raw value so functions can optionally take this as an argument
     return slit
   }

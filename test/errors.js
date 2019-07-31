@@ -15,7 +15,7 @@ describe('errors', () => {
 
   it('should return errors with status', () => {
     try {
-      getJSONField('noExist.id', { context: [ 'path' ], table: user, subSchemas: { data: dataType.schema } })
+      getJSONField('noExist.id', { context: [ 'path' ], model: user, subSchemas: { data: dataType.schema } })
     } catch (err) {
       should(err.status).eql(400)
     }
@@ -23,7 +23,7 @@ describe('errors', () => {
 
   it('should return errors with fields', () => {
     try {
-      getJSONField('noExist.id', { context: [ 'path' ], table: user, subSchemas: { data: dataType.schema } })
+      getJSONField('noExist.id', { context: [ 'path' ], model: user, subSchemas: { data: dataType.schema } })
     } catch (err) {
       should(err.fields).eql([
         {
@@ -37,7 +37,7 @@ describe('errors', () => {
 
   it('should return serializable errors', () => {
     try {
-      getJSONField('noExist.id', { context: [ 'path' ], table: user, subSchemas: { data: dataType.schema } })
+      getJSONField('noExist.id', { context: [ 'path' ], model: user, subSchemas: { data: dataType.schema } })
     } catch (err) {
       should(err.toString()).eql(`
 Error: Bad Request

@@ -22,7 +22,7 @@ describe('AnalyticsQuery#options#aggregations', () => {
       groupings: [
         { field: 'name' }
       ]
-    }, { table: user })
+    }, { model: user })
     const res = await query.execute()
     should.exist(res)
     res.length.should.eql(3)
@@ -61,7 +61,7 @@ describe('AnalyticsQuery#options#aggregations', () => {
       groupings: [
         { field: 'name' }
       ]
-    }, { table: user })
+    }, { model: user })
     const res = await query.execute()
     should.exist(res)
     res.length.should.eql(3)
@@ -83,7 +83,7 @@ describe('AnalyticsQuery#options#aggregations', () => {
         groupings: [
           { field: 'name' }
         ]
-      }, { table: user })
+      }, { model: user })
     } catch (err) {
       should.exist(err)
       should.exist(err.fields)
@@ -112,7 +112,7 @@ describe('AnalyticsQuery#options#aggregations', () => {
         groupings: [
           { field: 'name' }
         ]
-      }, { table: user })
+      }, { model: user })
     } catch (err) {
       should.exist(err)
       should.exist(err.fields)
@@ -146,7 +146,7 @@ describe('AnalyticsQuery#options#aggregations', () => {
         groupings: [
           { field: 'name' }
         ]
-      }, { table: user })
+      }, { model: user })
     } catch (err) {
       should.exist(err)
       should.exist(err.fields)

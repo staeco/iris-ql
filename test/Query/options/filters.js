@@ -6,15 +6,15 @@ describe('Query#options#filters', () => {
   const { user } = db.models
 
   it('should work for valid filters values', async () => {
-    should.exist(new Query({ filters: {} }, { table: user }))
-    should.exist(new Query({ filters: { name: { $ne: null } } }, { table: user }))
+    should.exist(new Query({ filters: {} }, { model: user }))
+    should.exist(new Query({ filters: { name: { $ne: null } } }, { model: user }))
   })
   it('should return 400 on bad filters', async () => {
-    should.throws(() => new Query({ filters: 'blahblah' }, { table: user }))
-    should.throws(() => new Query({ filters: { missing: true } }, { table: user }))
+    should.throws(() => new Query({ filters: 'blahblah' }, { model: user }))
+    should.throws(() => new Query({ filters: { missing: true } }, { model: user }))
   })
   it('should execute with filters', async () => {
-    const query = new Query({ filters: { name: { $eq: 'Yo Yo 1' } } }, { table: user })
+    const query = new Query({ filters: { name: { $eq: 'Yo Yo 1' } } }, { model: user })
     const res = await query.execute()
     should.exist(res.count)
     should.exist(res.rows)

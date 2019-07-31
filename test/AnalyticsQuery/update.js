@@ -19,7 +19,7 @@ describe('AnalyticsQuery#execute', () => {
       groupings: [
         { field: 'name' }
       ]
-    }, { table: user })
+    }, { model: user })
 
     should.throws(() => query.update(null))
     should.throws(() => query.update(() => null))
@@ -39,7 +39,7 @@ describe('AnalyticsQuery#execute', () => {
       groupings: [
         { field: 'name' }
       ]
-    }, { table: user })
+    }, { model: user })
 
     query.update((v) => ({
       ...v,

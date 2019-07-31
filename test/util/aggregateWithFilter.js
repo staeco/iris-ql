@@ -9,19 +9,19 @@ describe('util#aggregateWithFilter', () => {
   const agg = new Aggregation({
     value: { function: 'now' },
     alias: 'now'
-  }, { table: user })
+  }, { model: user })
 
   it('should throw without opts', () => {
     should.throws(() => aggregateWithFilter({}))
-    should.throws(() => aggregateWithFilter({ filters: undefined, table: user }))
-    should.throws(() => aggregateWithFilter({ aggregation: undefined, filters: [], table: user }))
-    should.throws(() => aggregateWithFilter({ aggregation: agg, table: user }))
+    should.throws(() => aggregateWithFilter({ filters: undefined, model: user }))
+    should.throws(() => aggregateWithFilter({ aggregation: undefined, filters: [], model: user }))
+    should.throws(() => aggregateWithFilter({ aggregation: agg, model: user }))
   })
 
   it('should return aggregation', () => {
-    const filters = new Filter({ name: { $ne: null } }, { table: user })
+    const filters = new Filter({ name: { $ne: null } }, { model: user })
 
-    const t = aggregateWithFilter({ aggregation: agg, filters, table: user })
+    const t = aggregateWithFilter({ aggregation: agg, filters, model: user })
     should(t.val).equal('[object Object] FILTER (WHERE 1=1)')
   })
 })

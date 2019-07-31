@@ -32,12 +32,12 @@ function _ref3(i) {
 // this is an extension of parseQuery that allows for aggregations and groupings
 var _default = (query = {}, opt) => {
   const {
-    table,
+    model,
     context = []
   } = opt;
   const error = new _errors.ValidationError();
   let attrs = [];
-  const initialFieldLimit = opt.fieldLimit || Object.keys((0, _getScopedAttributes.default)(table)); // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
+  const initialFieldLimit = opt.fieldLimit || Object.keys((0, _getScopedAttributes.default)(model)); // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
 
   if (query.timezone) {
     if (typeof query.timezone !== 'string') {
