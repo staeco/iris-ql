@@ -24,6 +24,19 @@ export default (query, opt={}) => {
     order: []
   }
 
+  if (query.timezone) {
+    if (typeof query.timezone !== 'string') {
+      error.add({
+        path: [ ...context, 'timezone' ],
+        value: query.timezone,
+        message: 'Must be a string.'
+      })
+    } else {
+      opt.timezone = query.timezone
+      delete query.timezone
+    }
+  }
+
   // searching
   if (query.search) {
     const searchable = initialFieldLimit.filter((k) => attrs[k].searchable)
