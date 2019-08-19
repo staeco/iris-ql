@@ -80,6 +80,5 @@ describe('Query#execute', () => {
     })
     const filteredRes = await filteredQuery.execute()
     should(filteredRes.count).equal(1)
-    //console.log('res', JSON.stringify(res, null, 2))
   })
 })
