@@ -45,9 +45,22 @@ var _default = (query, opt = {}) => {
   const out = {
     where: [{} // very dumb fix for https://github.com/sequelize/sequelize/issues/10142
     ],
-    order: [] // searching
-
+    order: []
   };
+
+  if (query.timezone) {
+    if (typeof query.timezone !== 'string') {
+      error.add({
+        path: [...context, 'timezone'],
+        value: query.timezone,
+        message: 'Must be a string.'
+      });
+    } else {
+      opt.timezone = query.timezone;
+      delete query.timezone;
+    }
+  } // searching
+
 
   function _ref(k) {
     return attrs[k].searchable;
