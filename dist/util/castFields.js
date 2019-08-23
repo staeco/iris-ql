@@ -11,7 +11,7 @@ var _getJSONField = _interopRequireDefault(require("./getJSONField"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const jsonField = /"(\w*)"\."(\w*)"#>>'{(\w*)}'/g; // sometimes sequelize randomly wraps json access in useless parens, so unwrap everything
+const jsonField = /"(\w*)"\."(\w*)"#>>'{(\w*)}'/; // sometimes sequelize randomly wraps json access in useless parens, so unwrap everything
 
 const wrapped = /\("(\w*)"\."(\w*)"#>>'{(\w*)}'\)/g;
 
@@ -30,6 +30,7 @@ var _default = (v, opt) => {
     value: v,
     model: opt.model
   });
+  console.log(str, jsonField.test(str));
   if (!jsonField.test(str)) return v; // nothing to do! no fields to cast
   // if the field is followed by " IS" then skip, because we dont need to cast that
   // since its either IS NULL or IS NOT NULL

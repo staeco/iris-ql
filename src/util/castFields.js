@@ -2,7 +2,7 @@ import types from 'sequelize'
 import { where, value } from './toString'
 import getJSONField from './getJSONField'
 
-const jsonField = /"(\w*)"\."(\w*)"#>>'{(\w*)}'/g
+const jsonField = /"(\w*)"\."(\w*)"#>>'{(\w*)}'/
 
 // sometimes sequelize randomly wraps json access in useless parens, so unwrap everything
 const wrapped = /\("(\w*)"\."(\w*)"#>>'{(\w*)}'\)/g
@@ -12,6 +12,7 @@ const unwrap = (str) =>
 export default (v, opt) => {
   if (Array.isArray(v)) v = { $and: v } // convert it
   const str = where({ value: v, model: opt.model })
+  console.log(str, jsonField.test(str))
   if (!jsonField.test(str)) return v // nothing to do! no fields to cast
 
   // if the field is followed by " IS" then skip, because we dont need to cast that

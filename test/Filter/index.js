@@ -79,9 +79,10 @@ describe('Filter', () => {
   })
   it('should work with array JSON subkeys when schema provided', async () => {
     const query = new Filter({
-      'data.officers': {
-        $contains: [ 'W301' ],
-        $ne: null
+      data: {
+        officers: {
+          $contains: [ 'W301' ]
+        }
       }
     }, {
       model: datum,
@@ -99,6 +100,6 @@ describe('Filter', () => {
     should.exist(query.value())
     should.exist(query.toJSON())
     should.exist(query.input)
-    should(where({ value: query.value(), model: datum })).eql(`(fix_jsonb_array("datum"."data"#>>'{officers}') @> ARRAY['W301'] AND "datum"."data"#>>'{officers}' IS NOT NULL)`)
+    should(where({ value: query.value(), model: datum })).eql(`fix_jsonb_array("datum"."data"#>>'{officers}') @> ARRAY['W301']`)
   })
 })

@@ -55,7 +55,7 @@ var _default = (obj, opt) => {
             error.add({
               path: [...context, ...fullPath.split('.')],
               value: k,
-              message: `Field does not exist.`
+              message: 'Field does not exist.'
             });
             return p;
           }
