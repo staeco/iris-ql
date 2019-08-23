@@ -34,7 +34,7 @@ var _default = (v, opt) => {
   // if the field is followed by " IS" then skip, because we dont need to cast that
   // since its either IS NULL or IS NOT NULL
 
-  const needsCasting = new RegExp(`"${opt.model.name}"\\."(\\w*)"#>>'{(\\w*)}'(?! IS)`, 'g');
+  const needsCasting = new RegExp(`"${opt.model.name}"\\."(\\w*)"#>>'{(\\w*)}'(?! (IS NULL|IS NOT NULL))`, 'g');
   const redone = unwrap(str).replace(needsCasting, (match, col, field) => {
     const lit = (0, _getJSONField.default)(`${col}.${field}`, opt);
     return (0, _toString.value)({

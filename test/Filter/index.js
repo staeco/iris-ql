@@ -77,4 +77,28 @@ describe('Filter', () => {
     should.exist(query.input)
     should(where({ value: query.value(), model: datum })).eql(`(parse_iso("datum"."data"#>>'{startedAt}') <= now() AND "datum"."data"#>>'{startedAt}' IS NOT NULL)`)
   })
+  it('should work with array JSON subkeys when schema provided', async () => {
+    const query = new Filter({
+      'data.officers': {
+        $contains: [ 'W301' ],
+        $ne: null
+      }
+    }, {
+      model: datum,
+      subSchemas: {
+        data: {
+          officers: {
+            type: 'array',
+            items: {
+              type: 'text'
+            }
+          }
+        }
+      }
+    })
+    should.exist(query.value())
+    should.exist(query.toJSON())
+    should.exist(query.input)
+    should(where({ value: query.value(), model: datum })).eql(`(fix_jsonb_array("datum"."data"#>>'{officers}') @> ARRAY['W301'] AND "datum"."data"#>>'{officers}' IS NOT NULL)`)
+  })
 })
