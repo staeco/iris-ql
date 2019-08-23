@@ -35,6 +35,7 @@ describe('Query#execute', () => {
       filters: [
         {
           $and: [
+            { 'data.dispatchedAt': { $ne: null } },
             {
               function: 'gte',
               arguments: [

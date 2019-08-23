@@ -2,7 +2,17 @@ import types from 'sequelize'
 import isObject from 'is-pure-object'
 import { BadRequestError } from './errors'
 
-const numeric = (v) => types.cast(v, 'numeric')
+const numeric = (v) => {
+  const raw = v.raw || v
+  if (raw) {
+    if (typeof raw === 'number') return raw
+    if (typeof raw === 'string') {
+      const parsed = parseFloat(raw)
+      if (!isNaN(parsed)) return parsed
+    }
+  }
+  return types.cast(v, 'numeric')
+}
 const truncates = {
   millisecond: 'milliseconds',
   second: 'second',

@@ -11,7 +11,20 @@ var _errors = require("./errors");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const numeric = v => _sequelize.default.cast(v, 'numeric');
+const numeric = v => {
+  const raw = v.raw || v;
+
+  if (raw) {
+    if (typeof raw === 'number') return raw;
+
+    if (typeof raw === 'string') {
+      const parsed = parseFloat(raw);
+      if (!isNaN(parsed)) return parsed;
+    }
+  }
+
+  return _sequelize.default.cast(v, 'numeric');
+};
 
 const truncates = {
   millisecond: 'milliseconds',

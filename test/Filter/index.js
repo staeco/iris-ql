@@ -1,6 +1,7 @@
 import should from 'should'
 import { Filter } from '../../src'
 import db from '../fixtures/db'
+import { where } from '../../src/util/toString'
 
 describe('Filter', () => {
   const { user, datum } = db.models
@@ -58,7 +59,8 @@ describe('Filter', () => {
   it('should work with JSON subkeys when schema provided', async () => {
     const query = new Filter({
       'data.startedAt': {
-        $lte: { function: 'now' }
+        $lte: { function: 'now' },
+        $ne: null
       }
     }, {
       model: datum,
@@ -73,5 +75,6 @@ describe('Filter', () => {
     should.exist(query.value())
     should.exist(query.toJSON())
     should.exist(query.input)
+    should(where({ value: query.value(), model: datum })).eql(`(parse_iso("datum"."data"#>>'{startedAt}') <= now() AND "datum"."data"#>>'{startedAt}' IS NOT NULL)`)
   })
 })
