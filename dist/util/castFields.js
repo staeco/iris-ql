@@ -30,7 +30,6 @@ var _default = (v, opt) => {
     value: v,
     model: opt.model
   });
-  console.log(str, jsonField.test(str));
   if (!jsonField.test(str)) return v; // nothing to do! no fields to cast
   // if the field is followed by " IS" then skip, because we dont need to cast that
   // since its either IS NULL or IS NOT NULL

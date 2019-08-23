@@ -12,7 +12,6 @@ const unwrap = (str) =>
 export default (v, opt) => {
   if (Array.isArray(v)) v = { $and: v } // convert it
   const str = where({ value: v, model: opt.model })
-  console.log(str, jsonField.test(str))
   if (!jsonField.test(str)) return v // nothing to do! no fields to cast
 
   // if the field is followed by " IS" then skip, because we dont need to cast that
