@@ -94,7 +94,6 @@ export const extract = (part, f) => {
   if (!p) throw new BadRequestError('extract() expects a valid part argument')
   return types.fn('date_part', p, f)
 }
-//export const format = (fmt, f) => types.fn('to_char', f, fmt)
 
 // geospatial
 export const area = (f) => types.fn('ST_Area', types.cast(f, 'geography'))
