@@ -11,7 +11,9 @@ var schemaTypes = _interopRequireWildcard(require("../types"));
 
 var _errors = require("../errors");
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; if (obj != null) { var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -27,7 +29,7 @@ var _default = (v, opt) => {
     subSchemas = {},
     model,
     fieldLimit = Object.keys(model.rawAttributes),
-    cast = true
+    hydrate = true
   } = opt;
   const path = v.split('.');
   const col = path.shift();
@@ -66,9 +68,9 @@ var _default = (v, opt) => {
     });
   }
 
-  if (!cast) return lit; // asked to keep it raw
-  // if a schema is specified, check the type of the field to see if it needs casting
-  // this is because pg treats all json values as text, so we need to explicitly cast types for things
+  if (!hydrate) return lit; // asked to keep it raw
+  // if a schema is specified, check the type of the field to see if it needs hydrating
+  // this is because pg treats all json values as text, so we need to explicitly hydrate types for things
   // to work the way we expect
 
   const field = path[0];
@@ -82,7 +84,7 @@ var _default = (v, opt) => {
     });
   }
 
-  return schemaTypes[attrDef.type].cast(lit, _objectSpread({}, opt, {
+  return schemaTypes[attrDef.type].hydrate(lit, _objectSpread({}, opt, {
     attr: attrDef
   }));
 };

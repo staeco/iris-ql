@@ -7,11 +7,13 @@ var _operators = _interopRequireDefault(require("../operators"));
 
 var _getJSONField = _interopRequireDefault(require("../util/getJSONField"));
 
-var _castFields = _interopRequireDefault(require("../util/castFields"));
+var _hydrateFields = _interopRequireDefault(require("../util/hydrateFields"));
 
 var _errors = require("../errors");
 
 var _isPureObject = _interopRequireDefault(require("is-pure-object"));
+
+var _isQueryValue = _interopRequireDefault(require("../util/isQueryValue"));
 
 var _QueryValue = _interopRequireDefault(require("../QueryValue"));
 
@@ -25,8 +27,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 const reserved = new Set(Object.keys(_operators.default));
 
-const isQueryValue = v => v && (v.function || v.field || v.as);
-
 var _default = (obj, opt) => {
   const {
     model,
@@ -36,9 +36,9 @@ var _default = (obj, opt) => {
   const error = new _errors.ValidationError(); // recursively walk a filter object and replace query values with the real thing
 
   const transformValues = (v, parent = '') => {
-    if (isQueryValue(v)) return new _QueryValue.default(v, _objectSpread({}, opt, {
-      castJSON: false
-    })).value(); // keep it raw, we cast it all later
+    if ((0, _isQueryValue.default)(v)) return new _QueryValue.default(v, _objectSpread({}, opt, {
+      hydrateJSON: false
+    })).value(); // keep it raw, we hydrate it all later
 
     if (Array.isArray(v)) return v.map(i => transformValues(i, parent));
 
@@ -73,10 +73,10 @@ var _default = (obj, opt) => {
     return v;
   };
 
-  const transformed = transformValues(obj); // turn where object into string with fields casted
+  const transformed = transformValues(obj); // turn where object into string with fields hydrateed
 
   if (!error.isEmpty()) throw error;
-  return (0, _castFields.default)(transformed, opt);
+  return (0, _hydrateFields.default)(transformed, opt);
 };
 
 exports.default = _default;
