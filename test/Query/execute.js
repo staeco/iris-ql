@@ -48,7 +48,7 @@ describe('Query#execute', () => {
                     }
                   ]
                 },
-                '20'
+                20
               ]
             },
             {
@@ -63,7 +63,7 @@ describe('Query#execute', () => {
                     }
                   ]
                 },
-                '20'
+                20
               ]
             }
           ]

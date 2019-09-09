@@ -102,4 +102,32 @@ describe('Filter', () => {
     should.exist(query.input)
     should(where({ value: query.value(), model: datum })).eql(`fix_jsonb_array("datum"."data"#>>'{officers}') @> ARRAY['W301']`)
   })
+  it.skip('should fail with invalid function usage', async () => {
+    try {
+      new Filter({
+        function: 'gte',
+        arguments: [
+          { field: 'data.officers' },
+          'abc'
+        ]
+      } , {
+        model: datum,
+        subSchemas: {
+          data: {
+            officers: {
+              type: 'array',
+              items: {
+                type: 'text'
+              }
+            }
+          }
+        }
+      })
+    } catch (err) {
+      should.exist(err)
+      console.log(err)
+      return
+    }
+    throw new Error('Did not throw!')
+  })
 })

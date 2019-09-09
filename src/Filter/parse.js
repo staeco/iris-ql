@@ -1,13 +1,12 @@
 import operators from '../operators'
 import getJSONField from '../util/getJSONField'
-import castFields from '../util/castFields'
+import hydrateFields from '../util/hydrateFields'
 import { ValidationError } from '../errors'
 import isObject from 'is-pure-object'
+import isQueryValue from '../util/isQueryValue'
 import QueryValue from '../QueryValue'
 
 const reserved = new Set(Object.keys(operators))
-
-const isQueryValue = (v) => v && (v.function || v.field || v.as)
 
 export default (obj, opt) => {
   const {
@@ -18,7 +17,7 @@ export default (obj, opt) => {
   const error = new ValidationError()
   // recursively walk a filter object and replace query values with the real thing
   const transformValues = (v, parent='') => {
-    if (isQueryValue(v)) return new QueryValue(v, { ...opt, castJSON: false }).value() // keep it raw, we cast it all later
+    if (isQueryValue(v)) return new QueryValue(v, { ...opt, hydrateJSON: false }).value() // keep it raw, we hydrate it all later
     if (Array.isArray(v)) return v.map((i) => transformValues(i, parent))
     if (isObject(v)) {
       return Object.keys(v).reduce((p, k) => {
@@ -48,7 +47,7 @@ export default (obj, opt) => {
 
   const transformed = transformValues(obj)
 
-  // turn where object into string with fields casted
+  // turn where object into string with fields hydrateed
   if (!error.isEmpty()) throw error
-  return castFields(transformed, opt)
+  return hydrateFields(transformed, opt)
 }

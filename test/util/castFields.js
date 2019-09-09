@@ -1,17 +1,17 @@
 import should from 'should'
-import castFields from '../../src/util/castFields'
+import hydrateFields from '../../src/util/hydrateFields'
 import db from '../fixtures/db'
 
-describe('util#castFields', () => {
+describe('util#hydrateFields', () => {
   const { user } = db.models
 
-  it('should skip casting when no data type specified', () => {
-    const t = castFields({ id: '' }, { model: user })
+  it('should skip hydrating when no data type specified', () => {
+    const t = hydrateFields({ id: '' }, { model: user })
     should(t).eql({ id: '' })
   })
 
   it('should accept array of fields as input', () => {
-    const t = castFields([ { id: '' } ], { model: user })
+    const t = hydrateFields([ { id: '' } ], { model: user })
     should(t).eql({ $and: [ { id: '' } ] })
   })
 })

@@ -28,7 +28,7 @@ describe('AnalyticsQuery#options#aggregations', () => {
     res.length.should.eql(3)
     res[0].count.should.eql(1)
   })
-  it('should execute a query with casting', async () => {
+  it('should execute a query with nested aggregations', async () => {
     const query = new AnalyticsQuery({
       aggregations: [
         {
@@ -45,11 +45,11 @@ describe('AnalyticsQuery#options#aggregations', () => {
         {
           value: {
             function: 'average',
-            as: 'text',
             arguments: [
               {
-                function: 'ms',
+                function: 'interval',
                 arguments: [
+                  { function: 'lastWeek' },
                   { field: 'createdAt' }
                 ]
               }
@@ -65,7 +65,8 @@ describe('AnalyticsQuery#options#aggregations', () => {
     const res = await query.execute()
     should.exist(res)
     res.length.should.eql(3)
-    should(typeof res[0].timeSpent).eql('string')
+    console.log(res[0])
+    should(typeof res[0].timeSpent).eql('number')
   })
   it('should return aggregation invalid alias errors correctly', async () => {
     try {

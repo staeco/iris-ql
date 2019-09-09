@@ -10,48 +10,50 @@ const getBasicGeoJSONIssues = (v, type) => {
   if (v.type !== type) return `Not a valid type value (Expected ${type} not ${v.type})`
 }
 
+// test is used to validate and type user-inputted values
+// hydrate is used to hydrate db text values to their properly typed values
 export const any = {
   name: 'Any',
-  test: () => true,
-  cast: (txt) => txt
+  check: () => true,
+  hydrate: (txt) => txt
 }
 
 export const array = {
   name: 'List',
   items: true,
+  check: (v) => Array.isArray(v),
   // TODO: recursively map the array against the right types
   // this treats everything as a text array
-  // probably need to pass in type and let the db figure out casting.
-  // should follow moving all casting to db functions
-  cast: (txt) => types.fn('fix_jsonb_array', txt)
+  // probably need to pass in type and let the db figure out hydrating
+  hydrate: (txt) => types.fn('fix_jsonb_array', txt)
 }
 
 export const object = {
   name: 'Map',
-  test: isObject,
-  cast: (txt) => types.cast(txt, 'jsonb')
+  check: isObject,
+  hydrate: (txt) => types.cast(txt, 'jsonb')
 }
 
 export const text = {
   name: 'Text',
-  test: (v) => typeof v === 'string',
-  cast: (txt) => txt
+  check: (v) => typeof v === 'string',
+  hydrate: (txt) => txt
 }
 export const number = {
   name: 'Number',
-  test: isNumber,
-  cast: (txt) => types.cast(txt, 'numeric')
+  check: (v) => isNumber(v),
+  hydrate: (txt) => types.cast(txt, 'numeric')
 }
 export const boolean = {
   name: 'True/False',
-  test: (v) => typeof v === 'boolean',
-  cast: (txt) => types.cast(txt, 'boolean')
+  check: (v) => typeof v === 'boolean',
+  hydrate: (txt) => types.cast(txt, 'boolean')
 }
 
 export const date = {
   name: 'Date/Time',
-  test: (v) => moment(v, moment.ISO_8601).isValid(),
-  cast: (txt, { timezone }) => {
+  check: (v) => moment(v, moment.ISO_8601).isValid(),
+  hydrate: (txt, { timezone }) => {
     if (!timezone) return types.fn('parse_iso', txt)
     if (!zones.has(timezone)) throw new BadRequestError('Not a valid timezone')
     return types.fn('parse_iso', txt, timezone)
@@ -64,32 +66,27 @@ const geoCast = (txt) =>
 
 export const point = {
   name: 'GeoJSON Point',
-  geospatial: true,
-  test: (v) => !getBasicGeoJSONIssues(v, 'Point'),
-  cast: geoCast
+  check: (v) => !getBasicGeoJSONIssues(v, 'Point'),
+  hydrate: geoCast
 }
 
 export const line = {
   name: 'GeoJSON LineString',
-  geospatial: true,
-  test: (v) => !getBasicGeoJSONIssues(v, 'LineString'),
-  cast: geoCast
+  check: (v) => !getBasicGeoJSONIssues(v, 'LineString'),
+  hydrate: geoCast
 }
 export const multiline = {
   name: 'GeoJSON MultiLineString',
-  geospatial: true,
-  test: (v) => !getBasicGeoJSONIssues(v, 'MultiLineString'),
-  cast: geoCast
+  check: (v) => !getBasicGeoJSONIssues(v, 'MultiLineString'),
+  hydrate: geoCast
 }
 export const polygon = {
   name: 'GeoJSON Polygon',
-  geospatial: true,
-  test: (v) => !getBasicGeoJSONIssues(v, 'Polygon'),
-  cast: geoCast
+  check: (v) => !getBasicGeoJSONIssues(v, 'Polygon'),
+  hydrate: geoCast
 }
 export const multipolygon = {
   name: 'GeoJSON MultiPolygon',
-  geospatial: true,
-  test: (v) => !getBasicGeoJSONIssues(v, 'MultiPolygon'),
-  cast: geoCast
+  check: (v) => !getBasicGeoJSONIssues(v, 'MultiPolygon'),
+  hydrate: geoCast
 }
