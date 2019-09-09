@@ -1,10 +1,34 @@
 import types from 'sequelize'
 import isObject from 'is-pure-object'
 import { ValidationError } from '../errors'
+import getTypes from '../types/getTypes'
 import * as funcs from '../types/functions'
 import getJSONField from '../util/getJSONField'
 
-const getFunction = (v, { context = [] }) => {
+const validateArgumentTypes = (func, sig, arg, opt) => {
+  if (sig.types === 'any') return true // allows anything
+  if (!sig.required && arg == null) return true // not present, so has a default
+  if (sig.required && arg == null) {
+    throw new ValidationError({
+      path: opt.context,
+      value: arg,
+      message: `Argument "${sig.name}" for "${func.name}" is required`
+    })
+  }
+  const argTypes = getTypes(arg, opt).map((t) => t.type)
+  const typesValid = argTypes.some((t) => sig.types.includes(t))
+  if (!typesValid) {
+    throw new ValidationError({
+      path: opt.context,
+      value: arg,
+      message: `Argument "${sig.name}" for "${func.name}" must be of type: ${sig.types.join(', ')}, instead got ${argTypes.join(', ')}`
+    })
+  }
+  return true
+}
+
+const getFunction = (v, opt) => {
+  const { context = [] } = opt
   if (typeof v.function !== 'string') {
     throw new ValidationError({
       path: [ ...context, 'function' ],
@@ -29,8 +53,23 @@ const getFunction = (v, { context = [] }) => {
     })
   }
 
-  // TODO-IMPL: get type of each function argument, and test against signature
-  return { fn: func, args: args }
+  // resolve function arguments, then check the types against the function signature
+  const sigArgs = func.signature || []
+  const resolvedArgs = sigArgs.map((sig, idx) => {
+    const nopt = {
+      ...opt,
+      context: [ ...context, 'arguments', idx ]
+    }
+    const argValue = args[idx]
+    const parsed = parse(argValue, nopt)
+    validateArgumentTypes(func, sig, argValue, nopt)
+    return {
+      types: getTypes(argValue, nopt),
+      raw: argValue,
+      value: parsed
+    }
+  })
+  return { fn: func, args: resolvedArgs }
 }
 
 const parse = (v, opt) => {
@@ -41,14 +80,19 @@ const parse = (v, opt) => {
     context = []
   } = opt
   if (v == null) return null
+  if (typeof v === 'string' || typeof v === 'number') {
+    return types.literal(model.sequelize.escape(v))
+  }
+  if (!isObject(v)) {
+    throw new ValidationError({
+      path: context,
+      value: v,
+      message: 'Must be a function, field, string, number, or object.'
+    })
+  }
   if (v.function) {
-    const { fn, args } = getFunction(v, { context })
-    return fn.execute(...args.map((i, idx) =>
-      parse(i, {
-        ...opt,
-        context: [ ...context, 'arguments', idx ]
-      })
-    ))
+    const { fn, args } = getFunction(v, opt)
+    return fn.execute(...args)
   }
   if (v.field) {
     if (typeof v.field !== 'string') {
@@ -68,19 +112,13 @@ const parse = (v, opt) => {
     }
     return types.col(v.field)
   }
-  if (typeof v === 'string' || typeof v === 'number') {
-    const safe = types.literal(model.sequelize.escape(v))
-    safe.raw = v
-    return safe
-  }
-  if (!isObject(v)) {
+  if (v.val) {
     throw new ValidationError({
-      path: context,
-      value: v,
-      message: 'Must be a function, field, string, number, or object.'
+      path: [ ...context, 'val' ],
+      value: v.val,
+      message: 'Must not contain a reserved key "val".'
     })
   }
-  // TODO: is allowing an object here a security issue?
   return v
 }
 

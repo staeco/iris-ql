@@ -4,16 +4,18 @@ import decamelize from 'decamelize'
 import { BadRequestError } from '../errors'
 import isObject from 'is-pure-object'
 
-const numeric = (v) => {
-  const raw = v.raw || v
-  if (raw) {
-    if (typeof raw === 'number') return raw
+const numeric = (info) => {
+  if (info.raw) {
+    if (typeof raw === 'number') return info.raw
     if (typeof raw === 'string') {
-      const parsed = parseFloat(raw)
+      const parsed = parseFloat(info.raw)
       if (!isNaN(parsed)) return parsed
     }
   }
-  return types.cast(v, 'numeric')
+  if (info.types.includes('date')) {
+    return types.cast(types.fn('time_to_ms', info.value), 'numeric')
+  }
+  return types.cast(info.value, 'numeric')
 }
 
 const truncatesToDB = {
@@ -37,7 +39,7 @@ const partsToDB = {
   millisecond: 'milliseconds',
   second: 'second',
   minute: 'minute',
-  hour: 'hour',
+  hourOfDay: 'hour',
   dayOfWeek: 'dow',
   dayOfMonth: 'day',
   dayOfYear: 'doy',
@@ -63,8 +65,8 @@ export const expand = {
       required: true
     }
   ],
-  returns: 'item-type',
-  execute: (f) => types.fn('unnest', f)
+  returns: (listInfo) => listInfo.types.find((i) => i.type === 'array').items,
+  execute: (listInfo) => types.fn('unnest', listInfo.value)
 }
 
 // Aggregations
@@ -73,12 +75,18 @@ export const min = {
   notes: 'Aggregates the minimum value of a number',
   signature: [
     {
-      name: 'Number',
-      types: [ 'number' ],
+      name: 'Value',
+      types: [ 'number', 'date' ],
       required: true
     }
   ],
-  returns: 'number',
+  returns: (valueInfo) => {
+    const primaryType = valueInfo.types.find((i) => min.signature[0].types.includes(i.type))
+    return {
+      type: primaryType,
+      measurement: primaryType.measurement
+    }
+  },
   aggregate: true,
   execute: (f) => types.fn('min', numeric(f))
 }
@@ -87,12 +95,18 @@ export const max = {
   notes: 'Aggregates the maximum value of a number',
   signature: [
     {
-      name: 'Number',
-      types: [ 'number' ],
+      name: 'Value',
+      types: [ 'number', 'date' ],
       required: true
     }
   ],
-  returns: 'number',
+  returns: (valueInfo) => {
+    const primaryType = valueInfo.types.find((i) => max.signature[0].types.includes(i.type))
+    return {
+      type: primaryType,
+      measurement: primaryType.measurement
+    }
+  },
   aggregate: true,
   execute: (f) => types.fn('max', numeric(f))
 }
@@ -101,12 +115,18 @@ export const sum = {
   notes: 'Aggregates the sum total of a number',
   signature: [
     {
-      name: 'Number',
-      types: [ 'number' ],
+      name: 'Value',
+      types: [ 'number', 'date' ],
       required: true
     }
   ],
-  returns: 'number',
+  returns: (valueInfo) => {
+    const primaryType = valueInfo.types.find((i) => sum.signature[0].types.includes(i.type))
+    return {
+      type: primaryType,
+      measurement: primaryType.measurement
+    }
+  },
   aggregate: true,
   execute: (f) => types.fn('sum', numeric(f))
 }
@@ -115,12 +135,18 @@ export const average = {
   notes: 'Aggregates the average of a number',
   signature: [
     {
-      name: 'Number',
-      types: [ 'number' ],
+      name: 'Value',
+      types: [ 'number', 'date' ],
       required: true
     }
   ],
-  returns: 'number',
+  returns: (valueInfo) => {
+    const primaryType = valueInfo.types.find((i) => average.signature[0].types.includes(i.type))
+    return {
+      type: primaryType,
+      measurement: primaryType.measurement
+    }
+  },
   aggregate: true,
   execute: (f) => types.fn('avg', numeric(f))
 }
@@ -129,19 +155,27 @@ export const median = {
   notes: 'Aggregates the median of a number',
   signature: [
     {
-      name: 'Number',
-      types: [ 'number' ],
+      name: 'Value',
+      types: [ 'number', 'date' ],
       required: true
     }
   ],
-  returns: 'number',
+  returns: (valueInfo) => {
+    const primaryType = valueInfo.types.find((i) => median.signature[0].types.includes(i.type))
+    return {
+      type: primaryType,
+      measurement: primaryType.measurement
+    }
+  },
   aggregate: true,
   execute: (f) => types.fn('median', numeric(f))
 }
 export const count = {
   name: 'Count',
   notes: 'Aggregates the total number of rows',
-  returns: 'number',
+  returns: {
+    type: 'number'
+  },
   aggregate: true,
   execute: () => types.fn('count', types.literal('*'))
 }
@@ -162,7 +196,14 @@ export const add = {
       required: true
     }
   ],
-  returns: 'number',
+  returns: (infoA, infoB) => {
+    const primaryTypeA = infoA.types.find((i) => i.type === 'number')
+    const primaryTypeB = infoB.types.find((i) => i.type === 'number')
+    return {
+      type: 'number',
+      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+    }
+  },
   execute: (a, b) =>
     types.fn('add', numeric(a), numeric(b))
 }
@@ -181,7 +222,14 @@ export const subtract = {
       required: true
     }
   ],
-  returns: 'number',
+  returns: (infoA, infoB) => {
+    const primaryTypeA = infoA.types.find((i) => i.type === 'number')
+    const primaryTypeB = infoB.types.find((i) => i.type === 'number')
+    return {
+      type: 'number',
+      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+    }
+  },
   execute: (a, b) =>
     types.fn('sub', numeric(a), numeric(b))
 }
@@ -200,7 +248,14 @@ export const multiply = {
       required: true
     }
   ],
-  returns: 'number',
+  returns: (infoA, infoB) => {
+    const primaryTypeA = infoA.types.find((i) => i.type === 'number')
+    const primaryTypeB = infoB.types.find((i) => i.type === 'number')
+    return {
+      type: 'number',
+      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+    }
+  },
   execute: (a, b) =>
     types.fn('mult', numeric(a), numeric(b))
 }
@@ -219,7 +274,14 @@ export const divide = {
       required: true
     }
   ],
-  returns: 'number',
+  returns: (infoA, infoB) => {
+    const primaryTypeA = infoA.types.find((i) => i.type === 'number')
+    const primaryTypeB = infoB.types.find((i) => i.type === 'number')
+    return {
+      type: 'number',
+      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+    }
+  },
   execute: (a, b) =>
     types.fn('div', numeric(a), numeric(b))
 }
@@ -238,7 +300,14 @@ export const remainder = {
       required: true
     }
   ],
-  returns: 'number',
+  returns: (infoA, infoB) => {
+    const primaryTypeA = infoA.types.find((i) => i.type === 'number')
+    const primaryTypeB = infoB.types.find((i) => i.type === 'number')
+    return {
+      type: 'number',
+      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+    }
+  },
   execute: (a, b) =>
     types.fn('mod', numeric(a), numeric(b))
 }
@@ -250,16 +319,18 @@ export const gt = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: [ 'number', 'date' ],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number' ],
+      types: [ 'number', 'date' ],
       required: true
     }
   ],
-  returns: 'number',
+  returns: {
+    type: 'boolean'
+  },
   execute: (a, b) =>
     types.fn('gt', numeric(a), numeric(b))
 }
@@ -269,16 +340,18 @@ export const lt = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: [ 'number', 'date' ],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number' ],
+      types: [ 'number', 'date' ],
       required: true
     }
   ],
-  returns: 'number',
+  returns: {
+    type: 'boolean'
+  },
   execute: (a, b) =>
     types.fn('lt', numeric(a), numeric(b))
 }
@@ -288,16 +361,18 @@ export const gte = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: [ 'number', 'date' ],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number' ],
+      types: [ 'number', 'date' ],
       required: true
     }
   ],
-  returns: 'number',
+  returns: {
+    type: 'boolean'
+  },
   execute: (a, b) =>
     types.fn('gte', numeric(a), numeric(b))
 }
@@ -307,16 +382,18 @@ export const lte = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: [ 'number', 'date' ],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number' ],
+      types: [ 'number', 'date' ],
       required: true
     }
   ],
-  returns: 'number',
+  returns: {
+    type: 'boolean'
+  },
   execute: (a, b) =>
     types.fn('lte', numeric(a), numeric(b))
 }
@@ -326,16 +403,18 @@ export const eq = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: [ 'number', 'date' ],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number' ],
+      types: [ 'number', 'date' ],
       required: true
     }
   ],
-  returns: 'number',
+  returns: {
+    type: 'boolean'
+  },
   execute: (a, b) =>
     types.fn('eq', numeric(a), numeric(b))
 }
@@ -344,25 +423,33 @@ export const eq = {
 export const now = {
   name: 'Now',
   notes: 'Returns the current date and time',
-  returns: 'date',
+  returns: {
+    type: 'date'
+  },
   execute: () => types.fn('now')
 }
 export const lastWeek = {
   name: 'Last Week',
   notes: 'Returns the date and time for 7 days ago',
-  returns: 'date',
+  returns: {
+    type: 'date'
+  },
   execute: () => types.literal("CURRENT_DATE - INTERVAL '7 days'")
 }
 export const lastMonth = {
   name: 'Last Month',
   notes: 'Returns the date and time for 1 month ago',
-  returns: 'date',
+  returns: {
+    type: 'date'
+  },
   execute: () => types.literal("CURRENT_DATE - INTERVAL '1 month'")
 }
 export const lastYear = {
   name: 'Last Year',
   notes: 'Returns the date and time for 1 year ago',
-  returns: 'date',
+  returns: {
+    type: 'date'
+  },
   execute: () => types.literal("CURRENT_DATE - INTERVAL '1 year'")
 }
 export const interval = {
@@ -380,9 +467,15 @@ export const interval = {
       required: true
     }
   ],
-  returns: 'number',
+  returns: {
+    type: 'number',
+    measurement: {
+      type: 'duration',
+      value: 'millisecond'
+    }
+  },
   execute: (start, end) =>
-    types.fn('sub', types.fn('time_to_ms', end), types.fn('time_to_ms', start))
+    types.fn('sub', types.fn('time_to_ms', end.value), types.fn('time_to_ms', start.value))
 }
 export const truncate = {
   name: 'Truncate',
@@ -390,7 +483,7 @@ export const truncate = {
   signature: [
     {
       name: 'Unit',
-      types: [ 'string' ],
+      types: [ 'text' ],
       required: true,
       options: truncates
     },
@@ -400,9 +493,11 @@ export const truncate = {
       required: true
     }
   ],
-  returns: 'date',
+  returns: {
+    type: 'date'
+  },
   execute: (p, f) =>
-    types.fn('date_trunc', p, f)
+    types.fn('date_trunc', truncatesToDB[p.raw], f.value)
 }
 export const extract = {
   name: 'Extract',
@@ -410,7 +505,7 @@ export const extract = {
   signature: [
     {
       name: 'Unit',
-      types: [ 'string' ],
+      types: [ 'text' ],
       required: true,
       options: parts
     },
@@ -420,9 +515,15 @@ export const extract = {
       required: true
     }
   ],
-  returns: 'date',
+  returns: (unitInfo) => ({
+    type: 'number',
+    measurement: {
+      type: 'datePart',
+      value: unitInfo.raw
+    }
+  }),
   execute: (p, f) =>
-    types.fn('date_part', p, f)
+    types.fn('date_part', partsToDB[p.raw], f.value)
 }
 
 // Geospatial
@@ -436,8 +537,14 @@ export const area = {
       required: true
     }
   ],
-  returns: 'number',
-  execute: (f) => types.fn('ST_Area', types.cast(f, 'geography'))
+  returns: {
+    type: 'number',
+    measurement: {
+      type: 'area',
+      value: 'meter'
+    }
+  },
+  execute: (f) => types.fn('ST_Area', types.cast(f.value, 'geography'))
 }
 export const length = {
   name: 'Length',
@@ -449,8 +556,14 @@ export const length = {
       required: true
     }
   ],
-  returns: 'number',
-  execute: (f) => types.fn('ST_Length', types.cast(f, 'geography'))
+  returns: {
+    type: 'number',
+    measurement: {
+      type: 'distance',
+      value: 'meter'
+    }
+  },
+  execute: (f) => types.fn('ST_Length', types.cast(f.value, 'geography'))
 }
 export const intersects = {
   name: 'Intersects',
@@ -467,9 +580,11 @@ export const intersects = {
       required: true
     }
   ],
-  returns: 'boolean',
+  returns: {
+    type: 'boolean'
+  },
   execute: (a, b) =>
-    types.fn('ST_Intersects', types.cast(a, 'geometry'), types.cast(b, 'geometry'))
+    types.fn('ST_Intersects', types.cast(a.value, 'geometry'), types.cast(b.value, 'geometry'))
 }
 export const distance = {
   name: 'Distance',
@@ -486,9 +601,15 @@ export const distance = {
       required: true
     }
   ],
-  returns: 'number',
+  returns: {
+    type: 'number',
+    measurement: {
+      type: 'distance',
+      value: 'meter'
+    }
+  },
   execute: (a, b) =>
-    types.fn('ST_Distance', types.cast(a, 'geometry'), types.cast(b, 'geometry'))
+    types.fn('ST_Distance', types.cast(a.value, 'geometry'), types.cast(b.value, 'geometry'))
 }
 export const geojson = {
   name: 'Create Geometry',
@@ -496,15 +617,15 @@ export const geojson = {
   signature: [
     {
       name: 'GeoJSON Text',
-      types: [ 'string' ],
+      types: [ 'text' ],
       required: true
     }
   ],
   returns: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline' ],
-  execute: (v) => {
+  execute: ({ raw }) => {
     let o
     try {
-      o = JSON.parse(v)
+      o = JSON.parse(raw)
     } catch (err) {
       throw new BadRequestError('Not a valid object!')
     }
@@ -512,13 +633,13 @@ export const geojson = {
     if (typeof o.type !== 'string') throw new BadRequestError('Not a valid GeoJSON object!')
 
     // FeatureCollection
-    if (Array.isArray(o.features)) return types.fn('geocollection_from_geojson', v)
+    if (Array.isArray(o.features)) return types.fn('geocollection_from_geojson', raw)
 
     // Feature
     if (o.geometry) return types.fn('from_geojson', JSON.stringify(o.geometry))
 
     // Anything else
-    return types.fn('from_geojson', v)
+    return types.fn('from_geojson', raw)
   }
 }
 export const boundingBox = {
@@ -546,7 +667,9 @@ export const boundingBox = {
       required: true
     }
   ],
-  returns: 'polygon',
+  returns: {
+    type: 'polygon'
+  },
   execute: (xmin, ymin, xmax, ymax) =>
-    types.fn('ST_MakeEnvelope', xmin, ymin, xmax, ymax)
+    types.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value)
 }

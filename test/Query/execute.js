@@ -42,7 +42,7 @@ describe('Query#execute', () => {
                 {
                   function: 'extract',
                   arguments: [
-                    'hour',
+                    'hourOfDay',
                     {
                       field: 'data.dispatchedAt'
                     }
@@ -57,7 +57,7 @@ describe('Query#execute', () => {
                 {
                   function: 'extract',
                   arguments: [
-                    'hour',
+                    'hourOfDay',
                     {
                       field: 'data.dispatchedAt'
                     }
