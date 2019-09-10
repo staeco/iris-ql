@@ -11,11 +11,6 @@ db.define('user', {
     allowNull: false,
     label: 'ID',
     notes: 'Unique ID',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -32,11 +27,6 @@ db.define('user', {
     defaultValue: types.NOW,
     label: 'Created',
     notes: 'Date and time this data was created',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -52,11 +42,6 @@ db.define('user', {
     defaultValue: types.NOW,
     label: 'Last Modified',
     notes: 'Date and time this data was last updated',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -68,11 +53,6 @@ db.define('user', {
   },
   role: {
     type: new types.VIRTUAL(types.TEXT),
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    },
     get: () => 'cool-user',
     label: 'Role'
   },
@@ -81,11 +61,6 @@ db.define('user', {
     defaultValue: false,
     allowNull: false,
     label: 'Verified',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -97,11 +72,6 @@ db.define('user', {
     allowNull: true,
     searchable: true,
     label: 'Name',
-    api: {
-      creamodel: true,
-      readable: true,
-      updamodel: true
-    },
     validate: {
       notEmpty: {
         msg: 'Must not be empty'
@@ -116,11 +86,6 @@ db.define('user', {
     type: types.TEXT,
     allowNull: false,
     unique: 'user_email_idx',
-    api: {
-      creamodel: true,
-      readable: true,
-      updamodel: true
-    },
     validate: {
       isEmail: true,
       notNull: {
@@ -141,11 +106,6 @@ db.define('user', {
     allowNull: false,
     label: 'Login ID',
     unique: 'auth_idx',
-    api: {
-      creamodel: false,
-      readable: false,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -160,11 +120,6 @@ db.define('user', {
     allowNull: false,
     label: 'Login Token',
     unique: 'auth_idx',
-    api: {
-      creamodel: false,
-      readable: false,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -178,23 +133,13 @@ db.define('user', {
     type: types.JSON,
     allowNull: true,
     searchable: false,
-    label: 'Settings',
-    api: {
-      creamodel: true,
-      readable: true,
-      updamodel: true
-    }
+    label: 'Settings'
   },
   settingsb: {
     type: types.JSONB,
     allowNull: true,
     searchable: false,
-    label: 'Settings B',
-    api: {
-      creamodel: true,
-      readable: true,
-      updamodel: true
-    }
+    label: 'Settings B'
   }
 }, {
   timestamps: true,
@@ -213,11 +158,6 @@ db.define('store', {
     allowNull: false,
     label: 'ID',
     notes: 'Unique ID',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -234,11 +174,6 @@ db.define('store', {
     defaultValue: types.NOW,
     label: 'Created',
     notes: 'Date and time this data was created',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -254,11 +189,6 @@ db.define('store', {
     defaultValue: types.NOW,
     label: 'Last Modified',
     notes: 'Date and time this data was last updated',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -273,11 +203,6 @@ db.define('store', {
     allowNull: true,
     searchable: true,
     label: 'Name',
-    api: {
-      creamodel: true,
-      readable: true,
-      updamodel: true
-    },
     validate: {
       notEmpty: {
         msg: 'Must not be empty'
@@ -293,11 +218,6 @@ db.define('store', {
     allowNull: true,
     searchable: true,
     label: 'Type',
-    api: {
-      creamodel: true,
-      readable: true,
-      updamodel: true
-    },
     validate: {
       notEmpty: {
         msg: 'Must not be empty'
@@ -312,12 +232,7 @@ db.define('store', {
     type: types.GEOGRAPHY('POINT', 4326),
     allowNull: true,
     label: 'Location',
-    notes: 'Location of the store',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    }
+    notes: 'Location of the store'
   }
 }, {
   timestamps: true,
@@ -336,11 +251,6 @@ db.define('datum', {
     allowNull: false,
     label: 'ID',
     notes: 'Unique ID',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -357,11 +267,6 @@ db.define('datum', {
     defaultValue: types.NOW,
     label: 'Created',
     notes: 'Date and time this data was created',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -377,11 +282,6 @@ db.define('datum', {
     defaultValue: types.NOW,
     label: 'Last Modified',
     notes: 'Date and time this data was last updated',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    },
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -391,33 +291,38 @@ db.define('datum', {
       }
     }
   },
+  sourceId: {
+    type: types.TEXT,
+    allowNull: false,
+    searchable: true,
+    label: 'Source ID',
+    validate: {
+      notEmpty: {
+        msg: 'Must not be empty'
+      },
+      len: {
+        args: [ 2, 2048 ],
+        msg: 'Must be between 2 and 2048 characters'
+      }
+    }
+  },
   data: {
     type: types.JSONB,
     allowNull: true,
     label: 'Data',
-    notes: 'Properties of the datum',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    }
+    notes: 'Properties of the datum'
   },
   geometry: {
     type: types.GEOGRAPHY,
     allowNull: true,
     label: 'Geometry',
-    notes: 'Geometry of the datum',
-    api: {
-      creamodel: false,
-      readable: true,
-      updamodel: false
-    }
+    notes: 'Geometry of the datum'
   }
 }, {
   timestamps: true,
   scopes: {
     public: {
-      attributes: [ 'id', 'createdAt', 'data', 'geometry' ]
+      attributes: [ 'id', 'createdAt', 'data', 'sourceId', 'geometry' ]
     }
   }
 })

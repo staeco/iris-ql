@@ -5,14 +5,10 @@ import { BadRequestError } from '../errors'
 import isObject from 'is-pure-object'
 
 const numeric = (info) => {
-  if (info.raw) {
-    if (typeof raw === 'number') return info.raw
-    if (typeof raw === 'string') {
-      const parsed = parseFloat(info.raw)
-      if (!isNaN(parsed)) return parsed
-    }
-  }
-  if (info.types.includes('date')) {
+  if (info.value.type === 'numeric') return info.value // already cast as numeric
+  const flatTypes = info.types.map((i) => i.type)
+  //if (flatTypes.includes('number')) return info.value // already a number
+  if (flatTypes.includes('date')) {
     return types.cast(types.fn('time_to_ms', info.value), 'numeric')
   }
   return types.cast(info.value, 'numeric')
@@ -83,7 +79,7 @@ export const min = {
   returns: (valueInfo) => {
     const primaryType = valueInfo.types.find((i) => min.signature[0].types.includes(i.type))
     return {
-      type: primaryType,
+      type: primaryType.type,
       measurement: primaryType.measurement
     }
   },
@@ -103,7 +99,7 @@ export const max = {
   returns: (valueInfo) => {
     const primaryType = valueInfo.types.find((i) => max.signature[0].types.includes(i.type))
     return {
-      type: primaryType,
+      type: primaryType.type,
       measurement: primaryType.measurement
     }
   },
@@ -123,7 +119,7 @@ export const sum = {
   returns: (valueInfo) => {
     const primaryType = valueInfo.types.find((i) => sum.signature[0].types.includes(i.type))
     return {
-      type: primaryType,
+      type: primaryType.type,
       measurement: primaryType.measurement
     }
   },
@@ -143,7 +139,7 @@ export const average = {
   returns: (valueInfo) => {
     const primaryType = valueInfo.types.find((i) => average.signature[0].types.includes(i.type))
     return {
-      type: primaryType,
+      type: primaryType.type,
       measurement: primaryType.measurement
     }
   },
@@ -163,7 +159,7 @@ export const median = {
   returns: (valueInfo) => {
     const primaryType = valueInfo.types.find((i) => median.signature[0].types.includes(i.type))
     return {
-      type: primaryType,
+      type: primaryType.type,
       measurement: primaryType.measurement
     }
   },

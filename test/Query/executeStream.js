@@ -73,7 +73,7 @@ describe('Query#executeStream', () => {
     should.exist(parsed[0].name)
   })
   it('should execute with proper model name', async () => {
-    const query = new Query({ limit: 1 }, { model: datum.scope('public') })
+    const query = new Query({ limit: 1, filters: { sourceId: '911-calls' } }, { model: datum.scope('public') })
     const stream = await query.executeStream({
       format: json
     })

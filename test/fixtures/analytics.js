@@ -1,5 +1,6 @@
 export const crimeTimeSeries = {
   filters: {
+    sourceId: '911-calls',
     data: {
       receivedAt: { $ne: null }
     }
@@ -27,6 +28,7 @@ export const crimeTimeSeries = {
 
 const seventies = new Date(0).toISOString()
 export const crimePerOfficer = {
+  sourceId: '911-calls',
   visibility: 'public',
   filters: {
     data: {
