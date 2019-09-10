@@ -233,33 +233,15 @@ Returns the current date.
 }
 ```
 
-### lastWeek() -> date
+### last(Duration text) -> date
 
-Returns the current date minus 7 days.
-
-```js
-{
-  function: 'lastWeek'
-}
-```
-
-### lastMonth() -> date
-
-Returns the current date minus 1 month.
+Returns the current date minus a duration specified as an ISO duration.
 
 ```js
+// One week ago
 {
-  function: 'lastMonth'
-}
-```
-
-### lastYear() -> date
-
-Returns the current date minus 1 year.
-
-```js
-{
-  function: 'lastYear'
+  function: 'last',
+  arguments: [ 'P1W' ]
 }
 ```
 
