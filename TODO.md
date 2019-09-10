@@ -8,7 +8,6 @@
 - Variadic logic and math functions
 - Add missing math functions https://www.postgresql.org/docs/11/functions-math.html
 
-
 ## Future
 
 - Move searchable into something else

@@ -102,7 +102,7 @@ describe('Filter', () => {
     should.exist(query.input)
     should(where({ value: query.value(), model: datum })).eql(`fix_jsonb_array("datum"."data"#>>'{officers}') @> ARRAY['W301']`)
   })
-  it.skip('should fail with invalid function usage', async () => {
+  it('should fail with invalid function usage', async () => {
     try {
       new Filter({
         function: 'gte',
@@ -125,7 +125,13 @@ describe('Filter', () => {
       })
     } catch (err) {
       should.exist(err)
-      console.log(err)
+      should(err.fields).eql([ {
+        path: [ 'arguments', 0 ],
+        value: {
+          field: 'data.officers'
+        },
+        message: 'Argument "Value A" for "Greater Than or Equal" must be of type: number, date, instead got array'
+      } ])
       return
     }
     throw new Error('Did not throw!')

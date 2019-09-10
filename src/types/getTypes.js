@@ -23,7 +23,7 @@ const getJSONTypes = (fieldPath, { model, subSchemas = {} }) => {
   if (!attrDef) return []
   const desc = schemaTypes[attrDef.type]
   if (!desc) return []
-  return [ { type: attrDef.type, measurement: attrDef.measurement } ]
+  return [ { type: attrDef.type, measurement: attrDef.measurement, items: attrDef.items } ]
 }
 
 const getFieldTypes = (fieldPath, { model }) => {
@@ -32,7 +32,7 @@ const getFieldTypes = (fieldPath, { model }) => {
   return [ toSchemaType(desc.type) ]
 }
 
-// return empty on any invalid condition, `parse` will handle main validation
+// return empty on any invalid condition, `parse` will handle main validation before this function is called
 const getTypes = (v, opt) => {
   if (!isQueryValue(v)) return getValueTypes(v)
   if (v.function) {

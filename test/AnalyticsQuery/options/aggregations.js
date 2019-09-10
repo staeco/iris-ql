@@ -65,7 +65,6 @@ describe('AnalyticsQuery#options#aggregations', () => {
     const res = await query.execute()
     should.exist(res)
     res.length.should.eql(3)
-    console.log(res[0])
     should(typeof res[0].timeSpent).eql('number')
   })
   it('should return aggregation invalid alias errors correctly', async () => {

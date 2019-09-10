@@ -32,7 +32,7 @@ const toSchemaType = (type) => {
   }
 
   // Unsupported types: ENUM, BLOB, CIDR, INET, MACADDR, RANGE, HSTORE, plain geometry, plain geography
-  return 'any'
+  return { type: 'any' }
 }
 
 export default toSchemaType

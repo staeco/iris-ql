@@ -1,6 +1,6 @@
 import parse from './parse'
 import exportStream from '../util/export'
-
+import getTypes from '../types/getTypes'
 
 export default class AnalyticsQuery {
   constructor(obj, options={}) {
@@ -19,6 +19,23 @@ export default class AnalyticsQuery {
   }
   value = () => this._parsed
   toJSON = () => this.input
+  getOutputSchema = () =>
+    this.input.aggregations.reduce((prev, agg, idx) => {
+      const types = getTypes(agg.value, {
+        ...this.options,
+        context: [ 'aggregations', idx ]
+      })
+      const primaryType = types.find((i) => i.type !== 'any')
+      const nv = {
+        type: primaryType?.type || 'any'
+      }
+      if (agg.name) nv.name = agg.name
+      if (agg.notes) nv.notes = agg.notes
+      if (primaryType?.measurement) nv.measurement = primaryType.measurement
+      prev[agg.alias] = nv
+      return prev
+    }, {})
+
   execute = async () =>
     this.options.model.findAll({
       raw: true,
