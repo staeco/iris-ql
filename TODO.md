@@ -9,6 +9,7 @@
 - Add missing math functions https://www.postgresql.org/docs/11/functions-math.html
 - getOptions that returns specific value suggestions for a query path
 - Prevent using groupings when aggregations dont support it
+- Reduce excess casting for numeric types
 
 ## Future
 

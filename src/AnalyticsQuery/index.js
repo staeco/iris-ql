@@ -39,7 +39,6 @@ export default class AnalyticsQuery {
   execute = async () =>
     this.options.model.findAll({
       raw: true,
-      logging: console.log,
       ...this.value()
     })
 
