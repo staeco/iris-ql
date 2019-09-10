@@ -11,7 +11,7 @@ describe('AnalyticsQuery#options#aggregations', () => {
           value: { function: 'count' },
           alias: 'count',
           filters: {
-            createdAt: { $gte: { function: 'lastWeek' } }
+            createdAt: { $gte: { function: 'last', arguments: [ 'P1W' ] } }
           }
         },
         {
@@ -35,7 +35,7 @@ describe('AnalyticsQuery#options#aggregations', () => {
           value: { function: 'count' },
           alias: 'count',
           filters: {
-            createdAt: { $gte: { function: 'lastWeek' } }
+            createdAt: { $gte: { function: 'last', arguments: [ 'P1W' ] } }
           }
         },
         {
@@ -49,7 +49,7 @@ describe('AnalyticsQuery#options#aggregations', () => {
               {
                 function: 'interval',
                 arguments: [
-                  { function: 'lastWeek' },
+                  { function: 'last', arguments: [ 'P1W' ] },
                   { field: 'createdAt' }
                 ]
               }

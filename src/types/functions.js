@@ -1,6 +1,7 @@
 import types from 'sequelize'
 import capitalize from 'capitalize'
 import decamelize from 'decamelize'
+import moment from 'moment'
 import { BadRequestError } from '../errors'
 import { multiline, line, point, polygon, multipolygon } from './'
 import isObject from 'is-pure-object'
@@ -467,29 +468,24 @@ export const now = {
   },
   execute: () => types.fn('now')
 }
-export const lastWeek = {
-  name: 'Last Week',
-  notes: 'Returns the date and time for 7 days ago',
+export const last = {
+  name: 'Last',
+  notes: 'Returns the date and time for any duration into the past',
+  signature: [
+    {
+      name: 'Duration',
+      types: [ 'text' ],
+      required: true
+    }
+  ],
   returns: {
     type: 'date'
   },
-  execute: () => types.literal("CURRENT_DATE - INTERVAL '7 days'")
-}
-export const lastMonth = {
-  name: 'Last Month',
-  notes: 'Returns the date and time for 1 month ago',
-  returns: {
-    type: 'date'
-  },
-  execute: () => types.literal("CURRENT_DATE - INTERVAL '1 month'")
-}
-export const lastYear = {
-  name: 'Last Year',
-  notes: 'Returns the date and time for 1 year ago',
-  returns: {
-    type: 'date'
-  },
-  execute: () => types.literal("CURRENT_DATE - INTERVAL '1 year'")
+  execute: ({ raw }) => {
+    const milli = moment.duration(raw).asMilliseconds()
+    if (milli === 0) throw new BadRequestError('Invalid duration')
+    return types.literal(`CURRENT_DATE - INTERVAL '${milli} milliseconds'`)
+  }
 }
 export const interval = {
   name: 'Interval',
