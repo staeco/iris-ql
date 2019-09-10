@@ -10,6 +10,7 @@
 - getOptions that returns specific value suggestions for a query path
 - Prevent using groupings when aggregations dont support it
 - Reduce excess casting for numeric types
+- Function name consistency (min/max but average/median/subtract?)
 
 ## Future
 

@@ -69,7 +69,6 @@ export const point = {
   check: (v) => !getBasicGeoJSONIssues(v, 'Point'),
   hydrate: geoCast
 }
-
 export const line = {
   name: 'GeoJSON LineString',
   check: (v) => !getBasicGeoJSONIssues(v, 'LineString'),

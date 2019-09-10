@@ -2,6 +2,7 @@ import types from 'sequelize'
 import capitalize from 'capitalize'
 import decamelize from 'decamelize'
 import { BadRequestError } from '../errors'
+import { multiline, line, point, polygon, multipolygon } from './'
 import isObject from 'is-pure-object'
 
 const numeric = (info) => {
@@ -12,6 +13,48 @@ const numeric = (info) => {
     return types.cast(types.fn('time_to_ms', info.value), 'numeric')
   }
   return types.cast(info.value, 'numeric')
+}
+
+const getGeoReturnType = (raw) => {
+  let o
+  try {
+    o = JSON.parse(raw)
+  } catch (err) {
+    return 'geometry'
+  }
+  if (!isObject(o)) return 'geometry'
+
+  // FeatureCollection
+  if (Array.isArray(o.features)) return 'geometry'
+  // Feature
+  if (o.geometry) return getGeoReturnType(JSON.stringify(o.geometry))
+  // Regular types
+  if (point.check(o)) return 'point'
+  if (line.check(o)) return 'line'
+  if (multiline.check(o)) return 'multiline'
+  if (polygon.check(o)) return 'polygon'
+  if (multipolygon.check(o)) return 'multipolygon'
+  return 'geometry'
+}
+
+const getGeometryValue = (raw) => {
+  let o
+  try {
+    o = JSON.parse(raw)
+  } catch (err) {
+    throw new BadRequestError('Not a valid object!')
+  }
+  if (!isObject(o)) throw new BadRequestError('Not a valid object!')
+  if (typeof o.type !== 'string') throw new BadRequestError('Not a valid GeoJSON object!')
+
+  // FeatureCollection
+  if (Array.isArray(o.features)) return types.fn('geocollection_from_geojson', raw)
+
+  // Feature
+  if (o.geometry) return getGeometryValue(JSON.stringify(o.geometry))
+
+  // Anything else
+  return types.fn('from_geojson', raw)
 }
 
 const truncatesToDB = {
@@ -567,12 +610,12 @@ export const intersects = {
   signature: [
     {
       name: 'Geometry A',
-      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline' ],
+      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry' ],
       required: true
     },
     {
       name: 'Geometry B',
-      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline' ],
+      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry' ],
       required: true
     }
   ],
@@ -588,12 +631,12 @@ export const distance = {
   signature: [
     {
       name: 'Geometry A',
-      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline' ],
+      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry' ],
       required: true
     },
     {
       name: 'Geometry B',
-      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline' ],
+      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry' ],
       required: true
     }
   ],
@@ -617,26 +660,10 @@ export const geojson = {
       required: true
     }
   ],
-  returns: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline' ],
-  execute: ({ raw }) => {
-    let o
-    try {
-      o = JSON.parse(raw)
-    } catch (err) {
-      throw new BadRequestError('Not a valid object!')
-    }
-    if (!isObject(o)) throw new BadRequestError('Not a valid object!')
-    if (typeof o.type !== 'string') throw new BadRequestError('Not a valid GeoJSON object!')
-
-    // FeatureCollection
-    if (Array.isArray(o.features)) return types.fn('geocollection_from_geojson', raw)
-
-    // Feature
-    if (o.geometry) return types.fn('from_geojson', JSON.stringify(o.geometry))
-
-    // Anything else
-    return types.fn('from_geojson', raw)
-  }
+  returns: ({ raw }) => ({
+    type: getGeoReturnType(raw)
+  }),
+  execute: ({ raw }) => getGeometryValue(raw)
 }
 export const boundingBox = {
   name: 'Create Bounding Box',

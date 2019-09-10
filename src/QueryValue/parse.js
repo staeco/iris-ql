@@ -21,7 +21,7 @@ const validateArgumentTypes = (func, sig, arg, opt) => {
     throw new ValidationError({
       path: opt.context,
       value: arg,
-      message: `Argument "${sig.name}" for "${func.name}" must be of type: ${sig.types.join(', ')}, instead got ${argTypes.join(', ')}`
+      message: `Argument "${sig.name}" for "${func.name}" must be of type: ${sig.types.join(', ')} - instead got ${argTypes.length === 0 ? '<none>' : argTypes.join(', ')}`
     })
   }
   return true

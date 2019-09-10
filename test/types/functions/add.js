@@ -19,15 +19,15 @@ describe('types#functions#add', () => {
       aggregations: [
         { value: { function: 'count' }, alias: 'total' },
         { value: { field: 'data.type' }, alias: 'type' },
-        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'totalCost' }
+        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'cost' }
       ],
       groupings: [
         { field: 'type' }
       ]
     }
     const expectedResponse = [
-      { total: 1, type: 'electric', totalCost: 6.73 },
-      { total: 1, type: 'regular', totalCost: 60.43 }
+      { total: 1, type: 'electric', cost: 6.73 },
+      { total: 1, type: 'regular', cost: 60.43 }
     ]
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()
@@ -46,15 +46,15 @@ describe('types#functions#add', () => {
       aggregations: [
         { value: { function: 'count' }, alias: 'total' },
         { value: { field: 'data.type' }, alias: 'type' },
-        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'totalCost' }
+        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'cost' }
       ],
       groupings: [
         { field: 'type' }
       ]
     }
     const expectedResponse = [
-      { total: 1, type: 'electric', totalCost: 6.14 },
-      { total: 1, type: 'regular', totalCost: 51.14 }
+      { total: 1, type: 'electric', cost: 6.14 },
+      { total: 1, type: 'regular', cost: 51.14 }
     ]
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()
@@ -79,15 +79,15 @@ describe('types#functions#add', () => {
       aggregations: [
         { value: { function: 'count' }, alias: 'total' },
         { value: { field: 'data.type' }, alias: 'type' },
-        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'totalCost' }
+        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'cost' }
       ],
       groupings: [
         { field: 'type' }
       ]
     }
     const expectedResponse = [
-      { total: 1, type: 'electric', totalCost: 5.73 },
-      { total: 1, type: 'regular', totalCost: 59.43 }
+      { total: 1, type: 'electric', cost: 5.73 },
+      { total: 1, type: 'regular', cost: 59.43 }
     ]
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()
@@ -106,7 +106,7 @@ describe('types#functions#add', () => {
       aggregations: [
         { value: { function: 'count' }, alias: 'total' },
         { value: { field: 'data.type' }, alias: 'type' },
-        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'totalCost' }
+        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'cost' }
       ],
       groupings: [
         { field: 'type' }
@@ -119,7 +119,7 @@ describe('types#functions#add', () => {
       should(err.fields).eql([ {
         path: [ 'aggregations', 2, 'value', 'arguments', 0, 'arguments', 1 ],
         value: 'abc',
-        message: 'Argument "Value B" for "Add" must be of type: number, instead got any, text'
+        message: 'Argument "Value B" for "Add" must be of type: number - instead got any, text'
       } ])
       return
     }
@@ -144,7 +144,7 @@ describe('types#functions#add', () => {
       aggregations: [
         { value: { function: 'count' }, alias: 'total' },
         { value: { field: 'data.type' }, alias: 'type' },
-        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'totalCost' }
+        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'cost' }
       ],
       groupings: [
         { field: 'type' }
@@ -157,7 +157,7 @@ describe('types#functions#add', () => {
       type: {
         type: 'text'
       },
-      totalCost: {
+      cost: {
         type: 'number',
         measurement: {
           type: 'currency',

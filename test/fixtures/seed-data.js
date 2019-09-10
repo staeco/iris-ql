@@ -59,7 +59,8 @@ const data = [
         type: 'LineString',
         coordinates: [
           [ 1, 2 ],
-          [ 2, 1 ]
+          [ 1, 8 ],
+          [ 1, 12 ]
         ]
       }
     },
@@ -67,7 +68,8 @@ const data = [
       type: 'LineString',
       coordinates: [
         [ 1, 2 ],
-        [ 2, 1 ]
+        [ 1, 8 ],
+        [ 1, 12 ]
       ]
     }
   },
@@ -80,11 +82,12 @@ const data = [
       type: 'electric',
       cost: 5.14,
       tax: 1.59,
-      location: {
+      path: {
         type: 'LineString',
         coordinates: [
           [ 1, 2 ],
-          [ 2, 1 ]
+          [ 1, 8 ],
+          [ 1, 12 ]
         ]
       }
     },
@@ -92,7 +95,8 @@ const data = [
       type: 'LineString',
       coordinates: [
         [ 1, 2 ],
-        [ 2, 1 ]
+        [ 1, 8 ],
+        [ 1, 12 ]
       ]
     }
   }

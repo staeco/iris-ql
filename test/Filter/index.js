@@ -130,7 +130,7 @@ describe('Filter', () => {
         value: {
           field: 'data.officers'
         },
-        message: 'Argument "Value A" for "Greater Than or Equal" must be of type: number, date, instead got array'
+        message: 'Argument "Value A" for "Greater Than or Equal" must be of type: number, date - instead got array'
       } ])
       return
     }
