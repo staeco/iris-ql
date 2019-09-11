@@ -39,7 +39,14 @@ describe('types#getTypes', () => {
     } ])
   })
   it('should work on top-level', () => {
-    should(fn({ field: 'createdAt' }, opt)).eql([ { type: 'date' } ])
-    should(fn({ field: 'sourceId' }, opt)).eql([ { type: 'text' } ])
+    should(fn({ field: 'createdAt' }, opt)).eql([ {
+      name: 'Created',
+      notes: 'Date and time this data was created',
+      type: 'date'
+    } ])
+    should(fn({ field: 'sourceId' }, opt)).eql([ {
+      name: 'Source ID',
+      type: 'text'
+    } ])
   })
 })

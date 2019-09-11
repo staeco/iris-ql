@@ -11,7 +11,7 @@ var _hydrateFields = _interopRequireDefault(require("../util/hydrateFields"));
 
 var _errors = require("../errors");
 
-var _isPureObject = _interopRequireDefault(require("is-pure-object"));
+var _isPlainObject = _interopRequireDefault(require("is-plain-object"));
 
 var _isQueryValue = _interopRequireDefault(require("../util/isQueryValue"));
 
@@ -66,7 +66,7 @@ var _default = (obj, opt) => {
       return p;
     }
 
-    if ((0, _isPureObject.default)(v)) {
+    if ((0, _isPlainObject.default)(v)) {
       return Object.keys(v).reduce(_ref, {});
     }
 

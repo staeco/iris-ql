@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.boundingBox = exports.geojson = exports.distance = exports.intersects = exports.length = exports.area = exports.extract = exports.truncate = exports.interval = exports.lastYear = exports.lastMonth = exports.lastWeek = exports.now = exports.eq = exports.lte = exports.gte = exports.lt = exports.gt = exports.remainder = exports.divide = exports.multiply = exports.subtract = exports.add = exports.count = exports.median = exports.average = exports.sum = exports.max = exports.min = exports.expand = void 0;
+exports.boundingBox = exports.geojson = exports.distance = exports.intersects = exports.length = exports.area = exports.extract = exports.bucket = exports.interval = exports.last = exports.now = exports.eq = exports.lte = exports.gte = exports.lt = exports.gt = exports.remainder = exports.divide = exports.multiply = exports.subtract = exports.add = exports.count = exports.median = exports.average = exports.sum = exports.max = exports.min = exports.expand = void 0;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
@@ -9,45 +9,74 @@ var _capitalize = _interopRequireDefault(require("capitalize"));
 
 var _decamelize = _interopRequireDefault(require("decamelize"));
 
+var _moment = _interopRequireDefault(require("moment"));
+
 var _errors = require("../errors");
 
-var _isPureObject = _interopRequireDefault(require("is-pure-object"));
+var _ = require("./");
+
+var _isPlainObject = _interopRequireDefault(require("is-plain-object"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _ref(i) {
+  return i.type;
+}
+
 const numeric = info => {
-  if (info.raw) {
-    if (typeof raw === 'number') return info.raw;
+  if (info.value.type === 'numeric') return info.value; // already cast as numeric
 
-    if (typeof raw === 'string') {
-      const parsed = parseFloat(info.raw);
-      if (!isNaN(parsed)) return parsed;
-    }
-  }
+  const flatTypes = info.types.map(_ref); //if (flatTypes.includes('number')) return info.value // already a number
 
-  if (info.types.includes('date')) {
+  if (flatTypes.includes('date')) {
     return _sequelize.default.cast(_sequelize.default.fn('time_to_ms', info.value), 'numeric');
   }
 
   return _sequelize.default.cast(info.value, 'numeric');
 };
 
-const truncatesToDB = {
-  millisecond: 'milliseconds',
-  second: 'second',
-  minute: 'minute',
-  hour: 'hour',
-  day: 'day',
-  week: 'week',
-  month: 'month',
-  quarter: 'quarter',
-  year: 'year',
-  decade: 'decade'
+const getGeoReturnType = raw => {
+  let o;
+
+  try {
+    o = JSON.parse(raw);
+  } catch (err) {
+    return 'geometry';
+  }
+
+  if (!(0, _isPlainObject.default)(o)) return 'geometry'; // FeatureCollection
+
+  if (Array.isArray(o.features)) return 'geometry'; // Feature
+
+  if (o.geometry) return getGeoReturnType(JSON.stringify(o.geometry)); // Regular types
+
+  if (_.point.check(o)) return 'point';
+  if (_.line.check(o)) return 'line';
+  if (_.multiline.check(o)) return 'multiline';
+  if (_.polygon.check(o)) return 'polygon';
+  if (_.multipolygon.check(o)) return 'multipolygon';
+  return 'geometry';
 };
-const truncates = Object.keys(truncatesToDB).map(k => ({
-  value: k,
-  label: (0, _capitalize.default)(k)
-}));
+
+const getGeometryValue = raw => {
+  let o;
+
+  try {
+    o = JSON.parse(raw);
+  } catch (err) {
+    throw new _errors.BadRequestError('Not a valid object!');
+  }
+
+  if (!(0, _isPlainObject.default)(o)) throw new _errors.BadRequestError('Not a valid object!');
+  if (typeof o.type !== 'string') throw new _errors.BadRequestError('Not a valid GeoJSON object!'); // FeatureCollection
+
+  if (Array.isArray(o.features)) return _sequelize.default.fn('geocollection_from_geojson', raw); // Feature
+
+  if (o.geometry) return getGeometryValue(JSON.stringify(o.geometry)); // Anything else
+
+  return _sequelize.default.fn('from_geojson', raw);
+};
+
 const partsToDB = {
   millisecond: 'milliseconds',
   second: 'second',
@@ -65,9 +94,25 @@ const partsToDB = {
 const parts = Object.keys(partsToDB).map(k => ({
   value: k,
   label: _capitalize.default.words((0, _decamelize.default)(k, ' '))
+}));
+const truncatesToDB = {
+  millisecond: 'milliseconds',
+  second: 'second',
+  minute: 'minute',
+  hour: 'hour',
+  day: 'day',
+  week: 'week',
+  month: 'month',
+  quarter: 'quarter',
+  year: 'year',
+  decade: 'decade'
+};
+const truncates = Object.keys(truncatesToDB).map(k => ({
+  value: k,
+  label: (0, _capitalize.default)(k)
 })); // Arrays
 
-function _ref(i) {
+function _ref2(i) {
   return i.type === 'array';
 }
 
@@ -79,13 +124,13 @@ const expand = {
     types: ['array'],
     required: true
   }],
-  returns: listInfo => listInfo.types.find(_ref).items,
+  returns: listInfo => listInfo.types.find(_ref2).items,
   execute: listInfo => _sequelize.default.fn('unnest', listInfo.value)
 }; // Aggregations
 
 exports.expand = expand;
 
-function _ref2(i) {
+function _ref3(i) {
   return min.signature[0].types.includes(i.type);
 }
 
@@ -98,9 +143,9 @@ const min = {
     required: true
   }],
   returns: valueInfo => {
-    const primaryType = valueInfo.types.find(_ref2);
+    const primaryType = valueInfo.types.find(_ref3);
     return {
-      type: primaryType,
+      type: primaryType.type,
       measurement: primaryType.measurement
     };
   },
@@ -109,7 +154,7 @@ const min = {
 };
 exports.min = min;
 
-function _ref3(i) {
+function _ref4(i) {
   return max.signature[0].types.includes(i.type);
 }
 
@@ -122,9 +167,9 @@ const max = {
     required: true
   }],
   returns: valueInfo => {
-    const primaryType = valueInfo.types.find(_ref3);
+    const primaryType = valueInfo.types.find(_ref4);
     return {
-      type: primaryType,
+      type: primaryType.type,
       measurement: primaryType.measurement
     };
   },
@@ -133,7 +178,7 @@ const max = {
 };
 exports.max = max;
 
-function _ref4(i) {
+function _ref5(i) {
   return sum.signature[0].types.includes(i.type);
 }
 
@@ -146,9 +191,9 @@ const sum = {
     required: true
   }],
   returns: valueInfo => {
-    const primaryType = valueInfo.types.find(_ref4);
+    const primaryType = valueInfo.types.find(_ref5);
     return {
-      type: primaryType,
+      type: primaryType.type,
       measurement: primaryType.measurement
     };
   },
@@ -157,7 +202,7 @@ const sum = {
 };
 exports.sum = sum;
 
-function _ref5(i) {
+function _ref6(i) {
   return average.signature[0].types.includes(i.type);
 }
 
@@ -170,9 +215,9 @@ const average = {
     required: true
   }],
   returns: valueInfo => {
-    const primaryType = valueInfo.types.find(_ref5);
+    const primaryType = valueInfo.types.find(_ref6);
     return {
-      type: primaryType,
+      type: primaryType.type,
       measurement: primaryType.measurement
     };
   },
@@ -181,7 +226,7 @@ const average = {
 };
 exports.average = average;
 
-function _ref6(i) {
+function _ref7(i) {
   return median.signature[0].types.includes(i.type);
 }
 
@@ -194,9 +239,9 @@ const median = {
     required: true
   }],
   returns: valueInfo => {
-    const primaryType = valueInfo.types.find(_ref6);
+    const primaryType = valueInfo.types.find(_ref7);
     return {
-      type: primaryType,
+      type: primaryType.type,
       measurement: primaryType.measurement
     };
   },
@@ -216,11 +261,11 @@ const count = {
 
 exports.count = count;
 
-function _ref7(i) {
+function _ref8(i) {
   return i.type === 'number';
 }
 
-function _ref8(i) {
+function _ref9(i) {
   return i.type === 'number';
 }
 
@@ -237,22 +282,22 @@ const add = {
     required: true
   }],
   returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find(_ref7);
-    const primaryTypeB = infoB.types.find(_ref8);
+    const primaryTypeA = infoA.types.find(_ref8);
+    const primaryTypeB = infoB.types.find(_ref9);
     return {
       type: 'number',
-      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+      measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
     };
   },
   execute: (a, b) => _sequelize.default.fn('add', numeric(a), numeric(b))
 };
 exports.add = add;
 
-function _ref9(i) {
+function _ref10(i) {
   return i.type === 'number';
 }
 
-function _ref10(i) {
+function _ref11(i) {
   return i.type === 'number';
 }
 
@@ -269,22 +314,22 @@ const subtract = {
     required: true
   }],
   returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find(_ref9);
-    const primaryTypeB = infoB.types.find(_ref10);
+    const primaryTypeA = infoA.types.find(_ref10);
+    const primaryTypeB = infoB.types.find(_ref11);
     return {
       type: 'number',
-      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+      measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
     };
   },
   execute: (a, b) => _sequelize.default.fn('sub', numeric(a), numeric(b))
 };
 exports.subtract = subtract;
 
-function _ref11(i) {
+function _ref12(i) {
   return i.type === 'number';
 }
 
-function _ref12(i) {
+function _ref13(i) {
   return i.type === 'number';
 }
 
@@ -301,22 +346,22 @@ const multiply = {
     required: true
   }],
   returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find(_ref11);
-    const primaryTypeB = infoB.types.find(_ref12);
+    const primaryTypeA = infoA.types.find(_ref12);
+    const primaryTypeB = infoB.types.find(_ref13);
     return {
       type: 'number',
-      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+      measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
     };
   },
   execute: (a, b) => _sequelize.default.fn('mult', numeric(a), numeric(b))
 };
 exports.multiply = multiply;
 
-function _ref13(i) {
+function _ref14(i) {
   return i.type === 'number';
 }
 
-function _ref14(i) {
+function _ref15(i) {
   return i.type === 'number';
 }
 
@@ -333,22 +378,22 @@ const divide = {
     required: true
   }],
   returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find(_ref13);
-    const primaryTypeB = infoB.types.find(_ref14);
+    const primaryTypeA = infoA.types.find(_ref14);
+    const primaryTypeB = infoB.types.find(_ref15);
     return {
       type: 'number',
-      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+      measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
     };
   },
   execute: (a, b) => _sequelize.default.fn('div', numeric(a), numeric(b))
 };
 exports.divide = divide;
 
-function _ref15(i) {
+function _ref16(i) {
   return i.type === 'number';
 }
 
-function _ref16(i) {
+function _ref17(i) {
   return i.type === 'number';
 }
 
@@ -365,11 +410,11 @@ const remainder = {
     required: true
   }],
   returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find(_ref15);
-    const primaryTypeB = infoB.types.find(_ref16);
+    const primaryTypeA = infoA.types.find(_ref16);
+    const primaryTypeB = infoB.types.find(_ref17);
     return {
       type: 'number',
-      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+      measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
     };
   },
   execute: (a, b) => _sequelize.default.fn('mod', numeric(a), numeric(b))
@@ -476,33 +521,27 @@ const now = {
   execute: () => _sequelize.default.fn('now')
 };
 exports.now = now;
-const lastWeek = {
-  name: 'Last Week',
-  notes: 'Returns the date and time for 7 days ago',
+const last = {
+  name: 'Last',
+  notes: 'Returns the date and time for any duration into the past',
+  signature: [{
+    name: 'Duration',
+    types: ['text'],
+    required: true
+  }],
   returns: {
     type: 'date'
   },
-  execute: () => _sequelize.default.literal("CURRENT_DATE - INTERVAL '7 days'")
+  execute: ({
+    raw
+  }) => {
+    const milli = _moment.default.duration(raw).asMilliseconds();
+
+    if (milli === 0) throw new _errors.BadRequestError('Invalid duration');
+    return _sequelize.default.literal(`CURRENT_DATE - INTERVAL '${milli} milliseconds'`);
+  }
 };
-exports.lastWeek = lastWeek;
-const lastMonth = {
-  name: 'Last Month',
-  notes: 'Returns the date and time for 1 month ago',
-  returns: {
-    type: 'date'
-  },
-  execute: () => _sequelize.default.literal("CURRENT_DATE - INTERVAL '1 month'")
-};
-exports.lastMonth = lastMonth;
-const lastYear = {
-  name: 'Last Year',
-  notes: 'Returns the date and time for 1 year ago',
-  returns: {
-    type: 'date'
-  },
-  execute: () => _sequelize.default.literal("CURRENT_DATE - INTERVAL '1 year'")
-};
-exports.lastYear = lastYear;
+exports.last = last;
 const interval = {
   name: 'Interval',
   notes: 'Returns the difference in milliseconds between Start and End dates',
@@ -525,14 +564,14 @@ const interval = {
   execute: (start, end) => _sequelize.default.fn('sub', _sequelize.default.fn('time_to_ms', end.value), _sequelize.default.fn('time_to_ms', start.value))
 };
 exports.interval = interval;
-const truncate = {
-  name: 'Truncate',
-  notes: 'Returns a date truncated to a certain unit of time',
+const bucket = {
+  name: 'Bucket',
+  notes: 'Returns a date rounded to a unit of time',
   signature: [{
     name: 'Unit',
     types: ['text'],
-    required: true,
-    options: truncates
+    options: truncates,
+    required: true
   }, {
     name: 'Date',
     types: ['date'],
@@ -543,10 +582,10 @@ const truncate = {
   },
   execute: (p, f) => _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value)
 };
-exports.truncate = truncate;
+exports.bucket = bucket;
 const extract = {
   name: 'Extract',
-  notes: 'Extracts a measurement of time from a date',
+  notes: 'Converts a date to a unit of time',
   signature: [{
     name: 'Unit',
     types: ['text'],
@@ -609,11 +648,11 @@ const intersects = {
   notes: 'Returns true/false if two geometries intersect',
   signature: [{
     name: 'Geometry A',
-    types: ['point', 'polygon', 'multipolygon', 'line', 'multiline'],
+    types: ['point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry'],
     required: true
   }, {
     name: 'Geometry B',
-    types: ['point', 'polygon', 'multipolygon', 'line', 'multiline'],
+    types: ['point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry'],
     required: true
   }],
   returns: {
@@ -627,11 +666,11 @@ const distance = {
   notes: 'Returns the distance between two geometries in meters',
   signature: [{
     name: 'Geometry A',
-    types: ['point', 'polygon', 'multipolygon', 'line', 'multiline'],
+    types: ['point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry'],
     required: true
   }, {
     name: 'Geometry B',
-    types: ['point', 'polygon', 'multipolygon', 'line', 'multiline'],
+    types: ['point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry'],
     required: true
   }],
   returns: {
@@ -652,27 +691,14 @@ const geojson = {
     types: ['text'],
     required: true
   }],
-  returns: ['point', 'polygon', 'multipolygon', 'line', 'multiline'],
+  returns: ({
+    raw
+  }) => ({
+    type: getGeoReturnType(raw)
+  }),
   execute: ({
     raw
-  }) => {
-    let o;
-
-    try {
-      o = JSON.parse(raw);
-    } catch (err) {
-      throw new _errors.BadRequestError('Not a valid object!');
-    }
-
-    if (!(0, _isPureObject.default)(o)) throw new _errors.BadRequestError('Not a valid object!');
-    if (typeof o.type !== 'string') throw new _errors.BadRequestError('Not a valid GeoJSON object!'); // FeatureCollection
-
-    if (Array.isArray(o.features)) return _sequelize.default.fn('geocollection_from_geojson', raw); // Feature
-
-    if (o.geometry) return _sequelize.default.fn('from_geojson', JSON.stringify(o.geometry)); // Anything else
-
-    return _sequelize.default.fn('from_geojson', raw);
-  }
+  }) => getGeometryValue(raw)
 };
 exports.geojson = geojson;
 const boundingBox = {

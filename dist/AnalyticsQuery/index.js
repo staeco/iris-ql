@@ -3,9 +3,13 @@
 exports.__esModule = true;
 exports.default = void 0;
 
+var _lodash = require("lodash");
+
 var _parse = _interopRequireDefault(require("./parse"));
 
 var _export = _interopRequireDefault(require("../util/export"));
+
+var _getTypes = _interopRequireDefault(require("../types/getTypes"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28,6 +32,23 @@ class AnalyticsQuery {
     this.value = () => this._parsed;
 
     this.toJSON = () => this.input;
+
+    this.getOutputSchema = () => this.input.aggregations.reduce((prev, agg, idx) => {
+      const types = (0, _getTypes.default)(agg.value, _objectSpread({}, this.options, {
+        context: ['aggregations', idx]
+      }));
+      if (types.length === 0) return prev; // no types? weird
+
+      const primaryType = types[0];
+      const nv = {
+        type: primaryType.type,
+        name: agg.name,
+        notes: agg.notes,
+        measurement: primaryType.measurement
+      };
+      prev[agg.alias] = (0, _lodash.pickBy)(nv);
+      return prev;
+    }, {});
 
     this.execute = async () => this.options.model.findAll(_objectSpread({
       raw: true

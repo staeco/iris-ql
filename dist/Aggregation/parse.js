@@ -3,7 +3,7 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-var _isPureObject = _interopRequireDefault(require("is-pure-object"));
+var _isPlainObject = _interopRequireDefault(require("is-plain-object"));
 
 var _QueryValue = _interopRequireDefault(require("../QueryValue"));
 
@@ -29,7 +29,7 @@ var _default = (a, opt) => {
   let agg, parsedFilters;
   const error = new _errors.ValidationError();
 
-  if (!(0, _isPureObject.default)(a)) {
+  if (!(0, _isPlainObject.default)(a)) {
     error.add({
       path: context,
       value: a,
@@ -69,7 +69,7 @@ var _default = (a, opt) => {
     error.add(err);
   }
 
-  if (a.filters && !(0, _isPureObject.default)(a.filters) && !Array.isArray(a.filters)) {
+  if (a.filters && !(0, _isPlainObject.default)(a.filters) && !Array.isArray(a.filters)) {
     error.add({
       path: [...context, 'filters'],
       value: a.filters,

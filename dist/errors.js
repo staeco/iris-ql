@@ -57,7 +57,6 @@ class ValidationError extends BadRequestError {
 
     this.fields = fields;
     if (!Array.isArray(this.fields)) this.fields = [this.fields];
-    if (this.fields.length) console.log('Validation Error Created:', this.fields);
     Error.captureStackTrace(this, ValidationError);
   }
 

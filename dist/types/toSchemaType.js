@@ -55,7 +55,7 @@ const toSchemaType = type => {
   if (key === 'REAL') return {
     type: 'number'
   };
-  if (key === 'DOUBLE') return {
+  if (key === 'DOUBLE PRECISION') return {
     type: 'number'
   };
   if (key === 'DECIMAL') return {
@@ -72,14 +72,17 @@ const toSchemaType = type => {
     items: toSchemaType(type.type)
   };
 
-  if (key === 'GEOMETRY' || key === 'GEOGRAPHY' && geomTypes[type.type]) {
-    return {
+  if (key === 'GEOMETRY' || key === 'GEOGRAPHY') {
+    if (geomTypes[type.type]) return {
       type: geomTypes[type.type]
     };
-  } // Unsupported types: ENUM, BLOB, CIDR, INET, MACADDR, RANGE, HSTORE, plain geometry, plain geography
+    return {
+      type: 'geometry'
+    };
+  } // Unsupported types: ENUM, BLOB, CIDR, INET, MACADDR, RANGE, HSTORE
 
 
-  return 'any';
+  return null;
 };
 
 var _default = toSchemaType;

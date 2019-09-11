@@ -3,7 +3,9 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-var _isPureObject = _interopRequireDefault(require("is-pure-object"));
+var _moment = _interopRequireDefault(require("moment"));
+
+var _isPlainObject = _interopRequireDefault(require("is-plain-object"));
 
 var _sequelize = require("sequelize");
 
@@ -33,6 +35,8 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+const zones = new Set(_moment.default.tz.names());
+
 var _default = (query, opt = {}) => {
   const error = new _errors.ValidationError();
   const {
@@ -46,7 +50,7 @@ var _default = (query, opt = {}) => {
     where: [{} // very dumb fix for https://github.com/sequelize/sequelize/issues/10142
     ],
     order: []
-  };
+  }; // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
 
   if (query.timezone) {
     if (typeof query.timezone !== 'string') {
@@ -56,9 +60,18 @@ var _default = (query, opt = {}) => {
         message: 'Must be a string.'
       });
     } else {
-      opt.timezone = query.timezone;
-      delete query.timezone;
+      if (!zones.has(query.timezone)) {
+        error.add({
+          path: [...context, 'timezone'],
+          value: query.timezone,
+          message: 'Not a valid timezone.'
+        });
+      } else {
+        opt.timezone = query.timezone;
+      }
     }
+
+    delete query.timezone;
   } // searching
 
 
@@ -148,7 +161,7 @@ var _default = (query, opt = {}) => {
 
 
   if (query.within) {
-    if (!(0, _isPureObject.default)(query.within)) {
+    if (!(0, _isPlainObject.default)(query.within)) {
       error.add({
         path: [...context, 'within'],
         value: query.within,
@@ -211,7 +224,7 @@ var _default = (query, opt = {}) => {
 
 
   if (query.intersects) {
-    if (!(0, _isPureObject.default)(query.intersects)) {
+    if (!(0, _isPlainObject.default)(query.intersects)) {
       error.add({
         path: [...context, 'intersects'],
         value: query.intersects,
@@ -300,7 +313,7 @@ var _default = (query, opt = {}) => {
 
 
   if (query.filters) {
-    if (!(0, _isPureObject.default)(query.filters) && !Array.isArray(query.filters)) {
+    if (!(0, _isPlainObject.default)(query.filters) && !Array.isArray(query.filters)) {
       error.add({
         path: [...context, 'filters'],
         value: query.filters,

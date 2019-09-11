@@ -48,10 +48,11 @@ const getJSONTypes = (fieldPath, {
   if (!attrDef) return [];
   const desc = schemaTypes[attrDef.type];
   if (!desc) return [];
-  return [{
+  return [(0, _lodash.pickBy)({
     type: attrDef.type,
-    measurement: attrDef.measurement
-  }];
+    measurement: attrDef.measurement,
+    items: attrDef.items
+  })];
 };
 
 const getFieldTypes = (fieldPath, {
@@ -59,11 +60,15 @@ const getFieldTypes = (fieldPath, {
 }) => {
   const desc = model.rawAttributes[fieldPath];
   if (!desc) return [];
-  return [(0, _toSchemaType.default)(desc.type)];
-}; // return empty on any invalid condition, `parse` will handle main validation
+  const schemaType = (0, _lodash.pickBy)(_objectSpread({}, (0, _toSchemaType.default)(desc.type), {
+    name: desc.name,
+    notes: desc.notes
+  }));
+  return schemaType ? [schemaType] : [];
+}; // return empty on any invalid condition, `parse` will handle main validation before this function is called
 
 
-const getTypes = (v, opt) => {
+const getTypes = (v, opt = {}) => {
   if (!(0, _isQueryValue.default)(v)) return getValueTypes(v);
 
   if (v.function) {
@@ -75,7 +80,7 @@ const getTypes = (v, opt) => {
       const args = v.arguments || [];
       const resolvedArgs = sigArgs.map((sig, idx) => {
         const nopt = _objectSpread({}, opt, {
-          context: [...opt.context, 'arguments', idx]
+          context: [...(opt.context || []), 'arguments', idx]
         });
 
         const argValue = args[idx];
@@ -84,7 +89,7 @@ const getTypes = (v, opt) => {
           raw: argValue
         };
       });
-      return [fn.returns(...resolvedArgs)];
+      return [(0, _lodash.pickBy)(fn.returns(...resolvedArgs))];
     }
 
     return [fn.returns];

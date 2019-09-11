@@ -5,7 +5,7 @@ exports.default = void 0;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
-var _isPureObject = _interopRequireDefault(require("is-pure-object"));
+var _isPlainObject = _interopRequireDefault(require("is-plain-object"));
 
 var _errors = require("../errors");
 
@@ -51,7 +51,7 @@ const validateArgumentTypes = (func, sig, arg, opt) => {
     throw new _errors.ValidationError({
       path: opt.context,
       value: arg,
-      message: `Argument "${sig.name}" for "${func.name}" must be of type: ${sig.types.join(', ')}, instead got ${argTypes.join(', ')}`
+      message: `Argument "${sig.name}" for "${func.name}" must be of type: ${sig.types.join(', ')} - instead got ${argTypes.length === 0 ? '<none>' : argTypes.join(', ')}`
     });
   }
 
@@ -125,7 +125,7 @@ const parse = (v, opt) => {
     return _sequelize.default.literal(model.sequelize.escape(v));
   }
 
-  if (!(0, _isPureObject.default)(v)) {
+  if (!(0, _isPlainObject.default)(v)) {
     throw new _errors.ValidationError({
       path: context,
       value: v,

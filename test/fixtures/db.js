@@ -9,7 +9,7 @@ db.define('user', {
     defaultValue: types.UUIDV4,
     primaryKey: true,
     allowNull: false,
-    label: 'ID',
+    name: 'ID',
     notes: 'Unique ID',
     validate: {
       notNull: {
@@ -25,7 +25,7 @@ db.define('user', {
     type: types.DATE,
     allowNull: false,
     defaultValue: types.NOW,
-    label: 'Created',
+    name: 'Created',
     notes: 'Date and time this data was created',
     validate: {
       notNull: {
@@ -40,7 +40,7 @@ db.define('user', {
     type: types.DATE,
     allowNull: false,
     defaultValue: types.NOW,
-    label: 'Last Modified',
+    name: 'Last Modified',
     notes: 'Date and time this data was last updated',
     validate: {
       notNull: {
@@ -54,13 +54,13 @@ db.define('user', {
   role: {
     type: new types.VIRTUAL(types.TEXT),
     get: () => 'cool-user',
-    label: 'Role'
+    name: 'Role'
   },
   verified: {
     type: types.BOOLEAN,
     defaultValue: false,
     allowNull: false,
-    label: 'Verified',
+    name: 'Verified',
     validate: {
       notNull: {
         msg: 'This field is required'
@@ -71,7 +71,7 @@ db.define('user', {
     type: types.TEXT,
     allowNull: true,
     searchable: true,
-    label: 'Name',
+    name: 'Name',
     validate: {
       notEmpty: {
         msg: 'Must not be empty'
@@ -99,12 +99,12 @@ db.define('user', {
         msg: 'Must be between 2 and 2048 characters'
       }
     },
-    label: 'Email'
+    name: 'Email'
   },
   authId: {
     type: types.TEXT,
     allowNull: false,
-    label: 'Login ID',
+    name: 'Login ID',
     unique: 'auth_idx',
     validate: {
       notNull: {
@@ -118,7 +118,7 @@ db.define('user', {
   authToken: {
     type: types.TEXT,
     allowNull: false,
-    label: 'Login Token',
+    name: 'Login Token',
     unique: 'auth_idx',
     validate: {
       notNull: {
@@ -133,13 +133,13 @@ db.define('user', {
     type: types.JSON,
     allowNull: true,
     searchable: false,
-    label: 'Settings'
+    name: 'Settings'
   },
   settingsb: {
     type: types.JSONB,
     allowNull: true,
     searchable: false,
-    label: 'Settings B'
+    name: 'Settings B'
   }
 }, {
   timestamps: true,
@@ -156,7 +156,7 @@ db.define('store', {
     defaultValue: types.UUIDV4,
     primaryKey: true,
     allowNull: false,
-    label: 'ID',
+    name: 'ID',
     notes: 'Unique ID',
     validate: {
       notNull: {
@@ -172,7 +172,7 @@ db.define('store', {
     type: types.DATE,
     allowNull: false,
     defaultValue: types.NOW,
-    label: 'Created',
+    name: 'Created',
     notes: 'Date and time this data was created',
     validate: {
       notNull: {
@@ -187,7 +187,7 @@ db.define('store', {
     type: types.DATE,
     allowNull: false,
     defaultValue: types.NOW,
-    label: 'Last Modified',
+    name: 'Last Modified',
     notes: 'Date and time this data was last updated',
     validate: {
       notNull: {
@@ -202,7 +202,7 @@ db.define('store', {
     type: types.TEXT,
     allowNull: true,
     searchable: true,
-    label: 'Name',
+    name: 'Name',
     validate: {
       notEmpty: {
         msg: 'Must not be empty'
@@ -217,7 +217,7 @@ db.define('store', {
     type: types.TEXT,
     allowNull: true,
     searchable: true,
-    label: 'Type',
+    name: 'Type',
     validate: {
       notEmpty: {
         msg: 'Must not be empty'
@@ -231,7 +231,7 @@ db.define('store', {
   location: {
     type: types.GEOGRAPHY('POINT', 4326),
     allowNull: true,
-    label: 'Location',
+    name: 'Location',
     notes: 'Location of the store'
   }
 }, {
@@ -249,7 +249,7 @@ db.define('datum', {
     defaultValue: types.UUIDV4,
     primaryKey: true,
     allowNull: false,
-    label: 'ID',
+    name: 'ID',
     notes: 'Unique ID',
     validate: {
       notNull: {
@@ -265,7 +265,7 @@ db.define('datum', {
     type: types.DATE,
     allowNull: false,
     defaultValue: types.NOW,
-    label: 'Created',
+    name: 'Created',
     notes: 'Date and time this data was created',
     validate: {
       notNull: {
@@ -280,7 +280,7 @@ db.define('datum', {
     type: types.DATE,
     allowNull: false,
     defaultValue: types.NOW,
-    label: 'Last Modified',
+    name: 'Last Modified',
     notes: 'Date and time this data was last updated',
     validate: {
       notNull: {
@@ -295,7 +295,7 @@ db.define('datum', {
     type: types.TEXT,
     allowNull: false,
     searchable: true,
-    label: 'Source ID',
+    name: 'Source ID',
     validate: {
       notEmpty: {
         msg: 'Must not be empty'
@@ -309,13 +309,13 @@ db.define('datum', {
   data: {
     type: types.JSONB,
     allowNull: true,
-    label: 'Data',
+    name: 'Data',
     notes: 'Properties of the datum'
   },
   geometry: {
     type: types.GEOGRAPHY,
     allowNull: true,
-    label: 'Geometry',
+    name: 'Geometry',
     notes: 'Geometry of the datum'
   }
 }, {
