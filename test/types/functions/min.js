@@ -56,7 +56,7 @@ describe('types#functions#min', () => {
       should(err.fields).eql([ {
         path: [ 'aggregations', 2, 'value', 'arguments', 0, 'arguments', 0 ],
         value: 'abc',
-        message: 'Argument "Value" for "Minimum" must be of type: number, date - instead got any, text'
+        message: 'Argument "Value" for "Minimum" must be of type: number, date - instead got text'
       } ])
       return
     }

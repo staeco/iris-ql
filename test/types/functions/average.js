@@ -56,7 +56,7 @@ describe('types#functions#average', () => {
       should(err.fields).eql([ {
         path: [ 'aggregations', 2, 'value', 'arguments', 0, 'arguments', 0 ],
         value: 'abc',
-        message: 'Argument "Value" for "Average" must be of type: number, date - instead got any, text'
+        message: 'Argument "Value" for "Average" must be of type: number, date - instead got text'
       } ])
       return
     }

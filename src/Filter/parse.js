@@ -2,7 +2,7 @@ import operators from '../operators'
 import getJSONField from '../util/getJSONField'
 import hydrateFields from '../util/hydrateFields'
 import { ValidationError } from '../errors'
-import isObject from 'is-pure-object'
+import isObject from 'is-plain-object'
 import isQueryValue from '../util/isQueryValue'
 import QueryValue from '../QueryValue'
 

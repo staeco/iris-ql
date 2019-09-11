@@ -119,7 +119,7 @@ describe('types#functions#multiply', () => {
       should(err.fields).eql([ {
         path: [ 'aggregations', 2, 'value', 'arguments', 0, 'arguments', 1 ],
         value: 'abc',
-        message: 'Argument "Value B" for "Multiply" must be of type: number - instead got any, text'
+        message: 'Argument "Value B" for "Multiply" must be of type: number - instead got text'
       } ])
       return
     }

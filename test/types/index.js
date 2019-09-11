@@ -3,7 +3,6 @@ import * as types from '../../src/types'
 
 describe('types', () => {
   it('should have a check func on each type', () => {
-    should(typeof types.any.check).equal('function')
     should(typeof types.text.check).equal('function')
     should(typeof types.number.check).equal('function')
     should(typeof types.boolean.check).equal('function')
@@ -16,7 +15,6 @@ describe('types', () => {
   })
 
   it('should have a hydrate func each type', () => {
-    should(typeof types.any.hydrate).equal('function')
     should(typeof types.array.hydrate).equal('function')
     should(typeof types.text.hydrate).equal('function')
     should(typeof types.number.hydrate).equal('function')
@@ -27,11 +25,6 @@ describe('types', () => {
     should(typeof types.multiline.hydrate).equal('function')
     should(typeof types.polygon.hydrate).equal('function')
     should(typeof types.multipolygon.hydrate).equal('function')
-  })
-
-
-  it('should check for any', () => {
-    should(types.any.check('invalid')).equal(true)
   })
 
   it('should check for object', () => {
@@ -85,10 +78,6 @@ describe('types', () => {
 
   it('should have a date check', () => {
     should(types.date.check({})).equal(false)
-  })
-
-  it('should hydrate any', () => {
-    should(types.any.hydrate('asf')).equal('asf')
   })
 
   it('should hydrate array', () => {

@@ -1,3 +1,4 @@
+import { pickBy } from 'lodash'
 import parse from './parse'
 import exportStream from '../util/export'
 import getTypes from '../types/getTypes'
@@ -25,14 +26,15 @@ export default class AnalyticsQuery {
         ...this.options,
         context: [ 'aggregations', idx ]
       })
-      const primaryType = types.find((i) => i.type !== 'any')
+      if (types.length === 0) return prev // no types? weird
+      const primaryType = types[0]
       const nv = {
-        type: primaryType?.type || 'any'
+        type: primaryType.type,
+        name: agg.name,
+        notes: agg.notes,
+        measurement: primaryType.measurement
       }
-      if (agg.name) nv.name = agg.name
-      if (agg.notes) nv.notes = agg.notes
-      if (primaryType?.measurement) nv.measurement = primaryType.measurement
-      prev[agg.alias] = nv
+      prev[agg.alias] = pickBy(nv)
       return prev
     }, {})
 

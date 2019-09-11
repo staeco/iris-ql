@@ -4,7 +4,7 @@ import decamelize from 'decamelize'
 import moment from 'moment'
 import { BadRequestError } from '../errors'
 import { multiline, line, point, polygon, multipolygon } from './'
-import isObject from 'is-pure-object'
+import isObject from 'is-plain-object'
 
 const numeric = (info) => {
   if (info.value.type === 'numeric') return info.value // already cast as numeric
@@ -241,7 +241,7 @@ export const add = {
     const primaryTypeB = infoB.types.find((i) => i.type === 'number')
     return {
       type: 'number',
-      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+      measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
     }
   },
   execute: (a, b) =>
@@ -267,7 +267,7 @@ export const subtract = {
     const primaryTypeB = infoB.types.find((i) => i.type === 'number')
     return {
       type: 'number',
-      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+      measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
     }
   },
   execute: (a, b) =>
@@ -293,7 +293,7 @@ export const multiply = {
     const primaryTypeB = infoB.types.find((i) => i.type === 'number')
     return {
       type: 'number',
-      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+      measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
     }
   },
   execute: (a, b) =>
@@ -319,7 +319,7 @@ export const divide = {
     const primaryTypeB = infoB.types.find((i) => i.type === 'number')
     return {
       type: 'number',
-      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+      measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
     }
   },
   execute: (a, b) =>
@@ -345,7 +345,7 @@ export const remainder = {
     const primaryTypeB = infoB.types.find((i) => i.type === 'number')
     return {
       type: 'number',
-      measurement: primaryTypeA.measurement || primaryTypeB.measurement
+      measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
     }
   },
   execute: (a, b) =>

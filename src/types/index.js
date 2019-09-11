@@ -2,7 +2,7 @@ import types from 'sequelize'
 import { BadRequestError } from '../errors'
 import moment from 'moment'
 import isNumber from 'is-number'
-import isObject from 'is-pure-object'
+import isObject from 'is-plain-object'
 
 const zones = new Set(moment.tz.names())
 const getBasicGeoJSONIssues = (v, type) => {
@@ -12,12 +12,6 @@ const getBasicGeoJSONIssues = (v, type) => {
 
 // test is used to validate and type user-inputted values
 // hydrate is used to hydrate db text values to their properly typed values
-export const any = {
-  name: 'Any',
-  check: () => true,
-  hydrate: (txt) => txt
-}
-
 export const array = {
   name: 'List',
   items: true,

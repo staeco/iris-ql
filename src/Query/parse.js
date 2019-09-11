@@ -1,4 +1,4 @@
-import isObject from 'is-pure-object'
+import isObject from 'is-plain-object'
 import { fn } from 'sequelize'
 import { lat, lon } from '../util/isValidCoordinate'
 import intersects from '../util/intersects'

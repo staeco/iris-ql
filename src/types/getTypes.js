@@ -1,4 +1,4 @@
-import { sortBy } from 'lodash'
+import { sortBy, pickBy } from 'lodash'
 import isQueryValue from '../util/isQueryValue'
 import * as schemaTypes from './'
 import * as functions from './functions'
@@ -23,17 +23,18 @@ const getJSONTypes = (fieldPath, { model, subSchemas = {} }) => {
   if (!attrDef) return []
   const desc = schemaTypes[attrDef.type]
   if (!desc) return []
-  return [ { type: attrDef.type, measurement: attrDef.measurement, items: attrDef.items } ]
+  return [ pickBy({ type: attrDef.type, measurement: attrDef.measurement, items: attrDef.items }) ]
 }
 
 const getFieldTypes = (fieldPath, { model }) => {
   const desc = model.rawAttributes[fieldPath]
   if (!desc) return []
-  return [ toSchemaType(desc.type) ]
+  const schemaType = toSchemaType(desc.type)
+  return schemaType ? [ schemaType ] : []
 }
 
 // return empty on any invalid condition, `parse` will handle main validation before this function is called
-const getTypes = (v, opt) => {
+const getTypes = (v, opt={}) => {
   if (!isQueryValue(v)) return getValueTypes(v)
   if (v.function) {
     const fn = functions[v.function]
@@ -45,7 +46,10 @@ const getTypes = (v, opt) => {
       const resolvedArgs = sigArgs.map((sig, idx) => {
         const nopt = {
           ...opt,
-          context: [ ...opt.context, 'arguments', idx ]
+          context: [
+            ...opt.context || [],
+            'arguments', idx
+          ]
         }
         const argValue = args[idx]
         return {
@@ -53,7 +57,7 @@ const getTypes = (v, opt) => {
           raw: argValue
         }
       })
-      return [ fn.returns(...resolvedArgs) ]
+      return [ pickBy(fn.returns(...resolvedArgs)) ]
     }
     return [ fn.returns ]
   }

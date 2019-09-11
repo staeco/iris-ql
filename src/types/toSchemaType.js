@@ -22,17 +22,18 @@ const toSchemaType = (type) => {
   if (key === 'BIGINT') return { type: 'number' }
   if (key === 'FLOAT') return { type: 'number' }
   if (key === 'REAL') return { type: 'number' }
-  if (key === 'DOUBLE') return { type: 'number' }
+  if (key === 'DOUBLE PRECISION') return { type: 'number' }
   if (key === 'DECIMAL') return { type: 'number' }
   if (key === 'JSON') return { type: 'object' }
   if (key === 'JSONB') return { type: 'object' }
   if (key === 'ARRAY') return { type: 'array', items: toSchemaType(type.type) }
-  if (key === 'GEOMETRY' || key === 'GEOGRAPHY' && geomTypes[type.type]) {
-    return { type: geomTypes[type.type] }
+  if (key === 'GEOMETRY' || key === 'GEOGRAPHY') {
+    if (geomTypes[type.type]) return { type: geomTypes[type.type] }
+    return { type: 'geometry' }
   }
 
-  // Unsupported types: ENUM, BLOB, CIDR, INET, MACADDR, RANGE, HSTORE, plain geometry, plain geography
-  return { type: 'any' }
+  // Unsupported types: ENUM, BLOB, CIDR, INET, MACADDR, RANGE, HSTORE
+  return null
 }
 
 export default toSchemaType

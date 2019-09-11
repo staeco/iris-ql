@@ -58,7 +58,7 @@ describe('types#functions#distance', () => {
       should(err.fields).eql([ {
         path: [ 'aggregations', 2, 'value', 'arguments', 0, 'arguments', 1 ],
         value: 'abc',
-        message: 'Argument "Geometry B" for "Distance" must be of type: point, polygon, multipolygon, line, multiline, geometry - instead got any, text'
+        message: 'Argument "Geometry B" for "Distance" must be of type: point, polygon, multipolygon, line, multiline, geometry - instead got text'
       } ])
       return
     }
