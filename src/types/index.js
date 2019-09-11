@@ -50,7 +50,7 @@ export const date = {
   hydrate: (txt, { timezone }) => {
     if (!timezone) return types.fn('parse_iso', txt)
     if (!zones.has(timezone)) throw new BadRequestError('Not a valid timezone')
-    return types.fn('parse_iso', txt, timezone)
+    return types.fn('force_tz', types.fn('parse_iso', txt), timezone)
   }
 }
 

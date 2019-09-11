@@ -58,23 +58,6 @@ const getGeometryValue = (raw) => {
   return types.fn('from_geojson', raw)
 }
 
-const truncatesToDB = {
-  millisecond: 'milliseconds',
-  second: 'second',
-  minute: 'minute',
-  hour: 'hour',
-  day: 'day',
-  week: 'week',
-  month: 'month',
-  quarter: 'quarter',
-  year: 'year',
-  decade: 'decade'
-}
-const truncates = Object.keys(truncatesToDB).map((k) => ({
-  value: k,
-  label: capitalize(k)
-}))
-
 const partsToDB = {
   millisecond: 'milliseconds',
   second: 'second',
@@ -92,6 +75,23 @@ const partsToDB = {
 const parts = Object.keys(partsToDB).map((k) => ({
   value: k,
   label: capitalize.words(decamelize(k, ' '))
+}))
+
+const truncatesToDB = {
+  millisecond: 'milliseconds',
+  second: 'second',
+  minute: 'minute',
+  hour: 'hour',
+  day: 'day',
+  week: 'week',
+  month: 'month',
+  quarter: 'quarter',
+  year: 'year',
+  decade: 'decade'
+}
+const truncates = Object.keys(truncatesToDB).map((k) => ({
+  value: k,
+  label: capitalize(k)
 }))
 
 // Arrays
@@ -512,15 +512,15 @@ export const interval = {
   execute: (start, end) =>
     types.fn('sub', types.fn('time_to_ms', end.value), types.fn('time_to_ms', start.value))
 }
-export const truncate = {
-  name: 'Truncate',
-  notes: 'Returns a date truncated to a certain unit of time',
+export const bucket = {
+  name: 'Bucket',
+  notes: 'Returns a date rounded to a unit of time',
   signature: [
     {
       name: 'Unit',
       types: [ 'text' ],
-      required: true,
-      options: truncates
+      options: truncates,
+      required: true
     },
     {
       name: 'Date',
@@ -536,7 +536,7 @@ export const truncate = {
 }
 export const extract = {
   name: 'Extract',
-  notes: 'Extracts a measurement of time from a date',
+  notes: 'Converts a date to a unit of time',
   signature: [
     {
       name: 'Unit',

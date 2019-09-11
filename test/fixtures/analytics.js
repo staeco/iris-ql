@@ -10,7 +10,7 @@ export const crimeTimeSeries = {
     {
       alias: 'day',
       value: {
-        function: 'truncate',
+        function: 'bucket',
         arguments: [
           'day',
           { field: 'data.receivedAt' }

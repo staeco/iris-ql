@@ -119,10 +119,7 @@ describe('types', () => {
     should.throws(() => types.date.hydrate(d, { timezone: 'invalid' }))
 
     const t2 = types.date.hydrate(d, { timezone: 'America/New_York' })
-    should(t2.args).eql([
-      d,
-      'America/New_York'
-    ])
+    should(t2.fn).equal('force_tz')
   })
 
   it('should hydrate point', () => {
