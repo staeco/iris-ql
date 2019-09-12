@@ -1,8 +1,11 @@
+import moment from 'moment'
 import Query from '../Query'
 import QueryValue from '../QueryValue'
 import Aggregation from '../Aggregation'
 import { ValidationError } from '../errors'
 import getScopedAttributes from '../util/getScopedAttributes'
+
+const zones = new Set(moment.tz.names())
 
 // this is an extension of parseQuery that allows for aggregations and groupings
 export default (query={}, opt) => {
@@ -20,9 +23,17 @@ export default (query={}, opt) => {
         message: 'Must be a string.'
       })
     } else {
-      opt.timezone = query.timezone
-      delete query.timezone
+      if (!zones.has(query.timezone)) {
+        error.add({
+          path: [ ...context, 'timezone' ],
+          value: query.timezone,
+          message: 'Not a valid timezone.'
+        })
+      } else {
+        opt.timezone = query.timezone
+      }
     }
+    delete query.timezone
   }
   if (!Array.isArray(query.aggregations)) {
     error.add({

@@ -1,6 +1,7 @@
+import { pickBy } from 'lodash'
 import parse from './parse'
 import exportStream from '../util/export'
-
+import getTypes from '../types/getTypes'
 
 export default class AnalyticsQuery {
   constructor(obj, options={}) {
@@ -19,6 +20,24 @@ export default class AnalyticsQuery {
   }
   value = () => this._parsed
   toJSON = () => this.input
+  getOutputSchema = () =>
+    this.input.aggregations.reduce((prev, agg, idx) => {
+      const types = getTypes(agg.value, {
+        ...this.options,
+        context: [ 'aggregations', idx ]
+      })
+      if (types.length === 0) return prev // no types? weird
+      const primaryType = types[0]
+      const nv = {
+        type: primaryType.type,
+        name: agg.name,
+        notes: agg.notes,
+        measurement: primaryType.measurement
+      }
+      prev[agg.alias] = pickBy(nv)
+      return prev
+    }, {})
+
   execute = async () =>
     this.options.model.findAll({
       raw: true,

@@ -13,6 +13,7 @@ export class BadRequestError extends Error {
     super(message)
     this.message = message
     this.status = status
+    Error.captureStackTrace(this, BadRequestError)
   }
   toString = () =>
     `${super.toString()} (HTTP ${this.status})`
@@ -20,9 +21,10 @@ export class BadRequestError extends Error {
 
 export class ValidationError extends BadRequestError {
   constructor(fields=[]) {
-    super()
+    super('Validation Error')
     this.fields = fields
     if (!Array.isArray(this.fields)) this.fields = [ this.fields ]
+    Error.captureStackTrace(this, ValidationError)
   }
   add = (err) => {
     if (err.fields) {

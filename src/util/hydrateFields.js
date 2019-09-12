@@ -12,9 +12,9 @@ const unwrap = (str) =>
 export default (v, opt) => {
   if (Array.isArray(v)) v = { $and: v } // convert it
   const str = where({ value: v, model: opt.model })
-  if (!jsonField.test(str)) return v // nothing to do! no fields to cast
+  if (!jsonField.test(str)) return v // nothing to do! no fields to hydrate
 
-  // if the field is followed by " IS" then skip, because we dont need to cast that
+  // if the field is followed by " IS" then skip, because we dont need to hydrate that
   // since its either IS NULL or IS NOT NULL
   const needsCasting = new RegExp(`"${opt.model.name}"\\."(\\w*)"#>>'{(\\w*)}'(?! (IS NULL|IS NOT NULL))`, 'g')
   const redone = unwrap(str).replace(needsCasting, (match, col, field) => {

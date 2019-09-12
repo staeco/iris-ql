@@ -9,7 +9,7 @@ export default (v, opt) => {
     subSchemas = {},
     model,
     fieldLimit = Object.keys(model.rawAttributes),
-    cast = true
+    hydrate = true
   } = opt
   const path = v.split('.')
   const col = path.shift()
@@ -38,10 +38,10 @@ export default (v, opt) => {
       message: `Field is not queryable: ${col}`
     })
   }
-  if (!cast) return lit // asked to keep it raw
+  if (!hydrate) return lit // asked to keep it raw
 
-  // if a schema is specified, check the type of the field to see if it needs casting
-  // this is because pg treats all json values as text, so we need to explicitly cast types for things
+  // if a schema is specified, check the type of the field to see if it needs hydrating
+  // this is because pg treats all json values as text, so we need to explicitly hydrate types for things
   // to work the way we expect
   const field = path[0]
   const attrDef = schema[field]
@@ -52,5 +52,5 @@ export default (v, opt) => {
       message: `Field does not exist: ${col}.${field}`
     })
   }
-  return schemaTypes[attrDef.type].cast(lit, { ...opt, attr: attrDef })
+  return schemaTypes[attrDef.type].hydrate(lit, { ...opt, attr: attrDef })
 }

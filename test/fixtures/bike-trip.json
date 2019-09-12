@@ -1,0 +1,94 @@
+{
+  "schema": {
+    "startedAt": {
+      "name": "Received",
+      "type": "date",
+      "validation": {
+        "required": true
+      }
+    },
+    "endedAt": {
+      "name": "Dispatched",
+      "type": "date"
+    },
+    "issues": {
+      "name": "Issues",
+      "type": "array",
+      "validation": {
+        "notEmpty": true,
+        "maxItems": 2048
+      },
+      "items": {
+        "name": "Officer ID",
+        "type": "text",
+        "validation": {
+          "required": true,
+          "notEmpty": true,
+          "maxLength": 2048
+        }
+      }
+    },
+    "cost": {
+      "name": "Cost",
+      "type": "number",
+      "measurement": {
+        "type": "currency",
+        "value": "usd"
+      },
+      "validation": {
+        "min": 0,
+        "max": 10000
+      }
+    },
+    "tax": {
+      "name": "Tax",
+      "type": "number",
+      "measurement": {
+        "type": "currency",
+        "value": "usd"
+      },
+      "validation": {
+        "min": 0,
+        "max": 10000
+      }
+    },
+    "type": {
+      "name": "Type",
+      "type": "text",
+      "validation": {
+        "notEmpty": true,
+        "maxLength": 2048
+      }
+    },
+    "notes": {
+      "name": "Notes",
+      "type": "text",
+      "validation": {
+        "notEmpty": true
+      }
+    },
+    "images": {
+      "name": "Images",
+      "type": "array",
+      "validation": {
+        "notEmpty": true,
+        "maxItems": 2048
+      },
+      "items": {
+        "name": "Image",
+        "type": "text",
+        "validation": {
+          "required": true,
+          "image": true
+        }
+      }
+    },
+    "path": {
+      "name": "Path",
+      "type": "line",
+      "validation": {
+        "required": true
+      }
+    }
+  }
+}

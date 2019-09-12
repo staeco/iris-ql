@@ -5,7 +5,7 @@ import db from '../fixtures/db'
 const dataType = {
   schema: {
     id: {
-      type: 'any'
+      type: 'text'
     }
   }
 }

@@ -3,6 +3,8 @@
 exports.__esModule = true;
 exports.default = void 0;
 
+var _moment = _interopRequireDefault(require("moment"));
+
 var _Query = _interopRequireDefault(require("../Query"));
 
 var _QueryValue = _interopRequireDefault(require("../QueryValue"));
@@ -21,6 +23,8 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+const zones = new Set(_moment.default.tz.names()); // this is an extension of parseQuery that allows for aggregations and groupings
+
 function _ref2(i) {
   return !!i;
 }
@@ -29,7 +33,6 @@ function _ref3(i) {
   return i[1];
 }
 
-// this is an extension of parseQuery that allows for aggregations and groupings
 var _default = (query = {}, opt) => {
   const {
     model,
@@ -47,9 +50,18 @@ var _default = (query = {}, opt) => {
         message: 'Must be a string.'
       });
     } else {
-      opt.timezone = query.timezone;
-      delete query.timezone;
+      if (!zones.has(query.timezone)) {
+        error.add({
+          path: [...context, 'timezone'],
+          value: query.timezone,
+          message: 'Not a valid timezone.'
+        });
+      } else {
+        opt.timezone = query.timezone;
+      }
     }
+
+    delete query.timezone;
   }
 
   function _ref(a, idx) {

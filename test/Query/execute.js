@@ -22,6 +22,7 @@ describe('Query#execute', () => {
   })
   it('should filter hour of day with timezone', async () => {
     const unfilteredQuery = new Query({
+      filters: { sourceId: '911-calls' },
       limit: 4,
       timezone: 'America/New_York'
     }, {
@@ -33,6 +34,7 @@ describe('Query#execute', () => {
       limit: 4,
       timezone: 'America/New_York',
       filters: [
+        { sourceId: '911-calls' },
         {
           $and: [
             { 'data.dispatchedAt': { $ne: null } },
@@ -42,13 +44,13 @@ describe('Query#execute', () => {
                 {
                   function: 'extract',
                   arguments: [
-                    'hour',
+                    'hourOfDay',
                     {
                       field: 'data.dispatchedAt'
                     }
                   ]
                 },
-                '20'
+                20
               ]
             },
             {
@@ -57,13 +59,13 @@ describe('Query#execute', () => {
                 {
                   function: 'extract',
                   arguments: [
-                    'hour',
+                    'hourOfDay',
                     {
                       field: 'data.dispatchedAt'
                     }
                   ]
                 },
-                '20'
+                20
               ]
             }
           ]

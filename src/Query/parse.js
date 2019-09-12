@@ -1,4 +1,5 @@
-import isObject from 'is-pure-object'
+import moment from 'moment'
+import isObject from 'is-plain-object'
 import { fn } from 'sequelize'
 import { lat, lon } from '../util/isValidCoordinate'
 import intersects from '../util/intersects'
@@ -9,6 +10,9 @@ import parseIffyStringArray from '../util/iffy/stringArray'
 import getScopedAttributes from '../util/getScopedAttributes'
 import Filter from '../Filter'
 import Ordering from '../Ordering'
+
+
+const zones = new Set(moment.tz.names())
 
 export default (query, opt={}) => {
   const error = new ValidationError()
@@ -24,6 +28,7 @@ export default (query, opt={}) => {
     order: []
   }
 
+  // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
   if (query.timezone) {
     if (typeof query.timezone !== 'string') {
       error.add({
@@ -32,9 +37,17 @@ export default (query, opt={}) => {
         message: 'Must be a string.'
       })
     } else {
-      opt.timezone = query.timezone
-      delete query.timezone
+      if (!zones.has(query.timezone)) {
+        error.add({
+          path: [ ...context, 'timezone' ],
+          value: query.timezone,
+          message: 'Not a valid timezone.'
+        })
+      } else {
+        opt.timezone = query.timezone
+      }
     }
+    delete query.timezone
   }
 
   // searching

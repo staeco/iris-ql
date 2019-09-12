@@ -5,7 +5,7 @@ import db from './fixtures/db'
 const dataType = {
   schema: {
     id: {
-      type: 'any'
+      type: 'text'
     }
   }
 }
@@ -40,7 +40,7 @@ describe('errors', () => {
       getJSONField('noExist.id', { context: [ 'path' ], model: user, subSchemas: { data: dataType.schema } })
     } catch (err) {
       should(err.toString()).eql(`
-Error: Bad Request
+Error: Validation Error
 Issues:
  - { path: [ 'path' ], value: 'noExist.id', message: 'Field does not exist: noExist' }
       `.trim())

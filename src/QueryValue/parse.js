@@ -1,47 +1,98 @@
 import types from 'sequelize'
-import isObject from 'is-pure-object'
+import isObject from 'is-plain-object'
 import { ValidationError } from '../errors'
-import * as funcs from '../functions'
+import getTypes from '../types/getTypes'
+import * as funcs from '../types/functions'
 import getJSONField from '../util/getJSONField'
 
-const baseParse = (v, opt) => {
+const validateArgumentTypes = (func, sig, arg, opt) => {
+  if (sig.types === 'any') return true // allows anything
+  if (!sig.required && arg == null) return true // not present, so has a default
+  if (sig.required && arg == null) {
+    throw new ValidationError({
+      path: opt.context,
+      value: arg,
+      message: `Argument "${sig.name}" for "${func.name}" is required`
+    })
+  }
+  const argTypes = getTypes(arg, opt).map((t) => t.type)
+  const typesValid = argTypes.some((t) => sig.types.includes(t))
+  if (!typesValid) {
+    throw new ValidationError({
+      path: opt.context,
+      value: arg,
+      message: `Argument "${sig.name}" for "${func.name}" must be of type: ${sig.types.join(', ')} - instead got ${argTypes.length === 0 ? '<none>' : argTypes.join(', ')}`
+    })
+  }
+  return true
+}
+
+const getFunction = (v, opt) => {
+  const { context = [] } = opt
+  if (typeof v.function !== 'string') {
+    throw new ValidationError({
+      path: [ ...context, 'function' ],
+      value: v.function,
+      message: 'Must be a string.'
+    })
+  }
+  const func = funcs[v.function]
+  const args = v.arguments || []
+  if (!func) {
+    throw new ValidationError({
+      path: [ ...context, 'function' ],
+      value: v.function,
+      message: 'Function does not exist'
+    })
+  }
+  if (!Array.isArray(args)) {
+    throw new ValidationError({
+      path: [ ...context, 'arguments' ],
+      value: v.function,
+      message: 'Must be an array.'
+    })
+  }
+
+  // resolve function arguments, then check the types against the function signature
+  const sigArgs = func.signature || []
+  const resolvedArgs = sigArgs.map((sig, idx) => {
+    const nopt = {
+      ...opt,
+      context: [ ...context, 'arguments', idx ]
+    }
+    const argValue = args[idx]
+    const parsed = parse(argValue, nopt)
+    validateArgumentTypes(func, sig, argValue, nopt)
+    return {
+      types: getTypes(argValue, nopt),
+      raw: argValue,
+      value: parsed
+    }
+  })
+  return { fn: func, args: resolvedArgs }
+}
+
+const parse = (v, opt) => {
   const {
     model,
     fieldLimit = Object.keys(opt.model.rawAttributes),
-    castJSON = true,
+    hydrateJSON = true,
     context = []
   } = opt
   if (v == null) return null
+  if (typeof v === 'string' || typeof v === 'number') {
+    return types.literal(model.sequelize.escape(v))
+  }
+  if (!isObject(v)) {
+    throw new ValidationError({
+      path: context,
+      value: v,
+      message: 'Must be a function, field, string, number, or object.'
+    })
+  }
   if (v.function) {
-    if (typeof v.function !== 'string') {
-      throw new ValidationError({
-        path: [ ...context, 'function' ],
-        value: v.function,
-        message: 'Must be a string.'
-      })
-    }
-    const func = funcs[v.function]
-    const args = v.arguments || []
-    if (!func) {
-      throw new ValidationError({
-        path: [ ...context, 'function' ],
-        value: v.function,
-        message: 'Function does not exist'
-      })
-    }
-    if (!Array.isArray(args)) {
-      throw new ValidationError({
-        path: [ ...context, 'arguments' ],
-        value: v.function,
-        message: 'Must be an array.'
-      })
-    }
-    return func(...args.map((i, idx) =>
-      parse(i, {
-        ...opt,
-        context: [ ...context, 'arguments', idx ]
-      })
-    ))
+    const { fn, args } = getFunction(v, opt)
+    return fn.execute(...args)
   }
   if (v.field) {
     if (typeof v.field !== 'string') {
@@ -51,7 +102,7 @@ const baseParse = (v, opt) => {
         message: 'Must be a string.'
       })
     }
-    if (v.field.includes('.')) return getJSONField(v.field, { ...opt, cast: castJSON })
+    if (v.field.includes('.')) return getJSONField(v.field, { ...opt, hydrate: hydrateJSON })
     if (fieldLimit && !fieldLimit.includes(v.field)) {
       throw new ValidationError({
         path: [ ...context, 'field' ],
@@ -61,34 +112,14 @@ const baseParse = (v, opt) => {
     }
     return types.col(v.field)
   }
-  if (typeof v === 'string' || typeof v === 'number') {
-    const slit = types.literal(model.sequelize.escape(v))
-    slit.raw = v // expose raw value so functions can optionally take this as an argument
-    return slit
-  }
-  if (!isObject(v)) {
+  if (v.val) {
     throw new ValidationError({
-      path: context,
-      value: v,
-      message: 'Must be a function, field, string, number, or object.'
+      path: [ ...context, 'val' ],
+      value: v.val,
+      message: 'Must not contain a reserved key "val".'
     })
   }
-  // TODO: is allowing an object here a security issue?
   return v
-}
-
-const parse = (v, opt) => {
-  const { context=[] } = opt
-  const ret = baseParse(v, opt)
-  if (!v.as) return ret
-  if (typeof v.as !== 'string') {
-    throw new ValidationError({
-      path: [ ...context, 'as' ],
-      value: v.as,
-      message: 'Must be a string.'
-    })
-  }
-  return types.cast(ret, v.as)
 }
 
 export default parse

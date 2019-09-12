@@ -24,6 +24,7 @@ class BadRequestError extends Error {
 
     this.message = message;
     this.status = status;
+    Error.captureStackTrace(this, BadRequestError);
   }
 
 }
@@ -32,7 +33,7 @@ exports.BadRequestError = BadRequestError;
 
 class ValidationError extends BadRequestError {
   constructor(fields = []) {
-    super();
+    super('Validation Error');
 
     this.add = err => {
       if (err.fields) {
@@ -56,6 +57,7 @@ class ValidationError extends BadRequestError {
 
     this.fields = fields;
     if (!Array.isArray(this.fields)) this.fields = [this.fields];
+    Error.captureStackTrace(this, ValidationError);
   }
 
 }
