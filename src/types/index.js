@@ -2,7 +2,7 @@ import types from 'sequelize'
 import { BadRequestError } from '../errors'
 import moment from 'moment'
 import isNumber from 'is-number'
-import isObject from 'is-plain-object'
+import isObject from 'is-plain-obj'
 
 const zones = new Set(moment.tz.names())
 const getBasicGeoJSONIssues = (v, type) => {

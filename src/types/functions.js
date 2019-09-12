@@ -4,7 +4,7 @@ import decamelize from 'decamelize'
 import moment from 'moment'
 import { BadRequestError } from '../errors'
 import { multiline, line, point, polygon, multipolygon } from './'
-import isObject from 'is-plain-object'
+import isObject from 'is-plain-obj'
 
 const numeric = (info) => {
   if (info.value.type === 'numeric') return info.value // already cast as numeric

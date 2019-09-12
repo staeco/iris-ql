@@ -11,14 +11,14 @@ var _moment = _interopRequireDefault(require("moment"));
 
 var _isNumber = _interopRequireDefault(require("is-number"));
 
-var _isPlainObject = _interopRequireDefault(require("is-plain-object"));
+var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const zones = new Set(_moment.default.tz.names());
 
 const getBasicGeoJSONIssues = (v, type) => {
-  if (!(0, _isPlainObject.default)(v)) return 'Not a valid object';
+  if (!(0, _isPlainObj.default)(v)) return 'Not a valid object';
   if (v.type !== type) return `Not a valid type value (Expected ${type} not ${v.type})`;
 }; // test is used to validate and type user-inputted values
 // hydrate is used to hydrate db text values to their properly typed values
@@ -36,7 +36,7 @@ const array = {
 exports.array = array;
 const object = {
   name: 'Map',
-  check: _isPlainObject.default,
+  check: _isPlainObj.default,
   hydrate: txt => _sequelize.default.cast(txt, 'jsonb')
 };
 exports.object = object;

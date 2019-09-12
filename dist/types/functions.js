@@ -15,7 +15,7 @@ var _errors = require("../errors");
 
 var _ = require("./");
 
-var _isPlainObject = _interopRequireDefault(require("is-plain-object"));
+var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -44,7 +44,7 @@ const getGeoReturnType = raw => {
     return 'geometry';
   }
 
-  if (!(0, _isPlainObject.default)(o)) return 'geometry'; // FeatureCollection
+  if (!(0, _isPlainObj.default)(o)) return 'geometry'; // FeatureCollection
 
   if (Array.isArray(o.features)) return 'geometry'; // Feature
 
@@ -67,7 +67,7 @@ const getGeometryValue = raw => {
     throw new _errors.BadRequestError('Not a valid object!');
   }
 
-  if (!(0, _isPlainObject.default)(o)) throw new _errors.BadRequestError('Not a valid object!');
+  if (!(0, _isPlainObj.default)(o)) throw new _errors.BadRequestError('Not a valid object!');
   if (typeof o.type !== 'string') throw new _errors.BadRequestError('Not a valid GeoJSON object!'); // FeatureCollection
 
   if (Array.isArray(o.features)) return _sequelize.default.fn('geocollection_from_geojson', raw); // Feature

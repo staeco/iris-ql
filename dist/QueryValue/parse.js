@@ -5,7 +5,7 @@ exports.default = void 0;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
-var _isPlainObject = _interopRequireDefault(require("is-plain-object"));
+var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 var _errors = require("../errors");
 
@@ -125,7 +125,7 @@ const parse = (v, opt) => {
     return _sequelize.default.literal(model.sequelize.escape(v));
   }
 
-  if (!(0, _isPlainObject.default)(v)) {
+  if (!(0, _isPlainObj.default)(v)) {
     throw new _errors.ValidationError({
       path: context,
       value: v,

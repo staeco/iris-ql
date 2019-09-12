@@ -3,11 +3,11 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-var _isPlainObject = _interopRequireDefault(require("is-plain-object"));
+var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _default = v => (0, _isPlainObject.default)(v) && (v.function || v.field);
+var _default = v => (0, _isPlainObj.default)(v) && (v.function || v.field);
 
 exports.default = _default;
 module.exports = exports.default;

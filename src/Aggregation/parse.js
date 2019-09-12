@@ -1,4 +1,4 @@
-import isObject from 'is-plain-object'
+import isObject from 'is-plain-obj'
 import QueryValue from '../QueryValue'
 import Filter from '../Filter'
 import { ValidationError } from '../errors'

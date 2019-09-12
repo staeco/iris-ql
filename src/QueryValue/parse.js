@@ -1,5 +1,5 @@
 import types from 'sequelize'
-import isObject from 'is-plain-object'
+import isObject from 'is-plain-obj'
 import { ValidationError } from '../errors'
 import getTypes from '../types/getTypes'
 import * as funcs from '../types/functions'

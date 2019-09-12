@@ -5,7 +5,7 @@ exports.default = void 0;
 
 var _moment = _interopRequireDefault(require("moment"));
 
-var _isPlainObject = _interopRequireDefault(require("is-plain-object"));
+var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 var _sequelize = require("sequelize");
 
@@ -161,7 +161,7 @@ var _default = (query, opt = {}) => {
 
 
   if (query.within) {
-    if (!(0, _isPlainObject.default)(query.within)) {
+    if (!(0, _isPlainObj.default)(query.within)) {
       error.add({
         path: [...context, 'within'],
         value: query.within,
@@ -224,7 +224,7 @@ var _default = (query, opt = {}) => {
 
 
   if (query.intersects) {
-    if (!(0, _isPlainObject.default)(query.intersects)) {
+    if (!(0, _isPlainObj.default)(query.intersects)) {
       error.add({
         path: [...context, 'intersects'],
         value: query.intersects,
@@ -313,7 +313,7 @@ var _default = (query, opt = {}) => {
 
 
   if (query.filters) {
-    if (!(0, _isPlainObject.default)(query.filters) && !Array.isArray(query.filters)) {
+    if (!(0, _isPlainObj.default)(query.filters) && !Array.isArray(query.filters)) {
       error.add({
         path: [...context, 'filters'],
         value: query.filters,
