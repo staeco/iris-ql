@@ -1,10 +1,10 @@
 // converts sequelize types to subSchema types
 const geomTypes = {
-  POINT: 'point',
-  LINESTRING: 'line',
-  MULTILINESTRING: 'multiline',
-  POLYGON: 'polygon',
-  MULTIPOLYGON: 'multipolygon'
+  point: 'point',
+  linestring: 'line',
+  multilinestring: 'multiline',
+  polygon: 'polygon',
+  multipolygon: 'multipolygon'
 }
 const toSchemaType = (type) => {
   const key = type.key || type.constructor.key
@@ -28,7 +28,8 @@ const toSchemaType = (type) => {
   if (key === 'JSONB') return { type: 'object' }
   if (key === 'ARRAY') return { type: 'array', items: toSchemaType(type.type) }
   if (key === 'GEOMETRY' || key === 'GEOGRAPHY') {
-    if (geomTypes[type.type]) return { type: geomTypes[type.type] }
+    const subtype = type.type?.toLowerCase()
+    if (geomTypes[subtype]) return { type: geomTypes[subtype] }
     return { type: 'geometry' }
   }
 

@@ -4,11 +4,11 @@ exports.__esModule = true;
 exports.default = void 0;
 // converts sequelize types to subSchema types
 const geomTypes = {
-  POINT: 'point',
-  LINESTRING: 'line',
-  MULTILINESTRING: 'multiline',
-  POLYGON: 'polygon',
-  MULTIPOLYGON: 'multipolygon'
+  point: 'point',
+  linestring: 'line',
+  multilinestring: 'multiline',
+  polygon: 'polygon',
+  multipolygon: 'multipolygon'
 };
 
 const toSchemaType = type => {
@@ -73,8 +73,11 @@ const toSchemaType = type => {
   };
 
   if (key === 'GEOMETRY' || key === 'GEOGRAPHY') {
-    if (geomTypes[type.type]) return {
-      type: geomTypes[type.type]
+    var _type$type;
+
+    const subtype = (_type$type = type.type) === null || _type$type === void 0 ? void 0 : _type$type.toLowerCase();
+    if (geomTypes[subtype]) return {
+      type: geomTypes[subtype]
     };
     return {
       type: 'geometry'
