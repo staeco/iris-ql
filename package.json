@@ -1,6 +1,6 @@
 {
   "name": "iris-ql",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "User friendly API query language",
   "main": "dist/index.js",
   "keywords": [],
@@ -39,7 +39,7 @@
   },
   "peerDependencies": {
     "pg": ">=7",
-    "sequelize": ">=5"
+    "sequelize": ">=4"
   },
   "resolutions": {
     "pg-cursor": "github:contra/node-pg-cursor#patch-1"

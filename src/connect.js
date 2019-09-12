@@ -4,6 +4,18 @@ import { plural, singular } from 'pluralize'
 import { underscore } from 'inflection'
 import operators from './operators'
 
+const alignTypeParser = (conn, id) => {
+  const parser = pg.types.getTypeParser(id, 'text')
+  // sequelize 5+
+  if (conn.connectionManager.oidParserMap) {
+    conn.connectionManager.oidParserMap.set(id, parser)
+    return conn
+  }
+  // sequelize 4
+  conn.connectionManager.oidMap[id] = parser
+  return conn
+}
+
 const defaultOptions = {
   logging: false,
   native: false,
@@ -38,10 +50,10 @@ export default (url, opt={}) => {
 
   // fix sequelize types overriding pg-types
   const override = () => {
-    conn.connectionManager.oidParserMap.set(20, pg.types.getTypeParser(20, 'text')) // bigint
-    conn.connectionManager.oidParserMap.set(1016, pg.types.getTypeParser(1016, 'text')) // bigint[]
-    conn.connectionManager.oidParserMap.set(1700, pg.types.getTypeParser(1700, 'text')) // numeric
-    conn.connectionManager.oidParserMap.set(1231, pg.types.getTypeParser(1231, 'text')) // numeric[]
+    alignTypeParser(conn, 20) // bigint
+    alignTypeParser(conn, 1016) // bigint[]
+    alignTypeParser(conn, 1700) // numeric
+    alignTypeParser(conn, 1231) // numeric[]
   }
   const oldRefresh = conn.connectionManager.refreshTypeParser.bind(conn.connectionManager)
   conn.connectionManager.refreshTypeParser = (...a) => {

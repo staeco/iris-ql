@@ -21,6 +21,20 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+const alignTypeParser = (conn, id) => {
+  const parser = _pg.default.types.getTypeParser(id, 'text'); // sequelize 5+
+
+
+  if (conn.connectionManager.oidParserMap) {
+    conn.connectionManager.oidParserMap.set(id, parser);
+    return conn;
+  } // sequelize 4
+
+
+  conn.connectionManager.oidMap[id] = parser;
+  return conn;
+};
+
 const defaultOptions = {
   logging: false,
   native: false,
@@ -57,13 +71,13 @@ var _default = (url, opt = {}) => {
   const conn = typeof url === 'object' ? new _sequelize.default(_objectSpread({}, defaultOptions, {}, url)) : new _sequelize.default(url, _objectSpread({}, defaultOptions, {}, opt)); // fix sequelize types overriding pg-types
 
   const override = () => {
-    conn.connectionManager.oidParserMap.set(20, _pg.default.types.getTypeParser(20, 'text')); // bigint
+    alignTypeParser(conn, 20); // bigint
 
-    conn.connectionManager.oidParserMap.set(1016, _pg.default.types.getTypeParser(1016, 'text')); // bigint[]
+    alignTypeParser(conn, 1016); // bigint[]
 
-    conn.connectionManager.oidParserMap.set(1700, _pg.default.types.getTypeParser(1700, 'text')); // numeric
+    alignTypeParser(conn, 1700); // numeric
 
-    conn.connectionManager.oidParserMap.set(1231, _pg.default.types.getTypeParser(1231, 'text')); // numeric[]
+    alignTypeParser(conn, 1231); // numeric[]
   };
 
   const oldRefresh = conn.connectionManager.refreshTypeParser.bind(conn.connectionManager);
