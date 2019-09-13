@@ -5,6 +5,7 @@ import moment from 'moment'
 import { BadRequestError } from '../errors'
 import { multiline, line, point, polygon, multipolygon } from './'
 import isObject from 'is-plain-obj'
+import ms from 'pretty-ms'
 
 const numeric = (info) => {
   if (info.value.type === 'numeric') return info.value // already cast as numeric
@@ -484,7 +485,7 @@ export const last = {
   execute: ({ raw }) => {
     const milli = moment.duration(raw).asMilliseconds()
     if (milli === 0) throw new BadRequestError('Invalid duration')
-    return types.literal(`CURRENT_DATE - INTERVAL '${milli} milliseconds'`)
+    return types.literal(`CURRENT_DATE - INTERVAL '${ms(milli, { verbose: true })}'`)
   }
 }
 export const interval = {

@@ -1,6 +1,6 @@
 {
   "name": "iris-ql",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "User friendly API query language",
   "main": "dist/index.js",
   "keywords": [],
@@ -76,6 +76,7 @@
     "pg-cursor": "github:contra/node-pg-cursor#patch-1",
     "pg-query-stream": "github:contra/node-pg-query-stream",
     "pluralize": "^8.0.0",
+    "pretty-ms": "^5.0.0",
     "pump": "^3.0.0",
     "through2": "^3.0.1"
   }

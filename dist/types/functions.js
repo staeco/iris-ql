@@ -17,6 +17,8 @@ var _ = require("./");
 
 var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
+var _prettyMs = _interopRequireDefault(require("pretty-ms"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _ref(i) {
@@ -538,7 +540,9 @@ const last = {
     const milli = _moment.default.duration(raw).asMilliseconds();
 
     if (milli === 0) throw new _errors.BadRequestError('Invalid duration');
-    return _sequelize.default.literal(`CURRENT_DATE - INTERVAL '${milli} milliseconds'`);
+    return _sequelize.default.literal(`CURRENT_DATE - INTERVAL '${(0, _prettyMs.default)(milli, {
+      verbose: true
+    })}'`);
   }
 };
 exports.last = last;
