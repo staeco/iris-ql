@@ -40,9 +40,11 @@ describe('types#functions#count', () => {
     }
     const expectedResponse = {
       total: {
+        name: 'Total',
         type: 'number'
       },
       type: {
+        name: 'Type',
         type: 'text'
       }
     }

@@ -81,6 +81,7 @@ describe('types#functions#min', () => {
     }
     const expectedResponse = {
       cost: {
+        name: 'Cost',
         type: 'number',
         measurement: {
           type: 'currency',
@@ -88,6 +89,7 @@ describe('types#functions#min', () => {
         }
       },
       type: {
+        name: 'Type',
         type: 'text'
       }
     }

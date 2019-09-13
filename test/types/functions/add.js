@@ -152,12 +152,15 @@ describe('types#functions#add', () => {
     }
     const expectedResponse = {
       total: {
+        name: 'Total',
         type: 'number'
       },
       type: {
+        name: 'Type',
         type: 'text'
       },
       cost: {
+        name: 'Cost',
         type: 'number',
         measurement: {
           type: 'currency',

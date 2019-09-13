@@ -84,6 +84,7 @@ describe('types#functions#distance', () => {
     }
     const expectedResponse = {
       totalDistance: {
+        name: 'Total Distance',
         type: 'number',
         measurement: {
           type: 'distance',
@@ -91,6 +92,7 @@ describe('types#functions#distance', () => {
         }
       },
       type: {
+        name: 'Type',
         type: 'text'
       }
     }

@@ -81,6 +81,7 @@ describe('types#functions#max', () => {
     }
     const expectedResponse = {
       cost: {
+        name: 'Cost',
         type: 'number',
         measurement: {
           type: 'currency',
@@ -88,6 +89,7 @@ describe('types#functions#max', () => {
         }
       },
       type: {
+        name: 'Type',
         type: 'text'
       }
     }
@@ -114,9 +116,11 @@ describe('types#functions#max', () => {
     }
     const expectedResponse = {
       maxStart: {
+        name: 'Max Start',
         type: 'date'
       },
       type: {
+        name: 'Type',
         type: 'text'
       }
     }

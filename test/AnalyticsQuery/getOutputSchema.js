@@ -46,8 +46,8 @@ describe('AnalyticsQuery#getOutputSchema', () => {
     const res = query.getOutputSchema()
     should.exist(res)
     should(res).eql({
-      day: { type: 'date' },
-      total: { type: 'number' }
+      day: { name: 'Day', type: 'date' },
+      total: { name: 'Total', type: 'number' }
     })
   })
   it('should get crime per officer', async () => {
@@ -55,10 +55,10 @@ describe('AnalyticsQuery#getOutputSchema', () => {
     const res = query.getOutputSchema()
     should.exist(res)
     should(res).eql({
-      pre70s: { type: 'number' },
-      weekly: { type: 'number' },
-      total: { type: 'number' },
-      officer: { type: 'text' }
+      pre70s: { name: 'Pre70S', type: 'number' },
+      weekly: { name: 'Weekly', type: 'number' },
+      total: { name: 'Total', type: 'number' },
+      officer: { name: 'Officer', type: 'text' }
     })
   })
 })
