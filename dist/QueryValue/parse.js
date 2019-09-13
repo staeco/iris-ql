@@ -27,11 +27,17 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function _ref(t) {
+function _ref(i) {
+  return i.value;
+}
+
+function _ref2(t) {
   return t.type;
 }
 
 const validateArgumentTypes = (func, sig, arg, opt) => {
+  var _sig$options;
+
   if (sig.types === 'any') return true; // allows anything
 
   if (!sig.required && arg == null) return true; // not present, so has a default
@@ -44,7 +50,17 @@ const validateArgumentTypes = (func, sig, arg, opt) => {
     });
   }
 
-  const argTypes = (0, _getTypes.default)(arg, opt).map(_ref);
+  const enumm = (_sig$options = sig.options) === null || _sig$options === void 0 ? void 0 : _sig$options.map(_ref);
+
+  if (enumm && !enumm.includes(arg)) {
+    throw new _errors.ValidationError({
+      path: opt.context,
+      value: arg,
+      message: `Argument "${sig.name}" for "${func.name}" must be one of: ${enumm.join(', ')}`
+    });
+  }
+
+  const argTypes = (0, _getTypes.default)(arg, opt).map(_ref2);
   const typesValid = argTypes.some(t => sig.types.includes(t));
 
   if (!typesValid) {

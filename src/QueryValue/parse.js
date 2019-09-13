@@ -15,6 +15,14 @@ const validateArgumentTypes = (func, sig, arg, opt) => {
       message: `Argument "${sig.name}" for "${func.name}" is required`
     })
   }
+  const enumm = sig.options?.map((i) => i.value)
+  if (enumm && !enumm.includes(arg)) {
+    throw new ValidationError({
+      path: opt.context,
+      value: arg,
+      message: `Argument "${sig.name}" for "${func.name}" must be one of: ${enumm.join(', ')}`
+    })
+  }
   const argTypes = getTypes(arg, opt).map((t) => t.type)
   const typesValid = argTypes.some((t) => sig.types.includes(t))
   if (!typesValid) {
