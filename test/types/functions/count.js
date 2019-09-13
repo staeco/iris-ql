@@ -45,7 +45,8 @@ describe('types#functions#count', () => {
       },
       type: {
         name: 'Type',
-        type: 'text'
+        type: 'text',
+        validation: { notEmpty: true, maxLength: 2048 }
       }
     }
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })

@@ -10,9 +10,9 @@ export default (agg, opt={}) => {
   if (types.length === 0) return // no types? weird
   const primaryType = types[0]
   let fieldSchema
-  if (agg.field) {
-    if (agg.field.includes('.')) {
-      const [ head, tail ] = agg.field.split('.')
+  if (agg.value.field) {
+    if (agg.value.field.includes('.')) {
+      const [ head, tail ] = agg.value.field.split('.')
       fieldSchema = opt.subSchemas[head][tail]
     } else {
       fieldSchema = opt.model.rawAttributes[agg.field]
@@ -22,6 +22,7 @@ export default (agg, opt={}) => {
     name: agg.name || fieldSchema?.name || fmt(agg.alias),
     notes: agg.notes || fieldSchema?.notes,
     type: primaryType.type,
-    measurement: primaryType.measurement
+    measurement: primaryType.measurement,
+    validation: primaryType.validation || fieldSchema?.validation
   })
 }

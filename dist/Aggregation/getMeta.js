@@ -16,7 +16,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const fmt = v => _capitalize.default.words((0, _decamelize.default)(v, ' '));
 
 var _default = (agg, opt = {}) => {
-  var _fieldSchema, _fieldSchema2;
+  var _fieldSchema, _fieldSchema2, _fieldSchema3;
 
   const types = (0, _getTypes.default)(agg.value, opt);
   if (types.length === 0) return; // no types? weird
@@ -24,9 +24,9 @@ var _default = (agg, opt = {}) => {
   const primaryType = types[0];
   let fieldSchema;
 
-  if (agg.field) {
-    if (agg.field.includes('.')) {
-      const [head, tail] = agg.field.split('.');
+  if (agg.value.field) {
+    if (agg.value.field.includes('.')) {
+      const [head, tail] = agg.value.field.split('.');
       fieldSchema = opt.subSchemas[head][tail];
     } else {
       fieldSchema = opt.model.rawAttributes[agg.field];
@@ -37,7 +37,8 @@ var _default = (agg, opt = {}) => {
     name: agg.name || ((_fieldSchema = fieldSchema) === null || _fieldSchema === void 0 ? void 0 : _fieldSchema.name) || fmt(agg.alias),
     notes: agg.notes || ((_fieldSchema2 = fieldSchema) === null || _fieldSchema2 === void 0 ? void 0 : _fieldSchema2.notes),
     type: primaryType.type,
-    measurement: primaryType.measurement
+    measurement: primaryType.measurement,
+    validation: primaryType.validation || ((_fieldSchema3 = fieldSchema) === null || _fieldSchema3 === void 0 ? void 0 : _fieldSchema3.validation)
   });
 };
 

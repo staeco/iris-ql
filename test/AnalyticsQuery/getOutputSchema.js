@@ -58,7 +58,15 @@ describe('AnalyticsQuery#getOutputSchema', () => {
       pre70s: { name: 'Pre70S', type: 'number' },
       weekly: { name: 'Weekly', type: 'number' },
       total: { name: 'Total', type: 'number' },
-      officer: { name: 'Officer', type: 'text' }
+      officer: {
+        name: 'Officer',
+        type: 'text',
+        validation: {
+          required: true,
+          notEmpty: true,
+          maxLength: 2048
+        }
+      }
     })
   })
 })

@@ -157,7 +157,8 @@ describe('types#functions#divide', () => {
       },
       type: {
         name: 'Type',
-        type: 'text'
+        type: 'text',
+        validation: { notEmpty: true, maxLength: 2048 }
       },
       cost: {
         name: 'Cost',

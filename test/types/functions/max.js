@@ -90,7 +90,8 @@ describe('types#functions#max', () => {
       },
       type: {
         name: 'Type',
-        type: 'text'
+        type: 'text',
+        validation: { notEmpty: true, maxLength: 2048 }
       }
     }
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
@@ -121,7 +122,8 @@ describe('types#functions#max', () => {
       },
       type: {
         name: 'Type',
-        type: 'text'
+        type: 'text',
+        validation: { notEmpty: true, maxLength: 2048 }
       }
     }
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
