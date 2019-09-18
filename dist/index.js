@@ -1,6 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
+exports.types = exports.functions = void 0;
 
 var _connect = _interopRequireDefault(require("./connect"));
 
@@ -14,13 +15,13 @@ var _operators = _interopRequireDefault(require("./operators"));
 
 exports.operators = _operators.default;
 
-var _functions = _interopRequireDefault(require("./types/functions"));
+var functions = _interopRequireWildcard(require("./types/functions"));
 
-exports.functions = _functions.default;
+exports.functions = functions;
 
-var _types = _interopRequireDefault(require("./types"));
+var types = _interopRequireWildcard(require("./types"));
 
-exports.types = _types.default;
+exports.types = types;
 
 var _AnalyticsQuery = _interopRequireDefault(require("./AnalyticsQuery"));
 
@@ -45,5 +46,9 @@ exports.Filter = _Filter.default;
 var _Aggregation = _interopRequireDefault(require("./Aggregation"));
 
 exports.Aggregation = _Aggregation.default;
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; if (obj != null) { var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
