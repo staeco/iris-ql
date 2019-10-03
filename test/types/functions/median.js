@@ -56,7 +56,7 @@ describe('types#functions#median', () => {
       should(err.fields).eql([ {
         path: [ 'aggregations', 2, 'value', 'arguments', 0, 'arguments', 0 ],
         value: 'abc',
-        message: 'Argument "Value" for "Median" must be of type: number, date - instead got text'
+        message: 'Argument "Value" for "Median" must be of type: number - instead got text'
       } ])
       return
     }

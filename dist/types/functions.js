@@ -22,13 +22,30 @@ var _prettyMs = _interopRequireDefault(require("pretty-ms"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _ref(i) {
+  return i.type === 'number';
+}
+
+function _ref2(i) {
+  return i.type === 'number';
+}
+
+const inheritNumeric = (infoA, infoB) => {
+  const primaryTypeA = infoA === null || infoA === void 0 ? void 0 : infoA.types.find(_ref);
+  const primaryTypeB = infoB === null || infoB === void 0 ? void 0 : infoB.types.find(_ref2);
+  return {
+    type: 'number',
+    measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
+  };
+};
+
+function _ref3(i) {
   return i.type;
 }
 
 const numeric = info => {
   if (info.value.type === 'numeric') return info.value; // already cast as numeric
 
-  const flatTypes = info.types.map(_ref); //if (flatTypes.includes('number')) return info.value // already a number
+  const flatTypes = info.types.map(_ref3); //if (flatTypes.includes('number')) return info.value // already a number
 
   if (flatTypes.includes('date')) {
     return _sequelize.default.cast(_sequelize.default.fn('time_to_ms', info.value), 'numeric');
@@ -114,7 +131,7 @@ const truncates = Object.keys(truncatesToDB).map(k => ({
   label: (0, _capitalize.default)(k)
 })); // Arrays
 
-function _ref2(i) {
+function _ref4(i) {
   return i.type === 'array';
 }
 
@@ -126,16 +143,16 @@ const expand = {
     types: ['array'],
     required: true
   }],
-  returns: listInfo => listInfo.types.find(_ref2).items,
+  returns: {
+    static: {
+      type: 'any'
+    },
+    dynamic: listInfo => listInfo.types.find(_ref4).items
+  },
   execute: listInfo => _sequelize.default.fn('unnest', listInfo.value)
 }; // Aggregations
 
 exports.expand = expand;
-
-function _ref3(i) {
-  return min.signature[0].types.includes(i.type);
-}
-
 const min = {
   name: 'Minimum',
   notes: 'Aggregates the minimum value of a number',
@@ -144,22 +161,16 @@ const min = {
     types: ['number', 'date'],
     required: true
   }],
-  returns: valueInfo => {
-    const primaryType = valueInfo.types.find(_ref3);
-    return {
-      type: primaryType.type,
-      measurement: primaryType.measurement
-    };
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: inheritNumeric
   },
   aggregate: true,
   execute: f => _sequelize.default.fn('min', numeric(f))
 };
 exports.min = min;
-
-function _ref4(i) {
-  return max.signature[0].types.includes(i.type);
-}
-
 const max = {
   name: 'Maximum',
   notes: 'Aggregates the maximum value of a number',
@@ -168,109 +179,83 @@ const max = {
     types: ['number', 'date'],
     required: true
   }],
-  returns: valueInfo => {
-    const primaryType = valueInfo.types.find(_ref4);
-    return {
-      type: primaryType.type,
-      measurement: primaryType.measurement
-    };
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: inheritNumeric
   },
   aggregate: true,
   execute: f => _sequelize.default.fn('max', numeric(f))
 };
 exports.max = max;
-
-function _ref5(i) {
-  return sum.signature[0].types.includes(i.type);
-}
-
 const sum = {
   name: 'Sum',
   notes: 'Aggregates the sum total of a number',
   signature: [{
     name: 'Value',
-    types: ['number', 'date'],
+    types: ['number'],
     required: true
   }],
-  returns: valueInfo => {
-    const primaryType = valueInfo.types.find(_ref5);
-    return {
-      type: primaryType.type,
-      measurement: primaryType.measurement
-    };
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: inheritNumeric
   },
   aggregate: true,
   execute: f => _sequelize.default.fn('sum', numeric(f))
 };
 exports.sum = sum;
-
-function _ref6(i) {
-  return average.signature[0].types.includes(i.type);
-}
-
 const average = {
   name: 'Average',
   notes: 'Aggregates the average of a number',
   signature: [{
     name: 'Value',
-    types: ['number', 'date'],
+    types: ['number'],
     required: true
   }],
-  returns: valueInfo => {
-    const primaryType = valueInfo.types.find(_ref6);
-    return {
-      type: primaryType.type,
-      measurement: primaryType.measurement
-    };
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: inheritNumeric
   },
   aggregate: true,
   execute: f => _sequelize.default.fn('avg', numeric(f))
 };
 exports.average = average;
-
-function _ref7(i) {
-  return median.signature[0].types.includes(i.type);
-}
-
 const median = {
   name: 'Median',
   notes: 'Aggregates the median of a number',
   signature: [{
     name: 'Value',
-    types: ['number', 'date'],
+    types: ['number'],
     required: true
   }],
-  returns: valueInfo => {
-    const primaryType = valueInfo.types.find(_ref7);
-    return {
-      type: primaryType.type,
-      measurement: primaryType.measurement
-    };
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: inheritNumeric
   },
   aggregate: true,
   execute: f => _sequelize.default.fn('median', numeric(f))
 };
 exports.median = median;
 const count = {
-  name: 'Count',
+  name: 'Total Count',
   notes: 'Aggregates the total number of rows',
   returns: {
-    type: 'number'
+    static: {
+      type: 'number'
+    }
   },
   aggregate: true,
   execute: () => _sequelize.default.fn('count', _sequelize.default.literal('*'))
 }; // Math
 
 exports.count = count;
-
-function _ref8(i) {
-  return i.type === 'number';
-}
-
-function _ref9(i) {
-  return i.type === 'number';
-}
-
 const add = {
   name: 'Add',
   notes: 'Applies addition to multiple numbers',
@@ -283,26 +268,15 @@ const add = {
     types: ['number'],
     required: true
   }],
-  returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find(_ref8);
-    const primaryTypeB = infoB.types.find(_ref9);
-    return {
-      type: 'number',
-      measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
-    };
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: inheritNumeric
   },
   execute: (a, b) => _sequelize.default.fn('add', numeric(a), numeric(b))
 };
 exports.add = add;
-
-function _ref10(i) {
-  return i.type === 'number';
-}
-
-function _ref11(i) {
-  return i.type === 'number';
-}
-
 const subtract = {
   name: 'Subtract',
   notes: 'Applies subtraction to multiple numbers',
@@ -315,26 +289,15 @@ const subtract = {
     types: ['number'],
     required: true
   }],
-  returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find(_ref10);
-    const primaryTypeB = infoB.types.find(_ref11);
-    return {
-      type: 'number',
-      measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
-    };
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: inheritNumeric
   },
   execute: (a, b) => _sequelize.default.fn('sub', numeric(a), numeric(b))
 };
 exports.subtract = subtract;
-
-function _ref12(i) {
-  return i.type === 'number';
-}
-
-function _ref13(i) {
-  return i.type === 'number';
-}
-
 const multiply = {
   name: 'Multiply',
   notes: 'Applies multiplication to multiple numbers',
@@ -347,26 +310,15 @@ const multiply = {
     types: ['number'],
     required: true
   }],
-  returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find(_ref12);
-    const primaryTypeB = infoB.types.find(_ref13);
-    return {
-      type: 'number',
-      measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
-    };
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: inheritNumeric
   },
   execute: (a, b) => _sequelize.default.fn('mult', numeric(a), numeric(b))
 };
 exports.multiply = multiply;
-
-function _ref14(i) {
-  return i.type === 'number';
-}
-
-function _ref15(i) {
-  return i.type === 'number';
-}
-
 const divide = {
   name: 'Divide',
   notes: 'Applies division to multiple numbers',
@@ -379,26 +331,15 @@ const divide = {
     types: ['number'],
     required: true
   }],
-  returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find(_ref14);
-    const primaryTypeB = infoB.types.find(_ref15);
-    return {
-      type: 'number',
-      measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
-    };
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: inheritNumeric
   },
   execute: (a, b) => _sequelize.default.fn('div', numeric(a), numeric(b))
 };
 exports.divide = divide;
-
-function _ref16(i) {
-  return i.type === 'number';
-}
-
-function _ref17(i) {
-  return i.type === 'number';
-}
-
 const remainder = {
   name: 'Remainder',
   notes: 'Applies division to multiple numbers and returns the remainder/modulus',
@@ -411,13 +352,11 @@ const remainder = {
     types: ['number'],
     required: true
   }],
-  returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find(_ref16);
-    const primaryTypeB = infoB.types.find(_ref17);
-    return {
-      type: 'number',
-      measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
-    };
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: inheritNumeric
   },
   execute: (a, b) => _sequelize.default.fn('mod', numeric(a), numeric(b))
 }; // Comparisons
@@ -436,7 +375,9 @@ const gt = {
     required: true
   }],
   returns: {
-    type: 'boolean'
+    static: {
+      type: 'boolean'
+    }
   },
   execute: (a, b) => _sequelize.default.fn('gt', numeric(a), numeric(b))
 };
@@ -454,7 +395,9 @@ const lt = {
     required: true
   }],
   returns: {
-    type: 'boolean'
+    static: {
+      type: 'boolean'
+    }
   },
   execute: (a, b) => _sequelize.default.fn('lt', numeric(a), numeric(b))
 };
@@ -472,7 +415,9 @@ const gte = {
     required: true
   }],
   returns: {
-    type: 'boolean'
+    static: {
+      type: 'boolean'
+    }
   },
   execute: (a, b) => _sequelize.default.fn('gte', numeric(a), numeric(b))
 };
@@ -490,7 +435,9 @@ const lte = {
     required: true
   }],
   returns: {
-    type: 'boolean'
+    static: {
+      type: 'boolean'
+    }
   },
   execute: (a, b) => _sequelize.default.fn('lte', numeric(a), numeric(b))
 };
@@ -508,7 +455,9 @@ const eq = {
     required: true
   }],
   returns: {
-    type: 'boolean'
+    static: {
+      type: 'boolean'
+    }
   },
   execute: (a, b) => _sequelize.default.fn('eq', numeric(a), numeric(b))
 }; // Time
@@ -518,7 +467,9 @@ const now = {
   name: 'Now',
   notes: 'Returns the current date and time',
   returns: {
-    type: 'date'
+    static: {
+      type: 'date'
+    }
   },
   execute: () => _sequelize.default.fn('now')
 };
@@ -532,7 +483,9 @@ const last = {
     required: true
   }],
   returns: {
-    type: 'date'
+    static: {
+      type: 'date'
+    }
   },
   execute: ({
     raw
@@ -559,10 +512,12 @@ const interval = {
     required: true
   }],
   returns: {
-    type: 'number',
-    measurement: {
-      type: 'duration',
-      value: 'millisecond'
+    static: {
+      type: 'number',
+      measurement: {
+        type: 'duration',
+        value: 'millisecond'
+      }
     }
   },
   execute: (start, end) => _sequelize.default.fn('sub', _sequelize.default.fn('time_to_ms', end.value), _sequelize.default.fn('time_to_ms', start.value))
@@ -582,7 +537,9 @@ const bucket = {
     required: true
   }],
   returns: {
-    type: 'date'
+    static: {
+      type: 'date'
+    }
   },
   execute: (p, f) => _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value)
 };
@@ -600,13 +557,18 @@ const extract = {
     types: ['date'],
     required: true
   }],
-  returns: unitInfo => ({
-    type: 'number',
-    measurement: {
-      type: 'datePart',
-      value: unitInfo.raw
-    }
-  }),
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: unitInfo => ({
+      type: 'number',
+      measurement: {
+        type: 'datePart',
+        value: unitInfo.raw
+      }
+    })
+  },
   execute: (p, f) => _sequelize.default.fn('date_part', partsToDB[p.raw], f.value)
 }; // Geospatial
 
@@ -620,10 +582,12 @@ const area = {
     required: true
   }],
   returns: {
-    type: 'number',
-    measurement: {
-      type: 'area',
-      value: 'meter'
+    static: {
+      type: 'number',
+      measurement: {
+        type: 'area',
+        value: 'meter'
+      }
     }
   },
   execute: f => _sequelize.default.fn('ST_Area', _sequelize.default.cast(f.value, 'geography'))
@@ -638,10 +602,12 @@ const length = {
     required: true
   }],
   returns: {
-    type: 'number',
-    measurement: {
-      type: 'distance',
-      value: 'meter'
+    static: {
+      type: 'number',
+      measurement: {
+        type: 'distance',
+        value: 'meter'
+      }
     }
   },
   execute: f => _sequelize.default.fn('ST_Length', _sequelize.default.cast(f.value, 'geography'))
@@ -660,7 +626,9 @@ const intersects = {
     required: true
   }],
   returns: {
-    type: 'boolean'
+    static: {
+      type: 'boolean'
+    }
   },
   execute: (a, b) => _sequelize.default.fn('ST_Intersects', _sequelize.default.cast(a.value, 'geometry'), _sequelize.default.cast(b.value, 'geometry'))
 };
@@ -678,10 +646,12 @@ const distance = {
     required: true
   }],
   returns: {
-    type: 'number',
-    measurement: {
-      type: 'distance',
-      value: 'meter'
+    static: {
+      type: 'number',
+      measurement: {
+        type: 'distance',
+        value: 'meter'
+      }
     }
   },
   execute: (a, b) => _sequelize.default.fn('ST_Distance', _sequelize.default.cast(a.value, 'geometry'), _sequelize.default.cast(b.value, 'geometry'))
@@ -695,11 +665,16 @@ const geojson = {
     types: ['text'],
     required: true
   }],
-  returns: ({
-    raw
-  }) => ({
-    type: getGeoReturnType(raw)
-  }),
+  returns: {
+    static: {
+      type: 'geometry'
+    },
+    dynamic: ({
+      raw
+    }) => ({
+      type: getGeoReturnType(raw)
+    })
+  },
   execute: ({
     raw
   }) => getGeometryValue(raw)
@@ -726,7 +701,9 @@ const boundingBox = {
     required: true
   }],
   returns: {
-    type: 'polygon'
+    static: {
+      type: 'polygon'
+    }
   },
   execute: (xmin, ymin, xmax, ymax) => _sequelize.default.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value)
 };

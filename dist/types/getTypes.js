@@ -75,7 +75,7 @@ const getTypes = (v, opt = {}) => {
     const fn = functions[v.function];
     if (!fn) return []; // dynamic return type based on inputs
 
-    if (typeof fn.returns === 'function') {
+    if (typeof fn.returns.dynamic === 'function') {
       const sigArgs = fn.signature || [];
       const args = v.arguments || [];
       const resolvedArgs = sigArgs.map((sig, idx) => {
@@ -89,10 +89,11 @@ const getTypes = (v, opt = {}) => {
           raw: argValue
         };
       });
-      return [(0, _lodash.pickBy)(fn.returns(...resolvedArgs))];
+      const nv = (0, _lodash.pickBy)(fn.returns.dynamic(...resolvedArgs));
+      return Array.isArray(nv) ? (0, _lodash.pickBy)(nv) : [nv];
     }
 
-    return [fn.returns];
+    return Array.isArray(fn.returns.static) ? fn.returns.static : [fn.returns.static];
   }
 
   if (v.field) {

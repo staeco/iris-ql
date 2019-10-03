@@ -7,6 +7,15 @@ import { multiline, line, point, polygon, multipolygon } from './'
 import isObject from 'is-plain-obj'
 import ms from 'pretty-ms'
 
+const inheritNumeric = (infoA, infoB) => {
+  const primaryTypeA = infoA?.types.find((i) => i.type === 'number')
+  const primaryTypeB = infoB?.types.find((i) => i.type === 'number')
+  return {
+    type: 'number',
+    measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
+  }
+}
+
 const numeric = (info) => {
   if (info.value.type === 'numeric') return info.value // already cast as numeric
   const flatTypes = info.types.map((i) => i.type)
@@ -106,7 +115,10 @@ export const expand = {
       required: true
     }
   ],
-  returns: (listInfo) => listInfo.types.find((i) => i.type === 'array').items,
+  returns: {
+    static: { type: 'any' },
+    dynamic: (listInfo) => listInfo.types.find((i) => i.type === 'array').items
+  },
   execute: (listInfo) => types.fn('unnest', listInfo.value)
 }
 
@@ -121,12 +133,9 @@ export const min = {
       required: true
     }
   ],
-  returns: (valueInfo) => {
-    const primaryType = valueInfo.types.find((i) => min.signature[0].types.includes(i.type))
-    return {
-      type: primaryType.type,
-      measurement: primaryType.measurement
-    }
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric
   },
   aggregate: true,
   execute: (f) => types.fn('min', numeric(f))
@@ -141,12 +150,9 @@ export const max = {
       required: true
     }
   ],
-  returns: (valueInfo) => {
-    const primaryType = valueInfo.types.find((i) => max.signature[0].types.includes(i.type))
-    return {
-      type: primaryType.type,
-      measurement: primaryType.measurement
-    }
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric
   },
   aggregate: true,
   execute: (f) => types.fn('max', numeric(f))
@@ -157,16 +163,13 @@ export const sum = {
   signature: [
     {
       name: 'Value',
-      types: [ 'number', 'date' ],
+      types: [ 'number' ],
       required: true
     }
   ],
-  returns: (valueInfo) => {
-    const primaryType = valueInfo.types.find((i) => sum.signature[0].types.includes(i.type))
-    return {
-      type: primaryType.type,
-      measurement: primaryType.measurement
-    }
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric
   },
   aggregate: true,
   execute: (f) => types.fn('sum', numeric(f))
@@ -177,16 +180,13 @@ export const average = {
   signature: [
     {
       name: 'Value',
-      types: [ 'number', 'date' ],
+      types: [ 'number' ],
       required: true
     }
   ],
-  returns: (valueInfo) => {
-    const primaryType = valueInfo.types.find((i) => average.signature[0].types.includes(i.type))
-    return {
-      type: primaryType.type,
-      measurement: primaryType.measurement
-    }
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric
   },
   aggregate: true,
   execute: (f) => types.fn('avg', numeric(f))
@@ -197,25 +197,22 @@ export const median = {
   signature: [
     {
       name: 'Value',
-      types: [ 'number', 'date' ],
+      types: [ 'number' ],
       required: true
     }
   ],
-  returns: (valueInfo) => {
-    const primaryType = valueInfo.types.find((i) => median.signature[0].types.includes(i.type))
-    return {
-      type: primaryType.type,
-      measurement: primaryType.measurement
-    }
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric
   },
   aggregate: true,
   execute: (f) => types.fn('median', numeric(f))
 }
 export const count = {
-  name: 'Count',
+  name: 'Total Count',
   notes: 'Aggregates the total number of rows',
   returns: {
-    type: 'number'
+    static: { type: 'number' }
   },
   aggregate: true,
   execute: () => types.fn('count', types.literal('*'))
@@ -237,13 +234,9 @@ export const add = {
       required: true
     }
   ],
-  returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find((i) => i.type === 'number')
-    const primaryTypeB = infoB.types.find((i) => i.type === 'number')
-    return {
-      type: 'number',
-      measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
-    }
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric
   },
   execute: (a, b) =>
     types.fn('add', numeric(a), numeric(b))
@@ -263,13 +256,9 @@ export const subtract = {
       required: true
     }
   ],
-  returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find((i) => i.type === 'number')
-    const primaryTypeB = infoB.types.find((i) => i.type === 'number')
-    return {
-      type: 'number',
-      measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
-    }
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric
   },
   execute: (a, b) =>
     types.fn('sub', numeric(a), numeric(b))
@@ -289,13 +278,9 @@ export const multiply = {
       required: true
     }
   ],
-  returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find((i) => i.type === 'number')
-    const primaryTypeB = infoB.types.find((i) => i.type === 'number')
-    return {
-      type: 'number',
-      measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
-    }
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric
   },
   execute: (a, b) =>
     types.fn('mult', numeric(a), numeric(b))
@@ -315,13 +300,9 @@ export const divide = {
       required: true
     }
   ],
-  returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find((i) => i.type === 'number')
-    const primaryTypeB = infoB.types.find((i) => i.type === 'number')
-    return {
-      type: 'number',
-      measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
-    }
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric
   },
   execute: (a, b) =>
     types.fn('div', numeric(a), numeric(b))
@@ -341,13 +322,9 @@ export const remainder = {
       required: true
     }
   ],
-  returns: (infoA, infoB) => {
-    const primaryTypeA = infoA.types.find((i) => i.type === 'number')
-    const primaryTypeB = infoB.types.find((i) => i.type === 'number')
-    return {
-      type: 'number',
-      measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
-    }
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric
   },
   execute: (a, b) =>
     types.fn('mod', numeric(a), numeric(b))
@@ -370,7 +347,7 @@ export const gt = {
     }
   ],
   returns: {
-    type: 'boolean'
+    static: { type: 'boolean' }
   },
   execute: (a, b) =>
     types.fn('gt', numeric(a), numeric(b))
@@ -391,7 +368,7 @@ export const lt = {
     }
   ],
   returns: {
-    type: 'boolean'
+    static: { type: 'boolean' }
   },
   execute: (a, b) =>
     types.fn('lt', numeric(a), numeric(b))
@@ -412,7 +389,7 @@ export const gte = {
     }
   ],
   returns: {
-    type: 'boolean'
+    static: { type: 'boolean' }
   },
   execute: (a, b) =>
     types.fn('gte', numeric(a), numeric(b))
@@ -433,7 +410,7 @@ export const lte = {
     }
   ],
   returns: {
-    type: 'boolean'
+    static: { type: 'boolean' }
   },
   execute: (a, b) =>
     types.fn('lte', numeric(a), numeric(b))
@@ -454,7 +431,7 @@ export const eq = {
     }
   ],
   returns: {
-    type: 'boolean'
+    static: { type: 'boolean' }
   },
   execute: (a, b) =>
     types.fn('eq', numeric(a), numeric(b))
@@ -465,7 +442,7 @@ export const now = {
   name: 'Now',
   notes: 'Returns the current date and time',
   returns: {
-    type: 'date'
+    static: { type: 'date' }
   },
   execute: () => types.fn('now')
 }
@@ -480,7 +457,7 @@ export const last = {
     }
   ],
   returns: {
-    type: 'date'
+    static: { type: 'date' }
   },
   execute: ({ raw }) => {
     const milli = moment.duration(raw).asMilliseconds()
@@ -504,10 +481,12 @@ export const interval = {
     }
   ],
   returns: {
-    type: 'number',
-    measurement: {
-      type: 'duration',
-      value: 'millisecond'
+    static: {
+      type: 'number',
+      measurement: {
+        type: 'duration',
+        value: 'millisecond'
+      }
     }
   },
   execute: (start, end) =>
@@ -530,7 +509,7 @@ export const bucket = {
     }
   ],
   returns: {
-    type: 'date'
+    static: { type: 'date' }
   },
   execute: (p, f) =>
     types.fn('date_trunc', truncatesToDB[p.raw], f.value)
@@ -551,13 +530,16 @@ export const extract = {
       required: true
     }
   ],
-  returns: (unitInfo) => ({
-    type: 'number',
-    measurement: {
-      type: 'datePart',
-      value: unitInfo.raw
-    }
-  }),
+  returns: {
+    static: { type: 'number' },
+    dynamic: (unitInfo) => ({
+      type: 'number',
+      measurement: {
+        type: 'datePart',
+        value: unitInfo.raw
+      }
+    })
+  },
   execute: (p, f) =>
     types.fn('date_part', partsToDB[p.raw], f.value)
 }
@@ -574,10 +556,12 @@ export const area = {
     }
   ],
   returns: {
-    type: 'number',
-    measurement: {
-      type: 'area',
-      value: 'meter'
+    static: {
+      type: 'number',
+      measurement: {
+        type: 'area',
+        value: 'meter'
+      }
     }
   },
   execute: (f) => types.fn('ST_Area', types.cast(f.value, 'geography'))
@@ -593,10 +577,12 @@ export const length = {
     }
   ],
   returns: {
-    type: 'number',
-    measurement: {
-      type: 'distance',
-      value: 'meter'
+    static: {
+      type: 'number',
+      measurement: {
+        type: 'distance',
+        value: 'meter'
+      }
     }
   },
   execute: (f) => types.fn('ST_Length', types.cast(f.value, 'geography'))
@@ -617,7 +603,7 @@ export const intersects = {
     }
   ],
   returns: {
-    type: 'boolean'
+    static: { type: 'boolean' }
   },
   execute: (a, b) =>
     types.fn('ST_Intersects', types.cast(a.value, 'geometry'), types.cast(b.value, 'geometry'))
@@ -638,10 +624,12 @@ export const distance = {
     }
   ],
   returns: {
-    type: 'number',
-    measurement: {
-      type: 'distance',
-      value: 'meter'
+    static: {
+      type: 'number',
+      measurement: {
+        type: 'distance',
+        value: 'meter'
+      }
     }
   },
   execute: (a, b) =>
@@ -657,9 +645,12 @@ export const geojson = {
       required: true
     }
   ],
-  returns: ({ raw }) => ({
-    type: getGeoReturnType(raw)
-  }),
+  returns: {
+    static: { type: 'geometry' },
+    dynamic: ({ raw }) => ({
+      type: getGeoReturnType(raw)
+    })
+  },
   execute: ({ raw }) => getGeometryValue(raw)
 }
 export const boundingBox = {
@@ -688,7 +679,7 @@ export const boundingBox = {
     }
   ],
   returns: {
-    type: 'polygon'
+    static: { type: 'polygon' }
   },
   execute: (xmin, ymin, xmax, ymax) =>
     types.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value)
