@@ -1,6 +1,6 @@
 {
   "name": "iris-ql",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "description": "User friendly API query language",
   "main": "dist/index.js",
   "keywords": [],
@@ -41,9 +41,6 @@
     "pg": ">=7",
     "sequelize": ">=4"
   },
-  "resolutions": {
-    "pg-cursor": "github:contra/node-pg-cursor#patch-1"
-  },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
@@ -73,7 +70,6 @@
     "is-number": "^7.0.0",
     "is-plain-obj": "^2.0.0",
     "moment": "^2.24.0",
-    "pg-cursor": "github:contra/node-pg-cursor#patch-1",
     "pg-query-stream": "github:contra/node-pg-query-stream",
     "pluralize": "^8.0.0",
     "pretty-ms": "^5.0.0",

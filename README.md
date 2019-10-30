@@ -86,11 +86,11 @@ If you intend on using streaming mode, you should add this to your package.json:
 
 ```json
 "resolutions": {
-  "pg-cursor": "github:contra/node-pg-cursor#patch-1"
+  "pg-query-stream": "github:contra/node-pg-query-stream"
 },
 ```
 
-pg-cursor has an upstream issue with DB types not being used correctly on cursors. This note will be removed once the PR is merged there.
+pg-query-stream has an upstream issue with DB types not being used correctly on cursors. This note will be removed once the fix is merged there.
 
 
 ## DB Support
