@@ -24,6 +24,17 @@ var _default = ({
     return Object.entries(rawAttributes).reduce(_ref, {});
   }
 
+  function _ref2(prev, [k, v]) {
+    if (attributes.exclude && attributes.exclude.includes(k)) return prev;
+    if (attributes.include && !attributes.include.includes(k)) return prev;
+    prev[k] = v;
+    return prev;
+  }
+
+  if (Array.isArray(attributes.exclude) || Array.isArray(attributes.include)) {
+    return Object.entries(rawAttributes).reduce(_ref2, {});
+  }
+
   throw new Error('Scope too complex - could not determine safe values!');
 };
 
