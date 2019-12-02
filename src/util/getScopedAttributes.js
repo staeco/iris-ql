@@ -9,5 +9,13 @@ export default ({ rawAttributes, _scope }) => {
       return prev
     }, {})
   }
+  if (Array.isArray(attributes.exclude) || Array.isArray(attributes.include)) {
+    return Object.entries(rawAttributes).reduce((prev, [ k, v ]) => {
+      if (attributes.exclude && attributes.exclude.includes(k)) return prev
+      if (attributes.include && !attributes.include.includes(k)) return prev
+      prev[k] = v
+      return prev
+    }, {})
+  }
   throw new Error('Scope too complex - could not determine safe values!')
 }
