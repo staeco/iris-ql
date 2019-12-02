@@ -125,9 +125,7 @@ describe('types', () => {
   it('should hydrate point', () => {
     const p = { type: 'Point', coordinates: [ 1, 2 ] }
     const top = types.point.hydrate(p)
-    const inner = top.args[0]
-    should(top.fn).equal('ST_SetSRID')
-    should(inner.fn).equal('ST_GeomFromGeoJSON')
-    should(inner.args[0]).equal(p)
+    should(top.fn).equal('ST_GeomFromGeoJSON')
+    should(top.args[0]).equal(p)
   })
 })
