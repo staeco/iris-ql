@@ -1,6 +1,6 @@
 {
   "name": "iris-ql",
-  "version": "2.0.11",
+  "version": "2.1.0",
   "description": "User friendly API query language",
   "main": "dist/index.js",
   "keywords": [],
@@ -63,13 +63,13 @@
   },
   "dependencies": {
     "capitalize": "^2.0.0",
-    "core-js": "3.0.0",
+    "core-js": "3",
     "decamelize": "^3.2.0",
     "graceful-fs": "^4.2.0",
     "inflection": "^1.12.0",
     "is-number": "^7.0.0",
     "is-plain-obj": "^2.0.0",
-    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.27",
     "pg-query-stream": "github:contra/node-pg-query-stream",
     "pluralize": "^8.0.0",
     "pretty-ms": "^5.0.0",

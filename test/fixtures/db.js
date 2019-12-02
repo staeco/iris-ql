@@ -229,7 +229,7 @@ db.define('store', {
     }
   },
   location: {
-    type: types.GEOGRAPHY('POINT', 4326),
+    type: types.GEOMETRY('POINT', 4326),
     allowNull: true,
     name: 'Location',
     notes: 'Location of the store'
@@ -313,7 +313,7 @@ db.define('datum', {
     notes: 'Properties of the datum'
   },
   geometry: {
-    type: types.GEOGRAPHY,
+    type: types.GEOMETRY('GEOMETRY', 4326),
     allowNull: true,
     name: 'Geometry',
     notes: 'Geometry of the datum'

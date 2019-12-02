@@ -18,10 +18,10 @@ describe('Query#options#within', () => {
   })
   it('should execute with within', async () => {
     const bbox = {
-      xmax: 90,
+      xmax: 180,
       ymax: 90,
-      xmin: -1,
-      ymin: -1
+      xmin: -179.999,
+      ymin: -89.999
     }
     const query = new Query({ within: bbox, limit: 1 }, { model: store })
     const res = await query.execute()

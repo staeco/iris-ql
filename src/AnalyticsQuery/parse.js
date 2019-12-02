@@ -1,4 +1,4 @@
-import moment from 'moment'
+import moment from 'moment-timezone'
 import Query from '../Query'
 import QueryValue from '../QueryValue'
 import Aggregation from '../Aggregation'

@@ -1,12 +1,13 @@
 import types from 'sequelize'
 import capitalize from 'capitalize'
 import decamelize from 'decamelize'
-import moment from 'moment'
+import moment from 'moment-timezone'
 import { BadRequestError } from '../errors'
 import { multiline, line, point, polygon, multipolygon } from './'
 import isObject from 'is-plain-obj'
 import ms from 'pretty-ms'
 
+const geom = (v) => types.fn('ST_SetSRID', v, 4326)
 const inheritNumeric = (infoA, infoB) => {
   const primaryTypeA = infoA?.types.find((i) => i.type === 'number')
   const primaryTypeB = infoB?.types.find((i) => i.type === 'number')
@@ -564,7 +565,8 @@ export const area = {
       }
     }
   },
-  execute: (f) => types.fn('ST_Area', types.cast(f.value, 'geography'))
+  execute: (f) =>
+    types.fn('ST_Area', types.cast(f.value, 'geography'))
 }
 export const length = {
   name: 'Length',
@@ -585,7 +587,8 @@ export const length = {
       }
     }
   },
-  execute: (f) => types.fn('ST_Length', types.cast(f.value, 'geography'))
+  execute: (f) =>
+    types.fn('ST_Length', types.cast(f.value, 'geography'))
 }
 export const intersects = {
   name: 'Intersects',
@@ -606,7 +609,7 @@ export const intersects = {
     static: { type: 'boolean' }
   },
   execute: (a, b) =>
-    types.fn('ST_Intersects', types.cast(a.value, 'geometry'), types.cast(b.value, 'geometry'))
+    types.fn('ST_Intersects', a.value, b.value)
 }
 export const distance = {
   name: 'Distance',
@@ -633,7 +636,7 @@ export const distance = {
     }
   },
   execute: (a, b) =>
-    types.fn('ST_Distance', types.cast(a.value, 'geometry'), types.cast(b.value, 'geometry'))
+    types.fn('ST_Distance', types.cast(a.value, 'geography'), types.cast(b.value, 'geography'))
 }
 export const geojson = {
   name: 'Create Geometry',
@@ -682,5 +685,5 @@ export const boundingBox = {
     static: { type: 'polygon' }
   },
   execute: (xmin, ymin, xmax, ymax) =>
-    types.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value)
+    geom(types.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value))
 }

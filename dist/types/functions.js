@@ -9,7 +9,7 @@ var _capitalize = _interopRequireDefault(require("capitalize"));
 
 var _decamelize = _interopRequireDefault(require("decamelize"));
 
-var _moment = _interopRequireDefault(require("moment"));
+var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
 
 var _errors = require("../errors");
 
@@ -20,6 +20,8 @@ var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 var _prettyMs = _interopRequireDefault(require("pretty-ms"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const geom = v => _sequelize.default.fn('ST_SetSRID', v, 4326);
 
 function _ref(i) {
   return i.type === 'number';
@@ -490,7 +492,7 @@ const last = {
   execute: ({
     raw
   }) => {
-    const milli = _moment.default.duration(raw).asMilliseconds();
+    const milli = _momentTimezone.default.duration(raw).asMilliseconds();
 
     if (milli === 0) throw new _errors.BadRequestError('Invalid duration');
     return _sequelize.default.literal(`CURRENT_DATE - INTERVAL '${(0, _prettyMs.default)(milli, {
@@ -630,7 +632,7 @@ const intersects = {
       type: 'boolean'
     }
   },
-  execute: (a, b) => _sequelize.default.fn('ST_Intersects', _sequelize.default.cast(a.value, 'geometry'), _sequelize.default.cast(b.value, 'geometry'))
+  execute: (a, b) => _sequelize.default.fn('ST_Intersects', a.value, b.value)
 };
 exports.intersects = intersects;
 const distance = {
@@ -654,7 +656,7 @@ const distance = {
       }
     }
   },
-  execute: (a, b) => _sequelize.default.fn('ST_Distance', _sequelize.default.cast(a.value, 'geometry'), _sequelize.default.cast(b.value, 'geometry'))
+  execute: (a, b) => _sequelize.default.fn('ST_Distance', _sequelize.default.cast(a.value, 'geography'), _sequelize.default.cast(b.value, 'geography'))
 };
 exports.distance = distance;
 const geojson = {
@@ -705,6 +707,6 @@ const boundingBox = {
       type: 'polygon'
     }
   },
-  execute: (xmin, ymin, xmax, ymax) => _sequelize.default.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value)
+  execute: (xmin, ymin, xmax, ymax) => geom(_sequelize.default.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value))
 };
 exports.boundingBox = boundingBox;

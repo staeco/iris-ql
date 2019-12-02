@@ -1,6 +1,6 @@
 import types from 'sequelize'
 import { BadRequestError } from '../errors'
-import moment from 'moment'
+import moment from 'moment-timezone'
 import isNumber from 'is-number'
 import isObject from 'is-plain-obj'
 

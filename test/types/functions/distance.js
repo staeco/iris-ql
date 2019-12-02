@@ -11,7 +11,7 @@ describe('types#functions#distance', () => {
       function: 'distance',
       arguments: [
         { field: 'data.path' },
-        { function: 'geojson', arguments: [ '{"type":"Point","coordinates":[10,10]}' ] }
+        { function: 'geojson', arguments: [ '{"type":"Point","coordinates":[1.01,8]}' ] }
       ]
     }
     const fullQuery = {
@@ -24,9 +24,37 @@ describe('types#functions#distance', () => {
         { field: 'type' }
       ]
     }
+    // expected distance is 1/8 to 1.01/8, they run parallel so have a distance of 1deg to meters
     const expectedResponse = [
-      { totalDistance: 9, type: 'electric' },
-      { totalDistance: 9, type: 'regular' }
+      { totalDistance: 1102.432847, type: 'electric' },
+      { totalDistance: 1102.432847, type: 'regular' }
+    ]
+    const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
+    const res = await query.execute()
+    should(res).eql(expectedResponse)
+  })
+  it('should work when intersecting', async () => {
+    const funcVal = {
+      function: 'distance',
+      arguments: [
+        { field: 'data.path' },
+        { function: 'geojson', arguments: [ '{"type":"Point","coordinates":[1,9]}' ] }
+      ]
+    }
+    const fullQuery = {
+      filters: { sourceId: 'bike-trips' },
+      aggregations: [
+        { value: { function: 'average', arguments: [ funcVal ] }, alias: 'totalDistance' },
+        { value: { field: 'data.type' }, alias: 'type' }
+      ],
+      groupings: [
+        { field: 'type' }
+      ]
+    }
+    // expected distance is 1/8 to 1/9, they intersect so 0
+    const expectedResponse = [
+      { totalDistance: 0, type: 'electric' },
+      { totalDistance: 0, type: 'regular' }
     ]
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()

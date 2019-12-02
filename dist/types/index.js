@@ -7,7 +7,7 @@ var _sequelize = _interopRequireDefault(require("sequelize"));
 
 var _errors = require("../errors");
 
-var _moment = _interopRequireDefault(require("moment"));
+var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
 
 var _isNumber = _interopRequireDefault(require("is-number"));
 
@@ -15,7 +15,7 @@ var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const zones = new Set(_moment.default.tz.names());
+const zones = new Set(_momentTimezone.default.tz.names());
 
 const getBasicGeoJSONIssues = (v, type) => {
   if (!(0, _isPlainObj.default)(v)) return 'Not a valid object';
@@ -60,7 +60,7 @@ const boolean = {
 exports.boolean = boolean;
 const date = {
   name: 'Date/Time',
-  check: v => (0, _moment.default)(v, _moment.default.ISO_8601).isValid(),
+  check: v => (0, _momentTimezone.default)(v, _momentTimezone.default.ISO_8601).isValid(),
   hydrate: (txt, {
     timezone
   }) => {
