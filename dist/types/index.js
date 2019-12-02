@@ -72,7 +72,7 @@ const date = {
 
 exports.date = date;
 
-const geoCast = txt => _sequelize.default.fn('ST_GeomFromGeoJSON', txt);
+const geoCast = txt => _sequelize.default.fn('ST_SetSRID', _sequelize.default.fn('ST_GeomFromGeoJSON', txt), 4326);
 
 const point = {
   name: 'GeoJSON Point',
