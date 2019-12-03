@@ -11,7 +11,7 @@ import getScopedAttributes from '../util/getScopedAttributes'
 import Filter from '../Filter'
 import Ordering from '../Ordering'
 
-const geom = (v) => fn('ST_SetSRID', v, 4326)
+const srid = (v) => fn('ST_SetSRID', v, 4326)
 const zones = new Set(moment.tz.names())
 
 export default (query, opt={}) => {
@@ -159,7 +159,7 @@ export default (query, opt={}) => {
           message: ymaxIssue
         })
       }
-      const box = geom(fn('ST_MakeEnvelope', actualXMin, actualYMin, actualXMax, actualYMax))
+      const box = srid(fn('ST_MakeEnvelope', actualXMin, actualYMin, actualXMax, actualYMax))
       out.where.push(intersects(box, { model }))
     }
   }
@@ -192,7 +192,7 @@ export default (query, opt={}) => {
           message: latIssue
         })
       }
-      out.where.push(intersects(geom(fn('ST_Point', actualX, actualY)), { model }))
+      out.where.push(intersects(srid(fn('ST_Point', actualX, actualY)), { model }))
     }
   }
 

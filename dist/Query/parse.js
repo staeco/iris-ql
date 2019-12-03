@@ -35,7 +35,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-const geom = v => (0, _sequelize.fn)('ST_SetSRID', v, 4326);
+const srid = v => (0, _sequelize.fn)('ST_SetSRID', v, 4326);
 
 const zones = new Set(_momentTimezone.default.tz.names());
 
@@ -217,7 +217,7 @@ var _default = (query, opt = {}) => {
         });
       }
 
-      const box = geom((0, _sequelize.fn)('ST_MakeEnvelope', actualXMin, actualYMin, actualXMax, actualYMax));
+      const box = srid((0, _sequelize.fn)('ST_MakeEnvelope', actualXMin, actualYMin, actualXMax, actualYMax));
       out.where.push((0, _intersects.default)(box, {
         model
       }));
@@ -258,7 +258,7 @@ var _default = (query, opt = {}) => {
         });
       }
 
-      out.where.push((0, _intersects.default)(geom((0, _sequelize.fn)('ST_Point', actualX, actualY)), {
+      out.where.push((0, _intersects.default)(srid((0, _sequelize.fn)('ST_Point', actualX, actualY)), {
         model
       }));
     }

@@ -3,7 +3,7 @@ import { Query } from '../../../src'
 import db from '../../fixtures/db'
 
 describe('Query#options#intersects', () => {
-  const { store } = db.models
+  const { store, datum } = db.models
 
   it('should work for valid intersects values', async () => {
     should.exist(new Query({ intersects: { x: 0, y: 0 } }, { model: store }))
@@ -16,7 +16,7 @@ describe('Query#options#intersects', () => {
     should.throws(() => new Query({ intersects: [] }, { model: store }))
     should.throws(() => new Query({ intersects: [ '1', '2' ] }, { model: store }))
   })
-  it('should execute with intersects', async () => {
+  it('should execute with intersects on points', async () => {
     const point = {
       x: 5,
       y: 5
@@ -28,6 +28,48 @@ describe('Query#options#intersects', () => {
     res.count.should.equal(1)
     res.rows.length.should.equal(1)
     res.rows[0].location.coordinates.should.eql([ 5, 5 ])
+  })
+  it('should execute with direct intersects on lines', async () => {
+    const point = {
+      x: 1,
+      y: 8
+    }
+    const query = new Query({
+      intersects: point,
+      filters: { sourceId: 'bike-trips' },
+      limit: 1
+    }, { model: datum })
+    const res = await query.execute()
+    should.exist(res.count)
+    should.exist(res.rows)
+    res.count.should.equal(2)
+    res.rows.length.should.equal(1)
+    res.rows[0].geometry.coordinates.should.eql([
+      [ 1, 2 ],
+      [ point.x, point.y ],
+      [ 1, 12 ]
+    ])
+  })
+  it('should execute with indirect intersects on lines', async () => {
+    const point = {
+      x: 1,
+      y: 11
+    }
+    const query = new Query({
+      intersects: point,
+      filters: { sourceId: 'bike-trips' },
+      limit: 1
+    }, { model: datum })
+    const res = await query.execute()
+    should.exist(res.count)
+    should.exist(res.rows)
+    res.count.should.equal(2)
+    res.rows.length.should.equal(1)
+    res.rows[0].geometry.coordinates.should.eql([
+      [ 1, 2 ],
+      [ 1, 8 ],
+      [ 1, 12 ]
+    ])
   })
   it('should validate coordinate max', async () => {
     const point = {
