@@ -7,6 +7,9 @@ import seedData from './fixtures/seed-data'
 before(async () => {
   await db.sync()
   await setupTests(db)
+})
+
+beforeEach(async () => {
   await seedUsers()
   await seedStores()
   await seedData()

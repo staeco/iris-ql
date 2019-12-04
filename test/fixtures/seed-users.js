@@ -19,9 +19,9 @@ const data = [
     authId: 'yaba3',
     authToken: 'yoyo'
   }
-]
+].map((v) => db.models.user.build(v).toJSON()) // generate the IDs
 
 export default async () =>
   Promise.all(data.map(async (i) =>
-    db.models.user.create(i)
+    db.models.user.upsert(i)
   ))

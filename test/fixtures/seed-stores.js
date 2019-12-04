@@ -31,9 +31,9 @@ const data = [
       ]
     }
   }
-]
+].map((v) => db.models.store.build(v).toJSON()) // generate the IDs
 
 export default async () =>
   Promise.all(data.map(async (i) =>
-    db.models.store.create(i)
+    db.models.store.upsert(i)
   ))

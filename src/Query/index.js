@@ -32,4 +32,6 @@ export default class Query {
       model: this.options.model,
       value: this.value()
     })
+  destroy = async () =>
+    this.options.model.destroy(this.value())
 }

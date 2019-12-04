@@ -100,9 +100,9 @@ const data = [
       ]
     }
   }
-]
+].map((v) => db.models.datum.build(v).toJSON()) // generate the IDs
 
 export default async () =>
   Promise.all(data.map(async (i) =>
-    db.models.datum.create(i)
+    db.models.datum.upsert(i)
   ))
