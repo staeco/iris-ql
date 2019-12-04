@@ -49,6 +49,8 @@ class Query {
       value: this.value()
     });
 
+    this.destroy = async () => this.options.model.destroy(this.value());
+
     if (!obj) throw new Error('Missing query!');
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
     this.input = obj;
