@@ -23,6 +23,10 @@ var types = _interopRequireWildcard(require("./types"));
 
 exports.types = types;
 
+var _getTypes = _interopRequireDefault(require("./types/getTypes"));
+
+exports.getTypes = _getTypes.default;
+
 var _AnalyticsQuery = _interopRequireDefault(require("./AnalyticsQuery"));
 
 exports.AnalyticsQuery = _AnalyticsQuery.default;
