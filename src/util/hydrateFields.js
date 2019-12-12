@@ -11,7 +11,7 @@ const unwrap = (str) =>
 
 export default (v, opt) => {
   if (Array.isArray(v)) v = { $and: v } // convert it
-  const str = where({ value: v, model: opt.model })
+  const str = where({ value: v, model: opt.model, instanceQuery: opt.instanceQuery })
   if (!jsonField.test(str)) return v // nothing to do! no fields to hydrate
 
   // if the field is followed by " IS" then skip, because we dont need to hydrate that
@@ -19,7 +19,7 @@ export default (v, opt) => {
   const needsCasting = new RegExp(`"${opt.model.name}"\\."(\\w*)"#>>'{(\\w*)}'(?! (IS NULL|IS NOT NULL))`, 'g')
   const redone = unwrap(str).replace(needsCasting, (match, col, field) => {
     const lit = getJSONField(`${col}.${field}`, opt)
-    return value({ value: lit, model: opt.model })
+    return value({ value: lit, model: opt.model, instanceQuery: opt.instanceQuery })
   })
   return types.literal(redone)
 }

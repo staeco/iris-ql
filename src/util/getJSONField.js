@@ -9,6 +9,7 @@ export default (v, opt) => {
     subSchemas = {},
     model,
     fieldLimit = Object.keys(model.rawAttributes),
+    instanceQuery,
     hydrate = true
   } = opt
   const path = v.split('.')
@@ -28,7 +29,7 @@ export default (v, opt) => {
       message: `Field is not JSON: ${col}`
     })
   }
-  const lit = types.literal(jsonPath({ column: col, model, path }))
+  const lit = types.literal(jsonPath({ column: col, model, path, instanceQuery }))
   const schema = subSchemas[col] || colInfo.subSchema
   if (!schema) {
     // did not give sufficient info to query json objects safely!

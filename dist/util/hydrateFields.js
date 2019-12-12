@@ -28,7 +28,8 @@ var _default = (v, opt) => {
 
   const str = (0, _toString.where)({
     value: v,
-    model: opt.model
+    model: opt.model,
+    instanceQuery: opt.instanceQuery
   });
   if (!jsonField.test(str)) return v; // nothing to do! no fields to hydrate
   // if the field is followed by " IS" then skip, because we dont need to hydrate that
@@ -39,7 +40,8 @@ var _default = (v, opt) => {
     const lit = (0, _getJSONField.default)(`${col}.${field}`, opt);
     return (0, _toString.value)({
       value: lit,
-      model: opt.model
+      model: opt.model,
+      instanceQuery: opt.instanceQuery
     });
   });
   return _sequelize.default.literal(redone);

@@ -33,5 +33,9 @@ export default class Query {
       value: this.value()
     })
   destroy = async () =>
-    this.options.model.destroy(this.value())
+    // need to reparse it with instanceQuery false, the sequelize query builder does not alias destroys for filters
+    this.options.model.destroy(parse(this.input, {
+      ...this.options,
+      instanceQuery: false
+    }))
 }

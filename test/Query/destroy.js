@@ -2,6 +2,14 @@ import should from 'should'
 import { Query } from '../../src'
 import db from '../fixtures/db'
 
+const dataType = {
+  schema: {
+    id: {
+      type: 'text'
+    }
+  }
+}
+
 describe('Query#destroy', () => {
   const { user } = db.models
   it('should fail trying to destroy by invalid scope', async () => {
@@ -31,5 +39,13 @@ describe('Query#destroy', () => {
     const whatsLeft = await user.findAll()
     should(total - whatsLeft.length).equal(1)
     should.not.exist(whatsLeft.find((i) => i.email === email))
+  })
+  it('should destroy with json filters', async () => {
+    const query = new Query({
+      filters: [
+        { 'settings.id': 'abc' }
+      ]
+    }, { model: user, subSchemas: { settings: dataType.schema } })
+    await query.destroy()
   })
 })

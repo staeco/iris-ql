@@ -29,6 +29,7 @@ var _default = (v, opt) => {
     subSchemas = {},
     model,
     fieldLimit = Object.keys(model.rawAttributes),
+    instanceQuery,
     hydrate = true
   } = opt;
   const path = v.split('.');
@@ -54,7 +55,8 @@ var _default = (v, opt) => {
   const lit = _sequelize.default.literal((0, _toString.jsonPath)({
     column: col,
     model,
-    path
+    path,
+    instanceQuery
   }));
 
   const schema = subSchemas[col] || colInfo.subSchema;
