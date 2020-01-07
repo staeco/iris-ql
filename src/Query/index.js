@@ -19,7 +19,7 @@ export default class Query {
     this._parsed = newInstanceValue
 
     // update non-instance query
-    const newCollectionValue = fn(this._parsed)
+    const newCollectionValue = fn(this._parsedCollection)
     if (!newCollectionValue || typeof newCollectionValue !== 'object') throw new Error('Invalid update function! Must return an object.')
     this._parsedCollection = newCollectionValue
     return this

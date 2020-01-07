@@ -25,6 +25,24 @@ describe('Query#destroy', () => {
     }
     throw new Error('Did not throw!')
   })
+  it('should work with filters and update', async () => {
+    const email = 'yo@yo.com'
+    const query = new Query({
+      filters: [
+        { email }
+      ]
+    }, { model: user })
+    query.update((v) => ({
+      ...v,
+      where: [
+        ...v.where,
+        { email: 'noexist@noexist.com' }
+      ]
+    }))
+    const count = await query.destroy()
+    should.exist(count)
+    should(count).equal(0)
+  })
   it('should destroy with filters', async () => {
     const email = 'yo@yo.com'
     const total = await user.count()
