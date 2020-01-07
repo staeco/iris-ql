@@ -49,8 +49,7 @@ class Query {
       value: this.value()
     });
 
-    this.destroy = async () => // need to reparse it with instanceQuery false, the sequelize query builder does not alias destroys for filters
-    this.options.model.destroy((0, _parse.default)(this.input, _objectSpread({}, this.options, {
+    this.destroy = async () => this.options.model.destroy((0, _parse.default)(this.input, _objectSpread({}, this.options, {
       instanceQuery: false
     })));
 
