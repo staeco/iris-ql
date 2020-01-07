@@ -63,6 +63,7 @@ var _default = async ({
   value,
   format,
   transform,
+  debug,
   analytics = false
 }) => {
   const nv = _objectSpread({}, value); // prep work findAll usually does
@@ -91,6 +92,7 @@ var _default = async ({
     value: nv,
     model
   });
+  if (debug) debug(sql);
   const src = await streamable(model, sql, transform);
   if (!format) return src;
   const out = (0, _pump.default)(src, format(), err => {

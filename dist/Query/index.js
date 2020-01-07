@@ -35,7 +35,8 @@ class Query {
     } = {}) => {
       const fn = count ? 'findAndCountAll' : 'findAll';
       return this.options.model[fn](_objectSpread({
-        raw
+        raw,
+        logging: this.options.debug
       }, this.value()));
     };
 
@@ -45,13 +46,20 @@ class Query {
     } = {}) => (0, _export.default)({
       format,
       transform,
+      debug: this.options.debug,
       model: this.options.model,
       value: this.value()
     });
 
-    this.destroy = async () => this.options.model.destroy((0, _parse.default)(this.input, _objectSpread({}, this.options, {
-      instanceQuery: false
-    })));
+    this.destroy = async () => {
+      // need to reparse it with instanceQuery false, the sequelize query builder does not alias destroys for filters
+      const baseQuery = (0, _parse.default)(this.input, _objectSpread({}, this.options, {
+        instanceQuery: false
+      }));
+      return this.options.model.destroy(_objectSpread({
+        logging: this.options.debug
+      }, baseQuery));
+    };
 
     if (!obj) throw new Error('Missing query!');
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');

@@ -22,6 +22,7 @@ export default class Query {
     const fn = count ? 'findAndCountAll' : 'findAll'
     return this.options.model[fn]({
       raw,
+      logging: this.options.debug,
       ...this.value()
     })
   }
@@ -29,14 +30,20 @@ export default class Query {
     exportStream({
       format,
       transform,
+      debug: this.options.debug,
       model: this.options.model,
       value: this.value()
     })
 
-  // need to reparse it with instanceQuery false, the sequelize query builder does not alias destroys for filters
-  destroy = async () =>
-    this.options.model.destroy(parse(this.input, {
+  destroy = async () => {
+    // need to reparse it with instanceQuery false, the sequelize query builder does not alias destroys for filters
+    const baseQuery = parse(this.input, {
       ...this.options,
       instanceQuery: false
-    }))
+    })
+    return this.options.model.destroy({
+      logging: this.options.debug,
+      ...baseQuery
+    })
+  }
 }

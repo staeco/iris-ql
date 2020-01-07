@@ -42,7 +42,8 @@ class AnalyticsQuery {
     }, {});
 
     this.execute = async () => this.options.model.findAll(_objectSpread({
-      raw: true
+      raw: true,
+      logging: this.options.debug
     }, this.value()));
 
     this.executeStream = async ({
@@ -52,6 +53,7 @@ class AnalyticsQuery {
       analytics: true,
       format,
       transform,
+      debug: this.options.debug,
       model: this.options.model,
       value: this.value()
     });

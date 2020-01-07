@@ -36,7 +36,7 @@ const streamable = async (model, sql, transform) => {
 }
 
 
-export default async ({ model, value, format, transform, analytics=false }) => {
+export default async ({ model, value, format, transform, debug, analytics=false }) => {
   const nv = { ...value }
 
   // prep work findAll usually does
@@ -55,6 +55,7 @@ export default async ({ model, value, format, transform, analytics=false }) => {
   }
 
   const sql = select({ value: nv, model })
+  if (debug) debug(sql)
   const src = await streamable(model, sql, transform)
   if (!format) return src
   const out = pump(src, format(), (err) => {
