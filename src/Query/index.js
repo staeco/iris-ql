@@ -8,12 +8,20 @@ export default class Query {
     this.input = obj
     this.options = options
     this._parsed = parse(obj, options)
+    this._parsedCollection = parse(obj, { ...options, instanceQuery: false })
   }
   update = (fn) => {
     if (typeof fn !== 'function') throw new Error('Missing update function!')
-    const newValue = fn(this._parsed)
-    if (!newValue || typeof newValue !== 'object') throw new Error('Invalid update function! Must return an object.')
-    this._parsed = newValue
+
+    // update instance query
+    const newInstanceValue = fn(this._parsed)
+    if (!newInstanceValue || typeof newInstanceValue !== 'object') throw new Error('Invalid update function! Must return an object.')
+    this._parsed = newInstanceValue
+
+    // update non-instance query
+    const newCollectionValue = fn(this._parsed)
+    if (!newCollectionValue || typeof newCollectionValue !== 'object') throw new Error('Invalid update function! Must return an object.')
+    this._parsedCollection = newCollectionValue
     return this
   }
   value = () => this._parsed
@@ -35,15 +43,9 @@ export default class Query {
       value: this.value()
     })
 
-  destroy = async () => {
-    // need to reparse it with instanceQuery false, the sequelize query builder does not alias destroys for filters
-    const baseQuery = parse(this.input, {
-      ...this.options,
-      instanceQuery: false
-    })
-    return this.options.model.destroy({
+  destroy = async () =>
+    this.options.model.destroy({
       logging: this.options.debug,
-      ...baseQuery
+      ...this._parsedCollection
     })
-  }
 }

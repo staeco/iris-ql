@@ -18,10 +18,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 class Query {
   constructor(obj, options = {}) {
     this.update = fn => {
-      if (typeof fn !== 'function') throw new Error('Missing update function!');
-      const newValue = fn(this._parsed);
-      if (!newValue || typeof newValue !== 'object') throw new Error('Invalid update function! Must return an object.');
-      this._parsed = newValue;
+      if (typeof fn !== 'function') throw new Error('Missing update function!'); // update instance query
+
+      const newInstanceValue = fn(this._parsed);
+      if (!newInstanceValue || typeof newInstanceValue !== 'object') throw new Error('Invalid update function! Must return an object.');
+      this._parsed = newInstanceValue; // update non-instance query
+
+      const newCollectionValue = fn(this._parsed);
+      if (!newCollectionValue || typeof newCollectionValue !== 'object') throw new Error('Invalid update function! Must return an object.');
+      this._parsedCollection = newCollectionValue;
       return this;
     };
 
@@ -51,21 +56,18 @@ class Query {
       value: this.value()
     });
 
-    this.destroy = async () => {
-      // need to reparse it with instanceQuery false, the sequelize query builder does not alias destroys for filters
-      const baseQuery = (0, _parse.default)(this.input, _objectSpread({}, this.options, {
-        instanceQuery: false
-      }));
-      return this.options.model.destroy(_objectSpread({
-        logging: this.options.debug
-      }, baseQuery));
-    };
+    this.destroy = async () => this.options.model.destroy(_objectSpread({
+      logging: this.options.debug
+    }, this._parsedCollection));
 
     if (!obj) throw new Error('Missing query!');
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
     this.input = obj;
     this.options = options;
     this._parsed = (0, _parse.default)(obj, options);
+    this._parsedCollection = (0, _parse.default)(obj, _objectSpread({}, options, {
+      instanceQuery: false
+    }));
   }
 
 }
