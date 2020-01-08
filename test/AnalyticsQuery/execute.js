@@ -50,4 +50,18 @@ describe('AnalyticsQuery#execute', () => {
       { total: 1, pre70s: 0, weekly: 1, officer: 'Wyatt' }
     ])
   })
+  it('should get crime time series with LA time zone', async () => {
+    const query = new AnalyticsQuery(crimeTimeSeries, { timezone: 'America/Los_Angeles', model: datum, subSchemas: { data: dataType.schema } })
+    const res = await query.execute()
+    should(res).eql([
+      {
+        total: 1,
+        day: new Date('2017-05-16T07:00:00.000Z')
+      },
+      {
+        total: 1,
+        day: new Date('2017-05-15T07:00:00.000Z')
+      }
+    ])
+  })
 })

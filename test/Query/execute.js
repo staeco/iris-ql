@@ -85,4 +85,69 @@ describe('Query#execute', () => {
     should(filteredRes.count).equal(1)
     should(filteredRes.rows[0].data.arrivedAt).eql('2017-05-17T00:24:09.649Z')
   })
+  it('should filter hour of day with LA timezone', async () => {
+    const unfilteredQuery = new Query({
+      filters: { sourceId: '911-calls' },
+      limit: 4,
+      timezone: 'America/Los_Angeles'
+    }, {
+      model: datum
+    })
+    const allRes = await unfilteredQuery.execute()
+    should(allRes.count).equal(2)
+    const filteredQuery = new Query({
+      limit: 4,
+      timezone: 'America/Los_Angeles',
+      filters: [
+        { sourceId: '911-calls' },
+        {
+          $and: [
+            { 'data.dispatchedAt': { $ne: null } },
+            {
+              function: 'gte',
+              arguments: [
+                {
+                  function: 'extract',
+                  arguments: [
+                    'hourOfDay',
+                    {
+                      field: 'data.dispatchedAt'
+                    }
+                  ]
+                },
+                17
+              ]
+            },
+            {
+              function: 'lte',
+              arguments: [
+                {
+                  function: 'extract',
+                  arguments: [
+                    'hourOfDay',
+                    {
+                      field: 'data.dispatchedAt'
+                    }
+                  ]
+                },
+                17
+              ]
+            }
+          ]
+        }
+      ]
+    }, {
+      subSchemas: {
+        data: {
+          dispatchedAt: {
+            type: 'date'
+          }
+        }
+      },
+      model: datum
+    })
+    const filteredRes = await filteredQuery.execute({ raw: true })
+    should(filteredRes.count).equal(1)
+    should(filteredRes.rows[0].data.arrivedAt).eql('2017-05-17T00:24:09.649Z')
+  })
 })
