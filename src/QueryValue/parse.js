@@ -100,7 +100,7 @@ const parse = (v, opt) => {
   }
   if (v.function) {
     const { fn, args } = getFunction(v, opt)
-    return fn.execute(...args)
+    return fn.execute(args, opt)
   }
   if (v.field) {
     if (typeof v.field !== 'string') {

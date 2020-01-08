@@ -111,15 +111,9 @@ describe('types', () => {
 
   it('should hydrate a date', () => {
     const d = '2019-07-29T15:57:02.156Z'
-    should.throws(() => types.date.hydrate(''))
-    const t1 = types.date.hydrate(d, { timezone: undefined })
+    const t1 = types.date.hydrate(d)
     should(t1.fn).equal('parse_iso')
     should(t1.args[0]).equal(d)
-
-    should.throws(() => types.date.hydrate(d, { timezone: 'invalid' }))
-
-    const t2 = types.date.hydrate(d, { timezone: 'America/New_York' })
-    should(t2.fn).equal('force_tz')
   })
 
   it('should hydrate point', () => {

@@ -89,7 +89,7 @@ const getTypes = (v, opt = {}) => {
           raw: argValue
         };
       });
-      const nv = (0, _lodash.pickBy)(fn.returns.dynamic(...resolvedArgs));
+      const nv = (0, _lodash.pickBy)(fn.returns.dynamic(resolvedArgs, opt));
       return Array.isArray(nv) ? (0, _lodash.pickBy)(nv) : [nv];
     }
 

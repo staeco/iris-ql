@@ -15,6 +15,8 @@ var _errors = require("../errors");
 
 var _ = require("./");
 
+var _forceTZ = _interopRequireDefault(require("../util/forceTZ"));
+
 var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 var _prettyMs = _interopRequireDefault(require("pretty-ms"));
@@ -31,7 +33,7 @@ function _ref2(i) {
   return i.type === 'number';
 }
 
-const inheritNumeric = (infoA, infoB) => {
+const inheritNumeric = ([infoA, infoB]) => {
   const primaryTypeA = infoA === null || infoA === void 0 ? void 0 : infoA.types.find(_ref);
   const primaryTypeB = infoB === null || infoB === void 0 ? void 0 : infoB.types.find(_ref2);
   return {
@@ -149,9 +151,9 @@ const expand = {
     static: {
       type: 'any'
     },
-    dynamic: listInfo => listInfo.types.find(_ref4).items
+    dynamic: ([listInfo]) => listInfo.types.find(_ref4).items
   },
-  execute: listInfo => _sequelize.default.fn('unnest', listInfo.value)
+  execute: ([listInfo]) => _sequelize.default.fn('unnest', listInfo.value)
 }; // Aggregations
 
 exports.expand = expand;
@@ -170,7 +172,7 @@ const min = {
     dynamic: inheritNumeric
   },
   aggregate: true,
-  execute: f => _sequelize.default.fn('min', numeric(f))
+  execute: ([f]) => _sequelize.default.fn('min', numeric(f))
 };
 exports.min = min;
 const max = {
@@ -188,7 +190,7 @@ const max = {
     dynamic: inheritNumeric
   },
   aggregate: true,
-  execute: f => _sequelize.default.fn('max', numeric(f))
+  execute: ([f]) => _sequelize.default.fn('max', numeric(f))
 };
 exports.max = max;
 const sum = {
@@ -206,7 +208,7 @@ const sum = {
     dynamic: inheritNumeric
   },
   aggregate: true,
-  execute: f => _sequelize.default.fn('sum', numeric(f))
+  execute: ([f]) => _sequelize.default.fn('sum', numeric(f))
 };
 exports.sum = sum;
 const average = {
@@ -224,7 +226,7 @@ const average = {
     dynamic: inheritNumeric
   },
   aggregate: true,
-  execute: f => _sequelize.default.fn('avg', numeric(f))
+  execute: ([f]) => _sequelize.default.fn('avg', numeric(f))
 };
 exports.average = average;
 const median = {
@@ -242,7 +244,7 @@ const median = {
     dynamic: inheritNumeric
   },
   aggregate: true,
-  execute: f => _sequelize.default.fn('median', numeric(f))
+  execute: ([f]) => _sequelize.default.fn('median', numeric(f))
 };
 exports.median = median;
 const count = {
@@ -276,7 +278,7 @@ const add = {
     },
     dynamic: inheritNumeric
   },
-  execute: (a, b) => _sequelize.default.fn('add', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('add', numeric(a), numeric(b))
 };
 exports.add = add;
 const subtract = {
@@ -297,7 +299,7 @@ const subtract = {
     },
     dynamic: inheritNumeric
   },
-  execute: (a, b) => _sequelize.default.fn('sub', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('sub', numeric(a), numeric(b))
 };
 exports.subtract = subtract;
 const multiply = {
@@ -318,7 +320,7 @@ const multiply = {
     },
     dynamic: inheritNumeric
   },
-  execute: (a, b) => _sequelize.default.fn('mult', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('mult', numeric(a), numeric(b))
 };
 exports.multiply = multiply;
 const divide = {
@@ -339,7 +341,7 @@ const divide = {
     },
     dynamic: inheritNumeric
   },
-  execute: (a, b) => _sequelize.default.fn('div', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('div', numeric(a), numeric(b))
 };
 exports.divide = divide;
 const remainder = {
@@ -360,7 +362,7 @@ const remainder = {
     },
     dynamic: inheritNumeric
   },
-  execute: (a, b) => _sequelize.default.fn('mod', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('mod', numeric(a), numeric(b))
 }; // Comparisons
 
 exports.remainder = remainder;
@@ -381,7 +383,7 @@ const gt = {
       type: 'boolean'
     }
   },
-  execute: (a, b) => _sequelize.default.fn('gt', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('gt', numeric(a), numeric(b))
 };
 exports.gt = gt;
 const lt = {
@@ -401,7 +403,7 @@ const lt = {
       type: 'boolean'
     }
   },
-  execute: (a, b) => _sequelize.default.fn('lt', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('lt', numeric(a), numeric(b))
 };
 exports.lt = lt;
 const gte = {
@@ -421,7 +423,7 @@ const gte = {
       type: 'boolean'
     }
   },
-  execute: (a, b) => _sequelize.default.fn('gte', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('gte', numeric(a), numeric(b))
 };
 exports.gte = gte;
 const lte = {
@@ -441,7 +443,7 @@ const lte = {
       type: 'boolean'
     }
   },
-  execute: (a, b) => _sequelize.default.fn('lte', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('lte', numeric(a), numeric(b))
 };
 exports.lte = lte;
 const eq = {
@@ -461,7 +463,7 @@ const eq = {
       type: 'boolean'
     }
   },
-  execute: (a, b) => _sequelize.default.fn('eq', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('eq', numeric(a), numeric(b))
 }; // Time
 
 exports.eq = eq;
@@ -489,9 +491,11 @@ const last = {
       type: 'date'
     }
   },
-  execute: ({
-    raw
-  }) => {
+  execute: ([a]) => {
+    const {
+      raw
+    } = a;
+
     const milli = _momentTimezone.default.duration(raw).asMilliseconds();
 
     if (milli === 0) throw new _errors.BadRequestError('Invalid duration');
@@ -522,7 +526,7 @@ const interval = {
       }
     }
   },
-  execute: (start, end) => _sequelize.default.fn('sub', _sequelize.default.fn('time_to_ms', end.value), _sequelize.default.fn('time_to_ms', start.value))
+  execute: ([start, end]) => _sequelize.default.fn('sub', _sequelize.default.fn('time_to_ms', end.value), _sequelize.default.fn('time_to_ms', start.value))
 };
 exports.interval = interval;
 const bucket = {
@@ -543,7 +547,7 @@ const bucket = {
       type: 'date'
     }
   },
-  execute: (p, f) => _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value)
+  execute: ([p, f], opt) => (0, _forceTZ.default)(_sequelize.default.fn('date_trunc', truncatesToDB[p.raw], (0, _forceTZ.default)(f.value, opt)), opt)
 };
 exports.bucket = bucket;
 const extract = {
@@ -563,7 +567,7 @@ const extract = {
     static: {
       type: 'number'
     },
-    dynamic: unitInfo => ({
+    dynamic: ([unitInfo]) => ({
       type: 'number',
       measurement: {
         type: 'datePart',
@@ -571,7 +575,7 @@ const extract = {
       }
     })
   },
-  execute: (p, f) => _sequelize.default.fn('date_part', partsToDB[p.raw], f.value)
+  execute: ([p, f], opt) => _sequelize.default.fn('date_part', partsToDB[p.raw], (0, _forceTZ.default)(f.value, opt))
 }; // Geospatial
 
 exports.extract = extract;
@@ -592,7 +596,7 @@ const area = {
       }
     }
   },
-  execute: f => _sequelize.default.fn('ST_Area', _sequelize.default.cast(f.value, 'geography'))
+  execute: ([f]) => _sequelize.default.fn('ST_Area', _sequelize.default.cast(f.value, 'geography'))
 };
 exports.area = area;
 const length = {
@@ -612,7 +616,7 @@ const length = {
       }
     }
   },
-  execute: f => _sequelize.default.fn('ST_Length', _sequelize.default.cast(f.value, 'geography'))
+  execute: ([f]) => _sequelize.default.fn('ST_Length', _sequelize.default.cast(f.value, 'geography'))
 };
 exports.length = length;
 const intersects = {
@@ -632,7 +636,7 @@ const intersects = {
       type: 'boolean'
     }
   },
-  execute: (a, b) => _sequelize.default.fn('ST_Intersects', a.value, b.value)
+  execute: ([a, b]) => _sequelize.default.fn('ST_Intersects', a.value, b.value)
 };
 exports.intersects = intersects;
 const distance = {
@@ -656,7 +660,7 @@ const distance = {
       }
     }
   },
-  execute: (a, b) => _sequelize.default.fn('ST_Distance', _sequelize.default.cast(a.value, 'geography'), _sequelize.default.cast(b.value, 'geography'))
+  execute: ([a, b]) => _sequelize.default.fn('ST_Distance', _sequelize.default.cast(a.value, 'geography'), _sequelize.default.cast(b.value, 'geography'))
 };
 exports.distance = distance;
 const geojson = {
@@ -671,15 +675,11 @@ const geojson = {
     static: {
       type: 'geometry'
     },
-    dynamic: ({
-      raw
-    }) => ({
-      type: getGeoReturnType(raw)
+    dynamic: ([a]) => ({
+      type: getGeoReturnType(a.raw)
     })
   },
-  execute: ({
-    raw
-  }) => getGeometryValue(raw)
+  execute: ([a]) => getGeometryValue(a.raw)
 };
 exports.geojson = geojson;
 const boundingBox = {
@@ -707,6 +707,6 @@ const boundingBox = {
       type: 'polygon'
     }
   },
-  execute: (xmin, ymin, xmax, ymax) => geom(_sequelize.default.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value))
+  execute: ([xmin, ymin, xmax, ymax]) => geom(_sequelize.default.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value))
 };
 exports.boundingBox = boundingBox;

@@ -61,7 +61,7 @@ const getTypes = (v, opt={}) => {
           raw: argValue
         }
       })
-      const nv = pickBy(fn.returns.dynamic(...resolvedArgs))
+      const nv = pickBy(fn.returns.dynamic(resolvedArgs, opt))
       return Array.isArray(nv) ? pickBy(nv) : [ nv ]
     }
     return Array.isArray(fn.returns.static)

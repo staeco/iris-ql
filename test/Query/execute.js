@@ -81,7 +81,8 @@ describe('Query#execute', () => {
       },
       model: datum
     })
-    const filteredRes = await filteredQuery.execute()
+    const filteredRes = await filteredQuery.execute({ raw: true })
     should(filteredRes.count).equal(1)
+    should(filteredRes.rows[0].data.arrivedAt).eql('2017-05-17T00:24:09.649Z')
   })
 })

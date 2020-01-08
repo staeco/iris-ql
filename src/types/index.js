@@ -1,10 +1,8 @@
 import types from 'sequelize'
-import { BadRequestError } from '../errors'
 import moment from 'moment-timezone'
 import isNumber from 'is-number'
 import isObject from 'is-plain-obj'
 
-const zones = new Set(moment.tz.names())
 const getBasicGeoJSONIssues = (v, type) => {
   if (!isObject(v)) return 'Not a valid object'
   if (v.type !== type) return `Not a valid type value (Expected ${type} not ${v.type})`
@@ -47,11 +45,7 @@ export const boolean = {
 export const date = {
   name: 'Date/Time',
   check: (v) => moment(v, moment.ISO_8601).isValid(),
-  hydrate: (txt, { timezone }) => {
-    if (!timezone) return types.fn('parse_iso', txt)
-    if (!zones.has(timezone)) throw new BadRequestError('Not a valid timezone')
-    return types.fn('force_tz', types.fn('parse_iso', txt), timezone)
-  }
+  hydrate: (txt) => types.fn('parse_iso', txt)
 }
 
 // geo (EPSG:4979 / WGS84)

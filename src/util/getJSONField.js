@@ -53,5 +53,5 @@ export default (v, opt) => {
       message: `Field does not exist: ${col}.${field}`
     })
   }
-  return schemaTypes[attrDef.type].hydrate(lit, { ...opt, attr: attrDef })
+  return schemaTypes[attrDef.type].hydrate(lit)
 }

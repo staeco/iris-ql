@@ -5,8 +5,6 @@ exports.multipolygon = exports.polygon = exports.multiline = exports.line = expo
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
-var _errors = require("../errors");
-
 var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
 
 var _isNumber = _interopRequireDefault(require("is-number"));
@@ -14,8 +12,6 @@ var _isNumber = _interopRequireDefault(require("is-number"));
 var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const zones = new Set(_momentTimezone.default.tz.names());
 
 const getBasicGeoJSONIssues = (v, type) => {
   if (!(0, _isPlainObj.default)(v)) return 'Not a valid object';
@@ -61,13 +57,7 @@ exports.boolean = boolean;
 const date = {
   name: 'Date/Time',
   check: v => (0, _momentTimezone.default)(v, _momentTimezone.default.ISO_8601).isValid(),
-  hydrate: (txt, {
-    timezone
-  }) => {
-    if (!timezone) return _sequelize.default.fn('parse_iso', txt);
-    if (!zones.has(timezone)) throw new _errors.BadRequestError('Not a valid timezone');
-    return _sequelize.default.fn('force_tz', _sequelize.default.fn('parse_iso', txt), timezone);
-  }
+  hydrate: txt => _sequelize.default.fn('parse_iso', txt)
 }; // geo (EPSG:4979 / WGS84)
 
 exports.date = date;

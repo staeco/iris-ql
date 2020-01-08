@@ -154,7 +154,7 @@ const parse = (v, opt) => {
       fn,
       args
     } = getFunction(v, opt);
-    return fn.execute(...args);
+    return fn.execute(args, opt);
   }
 
   if (v.field) {

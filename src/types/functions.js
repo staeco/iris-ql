@@ -4,11 +4,12 @@ import decamelize from 'decamelize'
 import moment from 'moment-timezone'
 import { BadRequestError } from '../errors'
 import { multiline, line, point, polygon, multipolygon } from './'
+import forceTZ from '../util/forceTZ'
 import isObject from 'is-plain-obj'
 import ms from 'pretty-ms'
 
 const geom = (v) => types.fn('ST_SetSRID', v, 4326)
-const inheritNumeric = (infoA, infoB) => {
+const inheritNumeric = ([ infoA, infoB ]) => {
   const primaryTypeA = infoA?.types.find((i) => i.type === 'number')
   const primaryTypeB = infoB?.types.find((i) => i.type === 'number')
   return {
@@ -118,9 +119,9 @@ export const expand = {
   ],
   returns: {
     static: { type: 'any' },
-    dynamic: (listInfo) => listInfo.types.find((i) => i.type === 'array').items
+    dynamic: ([ listInfo ]) => listInfo.types.find((i) => i.type === 'array').items
   },
-  execute: (listInfo) => types.fn('unnest', listInfo.value)
+  execute: ([ listInfo ]) => types.fn('unnest', listInfo.value)
 }
 
 // Aggregations
@@ -139,7 +140,7 @@ export const min = {
     dynamic: inheritNumeric
   },
   aggregate: true,
-  execute: (f) => types.fn('min', numeric(f))
+  execute: ([ f ]) => types.fn('min', numeric(f))
 }
 export const max = {
   name: 'Maximum',
@@ -156,7 +157,7 @@ export const max = {
     dynamic: inheritNumeric
   },
   aggregate: true,
-  execute: (f) => types.fn('max', numeric(f))
+  execute: ([ f ]) => types.fn('max', numeric(f))
 }
 export const sum = {
   name: 'Sum',
@@ -173,7 +174,7 @@ export const sum = {
     dynamic: inheritNumeric
   },
   aggregate: true,
-  execute: (f) => types.fn('sum', numeric(f))
+  execute: ([ f ]) => types.fn('sum', numeric(f))
 }
 export const average = {
   name: 'Average',
@@ -190,7 +191,7 @@ export const average = {
     dynamic: inheritNumeric
   },
   aggregate: true,
-  execute: (f) => types.fn('avg', numeric(f))
+  execute: ([ f ]) => types.fn('avg', numeric(f))
 }
 export const median = {
   name: 'Median',
@@ -207,7 +208,7 @@ export const median = {
     dynamic: inheritNumeric
   },
   aggregate: true,
-  execute: (f) => types.fn('median', numeric(f))
+  execute: ([ f ]) => types.fn('median', numeric(f))
 }
 export const count = {
   name: 'Total Count',
@@ -239,7 +240,7 @@ export const add = {
     static: { type: 'number' },
     dynamic: inheritNumeric
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('add', numeric(a), numeric(b))
 }
 export const subtract = {
@@ -261,7 +262,7 @@ export const subtract = {
     static: { type: 'number' },
     dynamic: inheritNumeric
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('sub', numeric(a), numeric(b))
 }
 export const multiply = {
@@ -283,7 +284,7 @@ export const multiply = {
     static: { type: 'number' },
     dynamic: inheritNumeric
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('mult', numeric(a), numeric(b))
 }
 export const divide = {
@@ -305,7 +306,7 @@ export const divide = {
     static: { type: 'number' },
     dynamic: inheritNumeric
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('div', numeric(a), numeric(b))
 }
 export const remainder = {
@@ -327,7 +328,7 @@ export const remainder = {
     static: { type: 'number' },
     dynamic: inheritNumeric
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('mod', numeric(a), numeric(b))
 }
 
@@ -350,7 +351,7 @@ export const gt = {
   returns: {
     static: { type: 'boolean' }
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('gt', numeric(a), numeric(b))
 }
 export const lt = {
@@ -371,7 +372,7 @@ export const lt = {
   returns: {
     static: { type: 'boolean' }
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('lt', numeric(a), numeric(b))
 }
 export const gte = {
@@ -392,7 +393,7 @@ export const gte = {
   returns: {
     static: { type: 'boolean' }
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('gte', numeric(a), numeric(b))
 }
 export const lte = {
@@ -413,7 +414,7 @@ export const lte = {
   returns: {
     static: { type: 'boolean' }
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('lte', numeric(a), numeric(b))
 }
 export const eq = {
@@ -434,7 +435,7 @@ export const eq = {
   returns: {
     static: { type: 'boolean' }
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('eq', numeric(a), numeric(b))
 }
 
@@ -460,7 +461,8 @@ export const last = {
   returns: {
     static: { type: 'date' }
   },
-  execute: ({ raw }) => {
+  execute: ([ a ]) => {
+    const { raw } = a
     const milli = moment.duration(raw).asMilliseconds()
     if (milli === 0) throw new BadRequestError('Invalid duration')
     return types.literal(`CURRENT_DATE - INTERVAL '${ms(milli, { verbose: true })}'`)
@@ -490,7 +492,7 @@ export const interval = {
       }
     }
   },
-  execute: (start, end) =>
+  execute: ([ start, end ]) =>
     types.fn('sub', types.fn('time_to_ms', end.value), types.fn('time_to_ms', start.value))
 }
 export const bucket = {
@@ -512,8 +514,8 @@ export const bucket = {
   returns: {
     static: { type: 'date' }
   },
-  execute: (p, f) =>
-    types.fn('date_trunc', truncatesToDB[p.raw], f.value)
+  execute: ([ p, f ], opt) =>
+    forceTZ(types.fn('date_trunc', truncatesToDB[p.raw], forceTZ(f.value, opt)), opt)
 }
 export const extract = {
   name: 'Extract',
@@ -533,7 +535,7 @@ export const extract = {
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: (unitInfo) => ({
+    dynamic: ([ unitInfo ]) => ({
       type: 'number',
       measurement: {
         type: 'datePart',
@@ -541,8 +543,8 @@ export const extract = {
       }
     })
   },
-  execute: (p, f) =>
-    types.fn('date_part', partsToDB[p.raw], f.value)
+  execute: ([ p, f ], opt) =>
+    types.fn('date_part', partsToDB[p.raw], forceTZ(f.value, opt))
 }
 
 // Geospatial
@@ -565,7 +567,7 @@ export const area = {
       }
     }
   },
-  execute: (f) =>
+  execute: ([ f ]) =>
     types.fn('ST_Area', types.cast(f.value, 'geography'))
 }
 export const length = {
@@ -587,7 +589,7 @@ export const length = {
       }
     }
   },
-  execute: (f) =>
+  execute: ([ f ]) =>
     types.fn('ST_Length', types.cast(f.value, 'geography'))
 }
 export const intersects = {
@@ -608,7 +610,7 @@ export const intersects = {
   returns: {
     static: { type: 'boolean' }
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('ST_Intersects', a.value, b.value)
 }
 export const distance = {
@@ -635,7 +637,7 @@ export const distance = {
       }
     }
   },
-  execute: (a, b) =>
+  execute: ([ a, b ]) =>
     types.fn('ST_Distance', types.cast(a.value, 'geography'), types.cast(b.value, 'geography'))
 }
 export const geojson = {
@@ -650,11 +652,11 @@ export const geojson = {
   ],
   returns: {
     static: { type: 'geometry' },
-    dynamic: ({ raw }) => ({
-      type: getGeoReturnType(raw)
+    dynamic: ([ a ]) => ({
+      type: getGeoReturnType(a.raw)
     })
   },
-  execute: ({ raw }) => getGeometryValue(raw)
+  execute: ([ a ]) => getGeometryValue(a.raw)
 }
 export const boundingBox = {
   name: 'Create Bounding Box',
@@ -684,6 +686,6 @@ export const boundingBox = {
   returns: {
     static: { type: 'polygon' }
   },
-  execute: (xmin, ymin, xmax, ymax) =>
+  execute: ([ xmin, ymin, xmax, ymax ]) =>
     geom(types.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value))
 }
