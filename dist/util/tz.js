@@ -18,9 +18,7 @@ const shift = (v, {
 } = {}) => {
   if (!timezone) return v;
   if (!zones.has(timezone)) throw new _errors.BadRequestError('Not a valid timezone');
-  const offset = _momentTimezone.default.tz(timezone).utcOffset() / 60; // utcOffset is in minutes, convert to hours
-
-  return _sequelize.default.fn('shift_tz', v, offset);
+  return _sequelize.default.fn('shift_tz', v, timezone);
 };
 
 exports.shift = shift;

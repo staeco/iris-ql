@@ -516,7 +516,7 @@ export const bucket = {
   },
   execute: ([ p, f ], opt) => {
     const useTZ = !!opt?.timezone
-    if (useTZ) return types.fn('date_trunc', truncatesToDB[p.raw], shiftTZ(f.value, opt))
+    if (useTZ) return shiftTZ(types.fn('date_trunc', truncatesToDB[p.raw], f.value), opt)
     return types.fn('date_trunc', truncatesToDB[p.raw], f.value)
   }
 }

@@ -549,7 +549,7 @@ const bucket = {
   },
   execute: ([p, f], opt) => {
     const useTZ = !!(opt === null || opt === void 0 ? void 0 : opt.timezone);
-    if (useTZ) return _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], (0, _tz.shift)(f.value, opt));
+    if (useTZ) return (0, _tz.shift)(_sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value), opt);
     return _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value);
   }
 };
