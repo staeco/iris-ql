@@ -15,7 +15,7 @@ var _errors = require("../errors");
 
 var _ = require("./");
 
-var _forceTZ = _interopRequireDefault(require("../util/forceTZ"));
+var _tz = require("../util/tz");
 
 var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
@@ -549,7 +549,7 @@ const bucket = {
   },
   execute: ([p, f], opt) => {
     const useTZ = !!(opt === null || opt === void 0 ? void 0 : opt.timezone);
-    if (useTZ) return _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], (0, _forceTZ.default)(f.value, opt), opt.timezone);
+    if (useTZ) return _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], (0, _tz.shift)(f.value, opt));
     return _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value);
   }
 };
@@ -579,7 +579,7 @@ const extract = {
       }
     })
   },
-  execute: ([p, f], opt) => _sequelize.default.fn('date_part', partsToDB[p.raw], (0, _forceTZ.default)(f.value, opt))
+  execute: ([p, f], opt) => _sequelize.default.fn('date_part', partsToDB[p.raw], (0, _tz.force)(f.value, opt))
 }; // Geospatial
 
 exports.extract = extract;

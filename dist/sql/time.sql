@@ -1,3 +1,8 @@
+CREATE OR REPLACE FUNCTION shift_tz(base_date timestamptz, tz_offset numeric) RETURNS timestamp AS $$
+  SELECT base_date AT TIME ZONE 'UTC' + (INTERVAL '1 hour' * tz_offset)
+$$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
+RETURNS NULL ON NULL INPUT;
+
 CREATE OR REPLACE FUNCTION force_tz(base_date timestamptz, tz text) RETURNS timestamp AS $$
   SELECT base_date AT TIME ZONE tz
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE

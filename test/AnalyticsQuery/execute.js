@@ -56,11 +56,11 @@ describe('AnalyticsQuery#execute', () => {
     should(res).eql([
       {
         total: 1,
-        day: new Date('2017-05-16T07:00:00.000Z')
+        day: new Date('2017-05-16T04:00:00.000Z')
       },
       {
         total: 1,
-        day: new Date('2017-05-15T07:00:00.000Z')
+        day: new Date('2017-05-15T04:00:00.000Z')
       }
     ])
   })
