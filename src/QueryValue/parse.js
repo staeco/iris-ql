@@ -5,8 +5,11 @@ import getTypes from '../types/getTypes'
 import * as funcs from '../types/functions'
 import getJSONField from '../util/getJSONField'
 
-const resolveField = (field, opt) =>
-  opt?.substitutions?.[field] ? opt.substitutions[field] : field
+const resolveField = (field, opt) => {
+  if (!opt?.substitutions) return field
+  const subs = typeof opt.substitutions === 'function' ? opt.substitutions(opt) : opt.substitutions
+  return subs?.[field] || field
+}
 
 const validateArgumentTypes = (func, sig, arg, opt) => {
   if (sig.types === 'any') return true // allows anything

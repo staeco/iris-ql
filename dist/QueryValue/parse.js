@@ -28,9 +28,9 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 const resolveField = (field, opt) => {
-  var _opt$substitutions;
-
-  return (opt === null || opt === void 0 ? void 0 : (_opt$substitutions = opt.substitutions) === null || _opt$substitutions === void 0 ? void 0 : _opt$substitutions[field]) ? opt.substitutions[field] : field;
+  if (!(opt === null || opt === void 0 ? void 0 : opt.substitutions)) return field;
+  const subs = typeof opt.substitutions === 'function' ? opt.substitutions(opt) : opt.substitutions;
+  return (subs === null || subs === void 0 ? void 0 : subs[field]) || field;
 };
 
 function _ref(i) {

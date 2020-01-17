@@ -69,9 +69,7 @@ describe('Query#execute', () => {
       subSchemas: {
         data: dataType.schema
       },
-      substitutions: (query, opt) => {
-        should.exist(query)
-        should.exist(query.filters)
+      substitutions: (opt) => {
         should.exist(opt)
         should.exist(opt.subSchemas.data)
         return { 'data.path': 'geometry' }
