@@ -5,6 +5,9 @@ import getTypes from '../types/getTypes'
 import * as funcs from '../types/functions'
 import getJSONField from '../util/getJSONField'
 
+const resolveField = (field, opt) =>
+  opt?.substitutions?.[field] ? opt.substitutions[field] : field
+
 const validateArgumentTypes = (func, sig, arg, opt) => {
   if (sig.types === 'any') return true // allows anything
   if (!sig.required && arg == null) return true // not present, so has a default
@@ -103,22 +106,23 @@ const parse = (v, opt) => {
     return fn.execute(args, opt)
   }
   if (v.field) {
+    const resolvedField = resolveField(v.field, opt)
     if (typeof v.field !== 'string') {
       throw new ValidationError({
         path: [ ...context, 'field' ],
-        value: v.field,
+        value: resolvedField,
         message: 'Must be a string.'
       })
     }
-    if (v.field.includes('.')) return getJSONField(v.field, { ...opt, hydrate: hydrateJSON })
-    if (fieldLimit && !fieldLimit.includes(v.field)) {
+    if (resolvedField.includes('.')) return getJSONField(resolvedField, { ...opt, hydrate: hydrateJSON })
+    if (fieldLimit && !fieldLimit.includes(resolvedField)) {
       throw new ValidationError({
         path: [ ...context, 'field' ],
-        value: v.field,
+        value: resolvedField,
         message: 'Field does not exist.'
       })
     }
-    return types.col(v.field)
+    return types.col(resolvedField)
   }
   if (v.val) {
     throw new ValidationError({

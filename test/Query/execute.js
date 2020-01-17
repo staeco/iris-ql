@@ -1,6 +1,7 @@
 import should from 'should'
 import { Query } from '../../src'
 import db from '../fixtures/db'
+import dataType from '../fixtures/bike-trip'
 
 describe('Query#execute', () => {
   const { user, datum } = db.models
@@ -19,6 +20,68 @@ describe('Query#execute', () => {
     res.count.should.equal(3)
     res.rows.length.should.equal(1)
     should.not.exist(res.rows[0].authToken)
+  })
+  it('should execute with geometry substitutions', async () => {
+    const query = new Query({
+      limit: 1,
+      filters: [
+        { sourceId: 'bike-trips' },
+        { 'data.path': { $ne: null } },
+        {
+          function: 'gte',
+          arguments: [
+            { function: 'length', arguments: [ { field: 'data.path' } ] },
+            1
+          ]
+        }
+      ]
+    }, {
+      model: datum,
+      subSchemas: {
+        data: dataType.schema
+      },
+      substitutions: {
+        'data.path': 'geometry'
+      }
+    })
+    const res = await query.execute()
+    should.exist(res.count)
+    should.exist(res.rows)
+    res.count.should.equal(2)
+    res.rows.length.should.equal(1)
+  })
+  it('should execute with function substitutions', async () => {
+    const query = new Query({
+      limit: 1,
+      filters: [
+        { sourceId: 'bike-trips' },
+        { 'data.path': { $ne: null } },
+        {
+          function: 'gte',
+          arguments: [
+            { function: 'length', arguments: [ { field: 'data.path' } ] },
+            1
+          ]
+        }
+      ]
+    }, {
+      model: datum,
+      subSchemas: {
+        data: dataType.schema
+      },
+      substitutions: (query, opt) => {
+        should.exist(query)
+        should.exist(query.filters)
+        should.exist(opt)
+        should.exist(opt.subSchemas.data)
+        return { 'data.path': 'geometry' }
+      }
+    })
+    const res = await query.execute()
+    should.exist(res.count)
+    should.exist(res.rows)
+    res.count.should.equal(2)
+    res.rows.length.should.equal(1)
   })
   it('should filter hour of day with timezone', async () => {
     const unfilteredQuery = new Query({

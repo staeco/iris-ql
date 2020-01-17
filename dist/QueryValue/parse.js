@@ -27,6 +27,12 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+const resolveField = (field, opt) => {
+  var _opt$substitutions;
+
+  return (opt === null || opt === void 0 ? void 0 : (_opt$substitutions = opt.substitutions) === null || _opt$substitutions === void 0 ? void 0 : _opt$substitutions[field]) ? opt.substitutions[field] : field;
+};
+
 function _ref(i) {
   return i.value;
 }
@@ -158,27 +164,29 @@ const parse = (v, opt) => {
   }
 
   if (v.field) {
+    const resolvedField = resolveField(v.field, opt);
+
     if (typeof v.field !== 'string') {
       throw new _errors.ValidationError({
         path: [...context, 'field'],
-        value: v.field,
+        value: resolvedField,
         message: 'Must be a string.'
       });
     }
 
-    if (v.field.includes('.')) return (0, _getJSONField.default)(v.field, _objectSpread({}, opt, {
+    if (resolvedField.includes('.')) return (0, _getJSONField.default)(resolvedField, _objectSpread({}, opt, {
       hydrate: hydrateJSON
     }));
 
-    if (fieldLimit && !fieldLimit.includes(v.field)) {
+    if (fieldLimit && !fieldLimit.includes(resolvedField)) {
       throw new _errors.ValidationError({
         path: [...context, 'field'],
-        value: v.field,
+        value: resolvedField,
         message: 'Field does not exist.'
       });
     }
 
-    return _sequelize.default.col(v.field);
+    return _sequelize.default.col(resolvedField);
   }
 
   if (v.val) {
