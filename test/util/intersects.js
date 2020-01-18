@@ -17,6 +17,6 @@ describe('util#intersects', () => {
   it('should return intersects', () => {
     const t = intersects({ type: 'Point', coordinates: [ 1, 2 ] }, { model: store })
     should(t.fn).equal('ST_Intersects')
-    should(t.args[0].col).equal('store.location')
+    should.exist(t.args[0])
   })
 })

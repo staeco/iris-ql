@@ -8,7 +8,6 @@ import { force as forceTZ, shift as shiftTZ } from '../util/tz'
 import isObject from 'is-plain-obj'
 import ms from 'pretty-ms'
 
-const geom = (v) => types.fn('ST_SetSRID', v, 4326)
 const inheritNumeric = ([ infoA, infoB ]) => {
   const primaryTypeA = infoA?.types.find((i) => i.type === 'number')
   const primaryTypeB = infoB?.types.find((i) => i.type === 'number')
@@ -614,7 +613,7 @@ export const intersects = {
     static: { type: 'boolean' }
   },
   execute: ([ a, b ]) =>
-    types.fn('ST_Intersects', a.value, b.value)
+    types.fn('ST_Intersects', types.cast(a.value, 'geometry'), types.cast(b.value, 'geometry'))
 }
 export const distance = {
   name: 'Distance',
@@ -690,5 +689,5 @@ export const boundingBox = {
     static: { type: 'polygon' }
   },
   execute: ([ xmin, ymin, xmax, ymax ]) =>
-    geom(types.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value))
+    types.fn('ST_SetSRID', types.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value), 4326)
 }

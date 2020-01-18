@@ -23,8 +23,6 @@ var _prettyMs = _interopRequireDefault(require("pretty-ms"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const geom = v => _sequelize.default.fn('ST_SetSRID', v, 4326);
-
 function _ref(i) {
   return i.type === 'number';
 }
@@ -640,7 +638,7 @@ const intersects = {
       type: 'boolean'
     }
   },
-  execute: ([a, b]) => _sequelize.default.fn('ST_Intersects', a.value, b.value)
+  execute: ([a, b]) => _sequelize.default.fn('ST_Intersects', _sequelize.default.cast(a.value, 'geometry'), _sequelize.default.cast(b.value, 'geometry'))
 };
 exports.intersects = intersects;
 const distance = {
@@ -711,6 +709,6 @@ const boundingBox = {
       type: 'polygon'
     }
   },
-  execute: ([xmin, ymin, xmax, ymax]) => geom(_sequelize.default.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value))
+  execute: ([xmin, ymin, xmax, ymax]) => _sequelize.default.fn('ST_SetSRID', _sequelize.default.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value), 4326)
 };
 exports.boundingBox = boundingBox;
