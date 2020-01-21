@@ -80,18 +80,6 @@ const results = await crimeTimeSeries.execute()
 */
 ```
 
-## Streaming Mode
-
-If you intend on using streaming mode, you should add this to your package.json:
-
-```json
-"resolutions": {
-  "pg-query-stream": "github:contra/node-pg-query-stream"
-},
-```
-
-pg-query-stream has an upstream issue with DB types not being used correctly on cursors. This note will be removed once the fix is merged there.
-
 
 ## DB Support
 

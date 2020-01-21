@@ -24,11 +24,10 @@ const streamable = async (model, sql, transform) => {
   ) : through2.obj()
 
   const end = (err) => {
-    query.close(() => {
-      model.sequelize.connectionManager.releaseConnection(conn)
-        .then(() => null)
-        .catch(() => null)
-    })
+    query.destroy()
+    model.sequelize.connectionManager.releaseConnection(conn)
+      .then(() => null)
+      .catch(() => null)
     if (err) out.emit('error', err)
   }
   const out = pump(query, modifier, end)

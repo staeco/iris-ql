@@ -1,6 +1,6 @@
 {
   "name": "iris-ql",
-  "version": "2.4.7",
+  "version": "2.4.8",
   "description": "User friendly API query language",
   "main": "dist/index.js",
   "keywords": [],
@@ -70,7 +70,7 @@
     "is-number": "^7.0.0",
     "is-plain-obj": "^2.0.0",
     "moment-timezone": "^0.5.27",
-    "pg-query-stream": "github:contra/node-pg-query-stream",
+    "pg-query-stream": "^3.0.0",
     "pluralize": "^8.0.0",
     "pretty-ms": "^5.0.0",
     "pump": "^3.0.0",

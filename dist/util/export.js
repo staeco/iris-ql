@@ -45,12 +45,9 @@ const streamable = async (model, sql, transform) => {
   }));
   const modifier = transform ? _through.default.obj((obj, _, cb) => cb(null, transform(obj))) : _through.default.obj();
 
-  function _ref3() {
-    model.sequelize.connectionManager.releaseConnection(conn).then(_ref).catch(_ref2);
-  }
-
   const end = err => {
-    query.close(_ref3);
+    query.destroy();
+    model.sequelize.connectionManager.releaseConnection(conn).then(_ref).catch(_ref2);
     if (err) out.emit('error', err);
   };
 
