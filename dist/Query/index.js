@@ -30,7 +30,9 @@ class Query {
       return this;
     };
 
-    this.value = () => this._parsed;
+    this.value = ({
+      instanceQuery = true
+    } = {}) => instanceQuery ? this._parsed : this._parsedCollection;
 
     this.toJSON = () => this.input;
 
@@ -56,9 +58,15 @@ class Query {
       value: this.value()
     });
 
+    this.count = async () => this.options.model.count(_objectSpread({
+      logging: this.options.debug
+    }, this.value()));
+
     this.destroy = async () => this.options.model.destroy(_objectSpread({
       logging: this.options.debug
-    }, this._parsedCollection));
+    }, this.value({
+      instanceQuery: false
+    })));
 
     if (!obj) throw new Error('Missing query!');
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');

@@ -24,7 +24,7 @@ export default class Query {
     this._parsedCollection = newCollectionValue
     return this
   }
-  value = () => this._parsed
+  value = ({ instanceQuery=true }={}) => instanceQuery ? this._parsed : this._parsedCollection
   toJSON = () => this.input
   execute = async ({ count=true, raw=false }={}) => {
     const fn = count ? 'findAndCountAll' : 'findAll'
@@ -43,9 +43,15 @@ export default class Query {
       value: this.value()
     })
 
+  count = async () =>
+    this.options.model.count({
+      logging: this.options.debug,
+      ...this.value()
+    })
+
   destroy = async () =>
     this.options.model.destroy({
       logging: this.options.debug,
-      ...this._parsedCollection
+      ...this.value({ instanceQuery: false })
     })
 }
