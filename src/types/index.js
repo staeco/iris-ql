@@ -50,7 +50,7 @@ export const date = {
 
 // geo (EPSG:4979 / WGS84)
 const geoCast = (txt) =>
-  types.fn('ST_GeomFromGeoJSON', txt)
+  types.fn('ST_SetSRID', types.fn('ST_GeomFromGeoJSON', txt), 4326)
 
 export const point = {
   name: 'GeoJSON Point',
