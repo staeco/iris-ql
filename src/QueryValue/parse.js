@@ -4,6 +4,7 @@ import { ValidationError } from '../errors'
 import getTypes from '../types/getTypes'
 import * as funcs from '../types/functions'
 import getJSONField from '../util/getJSONField'
+import { column } from '../util/toString'
 
 const resolveField = (field, opt) => {
   if (!opt?.substitutions) return field
@@ -125,6 +126,12 @@ const parse = (v, opt) => {
         message: 'Field does not exist.'
       })
     }
+    // a model field, serialize this differently
+    const baseFieldLimit = Object.keys(opt.model.rawAttributes)
+    if (baseFieldLimit.includes(resolvedField)) {
+      return types.literal(column({ ...opt, column: resolvedField }))
+    }
+    // a non-model field, but still in fieldLimit - probably an aggregation
     return types.col(resolvedField)
   }
   if (v.val) {

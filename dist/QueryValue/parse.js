@@ -15,6 +15,8 @@ var funcs = _interopRequireWildcard(require("../types/functions"));
 
 var _getJSONField = _interopRequireDefault(require("../util/getJSONField"));
 
+var _toString = require("../util/toString");
+
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -184,7 +186,17 @@ const parse = (v, opt) => {
         value: resolvedField,
         message: 'Field does not exist.'
       });
-    }
+    } // a model field, serialize this differently
+
+
+    const baseFieldLimit = Object.keys(opt.model.rawAttributes);
+
+    if (baseFieldLimit.includes(resolvedField)) {
+      return _sequelize.default.literal((0, _toString.column)(_objectSpread({}, opt, {
+        column: resolvedField
+      })));
+    } // a non-model field, but still in fieldLimit - probably an aggregation
+
 
     return _sequelize.default.col(resolvedField);
   }
