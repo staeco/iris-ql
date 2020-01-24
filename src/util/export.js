@@ -7,7 +7,7 @@ import through2 from 'through2'
 // it gets transformed and emitted from the stream
 // this is how you want to return millions of rows with low memory overhead
 const batchSize = 16
-const streamable = async (model, sql, transform) => {
+const streamable = async ({ model, sql, transform, onError }) => {
   const conn = await model.sequelize.connectionManager.getConnection({
     type: 'SELECT'
   })
@@ -24,18 +24,27 @@ const streamable = async (model, sql, transform) => {
   ) : through2.obj()
 
   const end = (err) => {
-    query.destroy()
-    model.sequelize.connectionManager.releaseConnection(conn)
-      .then(() => null)
-      .catch(() => null)
-    if (err) out.emit('error', err)
+    // clean up the connection
+    query.destroy(null, (err) => {
+      if (onError) onError(err)
+      model.sequelize.connectionManager.releaseConnection(conn)
+        .then(() => null)
+        .catch((err) => {
+          if (onError) onError(err)
+          return null
+        })
+    })
+    if (err) {
+      if (onError) onError(err)
+      out.emit('error', err)
+    }
   }
   const out = pump(query, modifier, end)
   return out
 }
 
 
-export default async ({ model, value, format, transform, debug, analytics=false }) => {
+export default async ({ model, value, format, transform, debug, onError, analytics=false }) => {
   const nv = { ...value }
 
   // prep work findAll usually does
@@ -55,7 +64,7 @@ export default async ({ model, value, format, transform, debug, analytics=false 
 
   const sql = select({ value: nv, model })
   if (debug) debug(sql)
-  const src = await streamable(model, sql, transform)
+  const src = await streamable({ model, sql, transform, onError })
   if (!format) return src
   const out = pump(src, format(), (err) => {
     if (err) out.emit('error', err)

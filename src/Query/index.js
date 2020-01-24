@@ -34,10 +34,11 @@ export default class Query {
       ...this.value()
     })
   }
-  executeStream = async ({ format, transform }={}) =>
+  executeStream = async ({ onError, format, transform }={}) =>
     exportStream({
       format,
       transform,
+      onError,
       debug: this.options.debug,
       model: this.options.model,
       value: this.value()

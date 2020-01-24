@@ -37,11 +37,12 @@ export default class AnalyticsQuery {
       ...this.value()
     })
 
-  executeStream = async ({ format, transform }={}) =>
+  executeStream = async ({ onError, format, transform }={}) =>
     exportStream({
       analytics: true,
       format,
       transform,
+      onError,
       debug: this.options.debug,
       model: this.options.model,
       value: this.value()

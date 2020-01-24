@@ -28,11 +28,12 @@ function _ref() {
   return null;
 }
 
-function _ref2() {
-  return null;
-}
-
-const streamable = async (model, sql, transform) => {
+const streamable = async ({
+  model,
+  sql,
+  transform,
+  onError
+}) => {
   const conn = await model.sequelize.connectionManager.getConnection({
     type: 'SELECT'
   }); // a not so fun hack to tie our sequelize types into this raw cursor
@@ -45,10 +46,24 @@ const streamable = async (model, sql, transform) => {
   }));
   const modifier = transform ? _through.default.obj((obj, _, cb) => cb(null, transform(obj))) : _through.default.obj();
 
-  const end = err => {
-    query.destroy();
+  function _ref2(err) {
+    if (onError) onError(err);
+    return null;
+  }
+
+  function _ref3(err) {
+    if (onError) onError(err);
     model.sequelize.connectionManager.releaseConnection(conn).then(_ref).catch(_ref2);
-    if (err) out.emit('error', err);
+  }
+
+  const end = err => {
+    // clean up the connection
+    query.destroy(null, _ref3);
+
+    if (err) {
+      if (onError) onError(err);
+      out.emit('error', err);
+    }
   };
 
   const out = (0, _pump.default)(query, modifier, end);
@@ -61,6 +76,7 @@ var _default = async ({
   format,
   transform,
   debug,
+  onError,
   analytics = false
 }) => {
   const nv = _objectSpread({}, value); // prep work findAll usually does
@@ -90,7 +106,12 @@ var _default = async ({
     model
   });
   if (debug) debug(sql);
-  const src = await streamable(model, sql, transform);
+  const src = await streamable({
+    model,
+    sql,
+    transform,
+    onError
+  });
   if (!format) return src;
   const out = (0, _pump.default)(src, format(), err => {
     if (err) out.emit('error', err);

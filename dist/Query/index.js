@@ -48,11 +48,13 @@ class Query {
     };
 
     this.executeStream = async ({
+      onError,
       format,
       transform
     } = {}) => (0, _export.default)({
       format,
       transform,
+      onError,
       debug: this.options.debug,
       model: this.options.model,
       value: this.value()
