@@ -1,6 +1,6 @@
 {
   "name": "iris-ql",
-  "version": "2.4.12",
+  "version": "2.4.13",
   "description": "User friendly API query language",
   "main": "dist/index.js",
   "keywords": [],
@@ -64,7 +64,7 @@
   "dependencies": {
     "capitalize": "^2.0.0",
     "core-js": "3",
-    "decamelize": "^3.2.0",
+    "decamelize": "^4.0.0",
     "graceful-fs": "^4.2.0",
     "inflection": "^1.12.0",
     "is-number": "^7.0.0",

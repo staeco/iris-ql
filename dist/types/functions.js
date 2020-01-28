@@ -489,7 +489,7 @@ const last = {
       type: 'date'
     }
   },
-  execute: ([a]) => {
+  execute: ([a], opt) => {
     const {
       raw
     } = a;
@@ -497,9 +497,9 @@ const last = {
     const milli = _momentTimezone.default.duration(raw).asMilliseconds();
 
     if (milli === 0) throw new _errors.BadRequestError('Invalid duration');
-    return _sequelize.default.literal(`CURRENT_DATE - INTERVAL '${(0, _prettyMs.default)(milli, {
+    return _sequelize.default.literal(`CURRENT_DATE - INTERVAL ${opt.model.sequelize.escape((0, _prettyMs.default)(milli, {
       verbose: true
-    })}'`);
+    }))}`);
   }
 };
 exports.last = last;

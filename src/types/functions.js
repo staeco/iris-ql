@@ -460,11 +460,11 @@ export const last = {
   returns: {
     static: { type: 'date' }
   },
-  execute: ([ a ]) => {
+  execute: ([ a ], opt) => {
     const { raw } = a
     const milli = moment.duration(raw).asMilliseconds()
     if (milli === 0) throw new BadRequestError('Invalid duration')
-    return types.literal(`CURRENT_DATE - INTERVAL '${ms(milli, { verbose: true })}'`)
+    return types.literal(`CURRENT_DATE - INTERVAL ${opt.model.sequelize.escape(ms(milli, { verbose: true }))}`)
   }
 }
 export const interval = {
