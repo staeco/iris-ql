@@ -47,23 +47,20 @@ const streamable = async ({
   const modifier = transform ? _through.default.obj((obj, _, cb) => cb(null, transform(obj))) : _through.default.obj();
 
   function _ref2(err) {
-    if (onError) onError(err);
+    if (err && onError) onError(err);
     return null;
   }
 
   function _ref3(err) {
-    if (onError) onError(err);
+    if (err && onError) onError(err);
     model.sequelize.connectionManager.releaseConnection(conn).then(_ref).catch(_ref2);
   }
 
   const end = err => {
     // clean up the connection
     query.destroy(null, _ref3);
-
-    if (err) {
-      if (onError) onError(err);
-      out.emit('error', err);
-    }
+    if (err && onError) onError(err);
+    if (err) out.emit('error', err);
   };
 
   const out = (0, _pump.default)(query, modifier, end);

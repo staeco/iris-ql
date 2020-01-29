@@ -26,18 +26,16 @@ const streamable = async ({ model, sql, transform, onError }) => {
   const end = (err) => {
     // clean up the connection
     query.destroy(null, (err) => {
-      if (onError) onError(err)
+      if (err && onError) onError(err)
       model.sequelize.connectionManager.releaseConnection(conn)
         .then(() => null)
         .catch((err) => {
-          if (onError) onError(err)
+          if (err && onError) onError(err)
           return null
         })
     })
-    if (err) {
-      if (onError) onError(err)
-      out.emit('error', err)
-    }
+    if (err && onError) onError(err)
+    if (err) out.emit('error', err)
   }
   const out = pump(query, modifier, end)
   return out
