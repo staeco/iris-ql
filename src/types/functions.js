@@ -60,7 +60,7 @@ const getGeometryValue = (raw) => {
   if (typeof o.type !== 'string') throw new BadRequestError('Not a valid GeoJSON object!')
 
   // FeatureCollection
-  if (Array.isArray(o.features)) return types.fn('geocollection_from_geojson', raw)
+  if (Array.isArray(o.features)) return types.fn('from_geojson_collection', raw)
 
   // Feature
   if (o.geometry) return getGeometryValue(JSON.stringify(o.geometry))

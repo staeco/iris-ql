@@ -8,14 +8,14 @@ CREATE OR REPLACE FUNCTION from_geojson(p_input jsonb) RETURNS geometry AS $$
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
-CREATE OR REPLACE FUNCTION geocollection_from_geojson(p_input text) RETURNS geometry AS $$
-  SELECT ST_SetSRID(ST_Collect(from_geojson(feat->'geometry')), 4326)
+CREATE OR REPLACE FUNCTION from_geojson_collection(p_input text) RETURNS geometry AS $$
+  SELECT ST_SetSRID(ST_Union(from_geojson(feat->'geometry')), 4326)
   FROM (SELECT jsonb_array_elements(p_input::jsonb->'features') AS feat) AS f;
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
-CREATE OR REPLACE FUNCTION geocollection_from_geojson(p_input jsonb) RETURNS geometry AS $$
-  SELECT ST_SetSRID(ST_Collect(from_geojson(feat->'geometry')), 4326)
+CREATE OR REPLACE FUNCTION from_geojson_collection(p_input jsonb) RETURNS geometry AS $$
+  SELECT ST_SetSRID(ST_Union(from_geojson(feat->'geometry')), 4326)
   FROM (SELECT jsonb_array_elements(p_input->'features') AS feat) AS f;
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;

@@ -91,7 +91,7 @@ const getGeometryValue = raw => {
   if (!(0, _isPlainObj.default)(o)) throw new _errors.BadRequestError('Not a valid object!');
   if (typeof o.type !== 'string') throw new _errors.BadRequestError('Not a valid GeoJSON object!'); // FeatureCollection
 
-  if (Array.isArray(o.features)) return _sequelize.default.fn('geocollection_from_geojson', raw); // Feature
+  if (Array.isArray(o.features)) return _sequelize.default.fn('from_geojson_collection', raw); // Feature
 
   if (o.geometry) return getGeometryValue(JSON.stringify(o.geometry)); // Anything else
 
