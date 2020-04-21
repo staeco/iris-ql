@@ -7,6 +7,10 @@ var _parse = _interopRequireDefault(require("./parse"));
 
 var _export = _interopRequireDefault(require("../util/export"));
 
+var _getTypes = _interopRequireDefault(require("../types/getTypes"));
+
+var _getScopedAttributes = _interopRequireDefault(require("../util/getScopedAttributes"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -35,6 +39,17 @@ class Query {
     } = {}) => instanceQuery ? this._parsed : this._parsedCollection;
 
     this.toJSON = () => this.input;
+
+    this.getOutputSchema = () => {
+      const attrs = (0, _getScopedAttributes.default)(this.options.model);
+      const fieldLimit = this.options.fieldLimit || Object.keys(attrs);
+      return fieldLimit.reduce((acc, k) => {
+        acc[k] = (0, _getTypes.default)({
+          field: k
+        }, this.options)[0];
+        return acc;
+      }, {});
+    };
 
     this.execute = async ({
       count = true,

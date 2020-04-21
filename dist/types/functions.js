@@ -23,31 +23,36 @@ var _prettyMs = _interopRequireDefault(require("pretty-ms"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _ref(i) {
-  return i.type === 'number';
-}
+// some operations we don't want to display a percentage after, for example:
+// 33% * 100,000 should return 33,000 as a flat integer
+// 100,000 / 77% should return 130,000 as a flat integer
+const isPercentage = i => {
+  var _i$measurement;
 
-function _ref2(i) {
-  return i.type === 'number';
-}
+  return ((_i$measurement = i.measurement) === null || _i$measurement === void 0 ? void 0 : _i$measurement.type) === 'percentage';
+};
 
-const inheritNumeric = ([infoA, infoB]) => {
-  const primaryTypeA = infoA === null || infoA === void 0 ? void 0 : infoA.types.find(_ref);
-  const primaryTypeB = infoB === null || infoB === void 0 ? void 0 : infoB.types.find(_ref2);
+const inheritNumeric = ({
+  retainPercentage
+}, [infoA, infoB]) => {
+  const filter = i => i.type === 'number' && (retainPercentage || !isPercentage(i));
+
+  const primaryTypeA = infoA === null || infoA === void 0 ? void 0 : infoA.types.find(filter);
+  const primaryTypeB = infoB === null || infoB === void 0 ? void 0 : infoB.types.find(filter);
   return {
     type: 'number',
     measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
   };
 };
 
-function _ref3(i) {
+function _ref(i) {
   return i.type;
 }
 
 const numeric = info => {
   if (info.value.type === 'numeric') return info.value; // already cast as numeric
 
-  const flatTypes = info.types.map(_ref3); //if (flatTypes.includes('number')) return info.value // already a number
+  const flatTypes = info.types.map(_ref); //if (flatTypes.includes('number')) return info.value // already a number
 
   if (flatTypes.includes('date')) {
     return _sequelize.default.cast(_sequelize.default.fn('time_to_ms', info.value), 'numeric');
@@ -133,7 +138,7 @@ const truncates = Object.keys(truncatesToDB).map(k => ({
   label: (0, _capitalize.default)(k)
 })); // Arrays
 
-function _ref4(i) {
+function _ref2(i) {
   return i.type === 'array';
 }
 
@@ -149,7 +154,7 @@ const expand = {
     static: {
       type: 'any'
     },
-    dynamic: ([listInfo]) => listInfo.types.find(_ref4).items
+    dynamic: ([listInfo]) => listInfo.types.find(_ref2).items
   },
   execute: ([listInfo]) => _sequelize.default.fn('unnest', listInfo.value)
 }; // Aggregations
@@ -167,7 +172,9 @@ const min = {
     static: {
       type: 'number'
     },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, {
+      retainPercentage: true
+    })
   },
   aggregate: true,
   execute: ([f]) => _sequelize.default.fn('min', numeric(f))
@@ -185,7 +192,9 @@ const max = {
     static: {
       type: 'number'
     },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, {
+      retainPercentage: true
+    })
   },
   aggregate: true,
   execute: ([f]) => _sequelize.default.fn('max', numeric(f))
@@ -203,7 +212,9 @@ const sum = {
     static: {
       type: 'number'
     },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, {
+      retainPercentage: true
+    })
   },
   aggregate: true,
   execute: ([f]) => _sequelize.default.fn('sum', numeric(f))
@@ -221,7 +232,9 @@ const average = {
     static: {
       type: 'number'
     },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, {
+      retainPercentage: true
+    })
   },
   aggregate: true,
   execute: ([f]) => _sequelize.default.fn('avg', numeric(f))
@@ -239,7 +252,9 @@ const median = {
     static: {
       type: 'number'
     },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, {
+      retainPercentage: true
+    })
   },
   aggregate: true,
   execute: ([f]) => _sequelize.default.fn('median', numeric(f))
@@ -274,7 +289,9 @@ const add = {
     static: {
       type: 'number'
     },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, {
+      retainPercentage: true
+    })
   },
   execute: ([a, b]) => _sequelize.default.fn('add', numeric(a), numeric(b))
 };
@@ -295,7 +312,9 @@ const subtract = {
     static: {
       type: 'number'
     },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, {
+      retainPercentage: true
+    })
   },
   execute: ([a, b]) => _sequelize.default.fn('sub', numeric(a), numeric(b))
 };
@@ -316,7 +335,9 @@ const multiply = {
     static: {
       type: 'number'
     },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, {
+      retainPercentage: false
+    })
   },
   execute: ([a, b]) => _sequelize.default.fn('mult', numeric(a), numeric(b))
 };
@@ -337,7 +358,9 @@ const divide = {
     static: {
       type: 'number'
     },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, {
+      retainPercentage: false
+    })
   },
   execute: ([a, b]) => _sequelize.default.fn('div', numeric(a), numeric(b))
 };
@@ -358,7 +381,9 @@ const remainder = {
     static: {
       type: 'number'
     },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, {
+      retainPercentage: false
+    })
   },
   execute: ([a, b]) => _sequelize.default.fn('mod', numeric(a), numeric(b))
 }; // Comparisons

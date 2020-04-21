@@ -56,11 +56,12 @@ const getJSONTypes = (fieldPath, {
 };
 
 const getFieldTypes = (fieldPath, {
-  model
+  model,
+  subSchemas = {}
 }) => {
   const desc = model.rawAttributes[fieldPath];
   if (!desc) return [];
-  const schemaType = (0, _lodash.pickBy)(_objectSpread({}, (0, _toSchemaType.default)(desc.type), {
+  const schemaType = (0, _lodash.pickBy)(_objectSpread({}, (0, _toSchemaType.default)(desc.type, subSchemas[fieldPath]), {
     name: desc.name,
     notes: desc.notes
   }));

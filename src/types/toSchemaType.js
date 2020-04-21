@@ -6,7 +6,7 @@ const geomTypes = {
   polygon: 'polygon',
   multipolygon: 'multipolygon'
 }
-const toSchemaType = (type) => {
+const toSchemaType = (type, subSchema) => {
   const key = type.key || type.constructor.key
   if (key === 'STRING') return { type: 'text' }
   if (key === 'TEXT') return { type: 'text' }
@@ -24,8 +24,8 @@ const toSchemaType = (type) => {
   if (key === 'REAL') return { type: 'number' }
   if (key === 'DOUBLE PRECISION') return { type: 'number' }
   if (key === 'DECIMAL') return { type: 'number' }
-  if (key === 'JSON') return { type: 'object' }
-  if (key === 'JSONB') return { type: 'object' }
+  if (key === 'JSON') return { type: 'object', schema: subSchema }
+  if (key === 'JSONB') return { type: 'object', schema: subSchema }
   if (key === 'ARRAY') return { type: 'array', items: toSchemaType(type.type) }
   if (key === 'GEOMETRY' || key === 'GEOGRAPHY') {
     const subtype = type.type?.toLowerCase()

@@ -8,9 +8,15 @@ import { force as forceTZ, shift as shiftTZ } from '../util/tz'
 import isObject from 'is-plain-obj'
 import ms from 'pretty-ms'
 
-const inheritNumeric = ([ infoA, infoB ]) => {
-  const primaryTypeA = infoA?.types.find((i) => i.type === 'number')
-  const primaryTypeB = infoB?.types.find((i) => i.type === 'number')
+
+// some operations we don't want to display a percentage after, for example:
+// 33% * 100,000 should return 33,000 as a flat integer
+// 100,000 / 77% should return 130,000 as a flat integer
+const isPercentage = (i) => i.measurement?.type === 'percentage'
+const inheritNumeric = ({ retainPercentage }, [ infoA, infoB ]) => {
+  const filter = (i) => i.type === 'number' && (retainPercentage || !isPercentage(i))
+  const primaryTypeA = infoA?.types.find(filter)
+  const primaryTypeB = infoB?.types.find(filter)
   return {
     type: 'number',
     measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
@@ -136,7 +142,7 @@ export const min = {
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
   execute: ([ f ]) => types.fn('min', numeric(f))
@@ -153,7 +159,7 @@ export const max = {
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
   execute: ([ f ]) => types.fn('max', numeric(f))
@@ -170,7 +176,7 @@ export const sum = {
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
   execute: ([ f ]) => types.fn('sum', numeric(f))
@@ -187,7 +193,7 @@ export const average = {
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
   execute: ([ f ]) => types.fn('avg', numeric(f))
@@ -204,7 +210,7 @@ export const median = {
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
   execute: ([ f ]) => types.fn('median', numeric(f))
@@ -237,7 +243,7 @@ export const add = {
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   execute: ([ a, b ]) =>
     types.fn('add', numeric(a), numeric(b))
@@ -259,7 +265,7 @@ export const subtract = {
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   execute: ([ a, b ]) =>
     types.fn('sub', numeric(a), numeric(b))
@@ -281,7 +287,7 @@ export const multiply = {
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
   execute: ([ a, b ]) =>
     types.fn('mult', numeric(a), numeric(b))
@@ -303,7 +309,7 @@ export const divide = {
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
   execute: ([ a, b ]) =>
     types.fn('div', numeric(a), numeric(b))
@@ -325,7 +331,7 @@ export const remainder = {
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: inheritNumeric
+    dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
   execute: ([ a, b ]) =>
     types.fn('mod', numeric(a), numeric(b))

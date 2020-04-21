@@ -44,7 +44,7 @@ describe('types#toSchemaType', () => {
     should(fn(sql.DECIMAL(11, 10))).eql(expected)
   })
   it('should work on json types', () => {
-    const expected = { type: 'object' }
+    const expected = { type: 'object', schema: undefined }
     should(fn(sql.JSON)).eql(expected)
     should(fn(sql.JSONB)).eql(expected)
   })

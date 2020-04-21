@@ -11,7 +11,7 @@ const geomTypes = {
   multipolygon: 'multipolygon'
 };
 
-const toSchemaType = type => {
+const toSchemaType = (type, subSchema) => {
   const key = type.key || type.constructor.key;
   if (key === 'STRING') return {
     type: 'text'
@@ -62,10 +62,12 @@ const toSchemaType = type => {
     type: 'number'
   };
   if (key === 'JSON') return {
-    type: 'object'
+    type: 'object',
+    schema: subSchema
   };
   if (key === 'JSONB') return {
-    type: 'object'
+    type: 'object',
+    schema: subSchema
   };
   if (key === 'ARRAY') return {
     type: 'array',

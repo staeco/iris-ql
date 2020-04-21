@@ -26,11 +26,11 @@ const getJSONTypes = (fieldPath, { model, subSchemas = {} }) => {
   return [ pickBy({ type: attrDef.type, measurement: attrDef.measurement, items: attrDef.items }) ]
 }
 
-const getFieldTypes = (fieldPath, { model }) => {
+const getFieldTypes = (fieldPath, { model, subSchemas = {} }) => {
   const desc = model.rawAttributes[fieldPath]
   if (!desc) return []
   const schemaType = pickBy({
-    ...toSchemaType(desc.type),
+    ...toSchemaType(desc.type, subSchemas[fieldPath]),
     name: desc.name,
     notes: desc.notes
   })
