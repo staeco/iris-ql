@@ -117,7 +117,7 @@ const getFunction = (v, opt) => {
 
   const sigArgs = func.signature || [];
   const resolvedArgs = sigArgs.map((sig, idx) => {
-    const nopt = _objectSpread({}, opt, {
+    const nopt = _objectSpread(_objectSpread({}, opt), {}, {
       context: [...context, 'arguments', idx]
     });
 
@@ -176,7 +176,7 @@ const parse = (v, opt) => {
       });
     }
 
-    if (resolvedField.includes('.')) return (0, _getJSONField.default)(resolvedField, _objectSpread({}, opt, {
+    if (resolvedField.includes('.')) return (0, _getJSONField.default)(resolvedField, _objectSpread(_objectSpread({}, opt), {}, {
       hydrate: hydrateJSON
     }));
 
@@ -192,7 +192,7 @@ const parse = (v, opt) => {
     const baseFieldLimit = Object.keys(opt.model.rawAttributes);
 
     if (baseFieldLimit.includes(resolvedField)) {
-      return _sequelize.default.literal((0, _toString.column)(_objectSpread({}, opt, {
+      return _sequelize.default.literal((0, _toString.column)(_objectSpread(_objectSpread({}, opt), {}, {
         column: resolvedField
       })));
     } // a non-model field, but still in fieldLimit - probably an aggregation

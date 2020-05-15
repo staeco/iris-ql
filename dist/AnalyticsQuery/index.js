@@ -32,7 +32,7 @@ class AnalyticsQuery {
     this.toJSON = () => this.input;
 
     this.getOutputSchema = () => this.input.aggregations.reduce((prev, agg, idx) => {
-      const meta = (0, _getMeta.default)(agg, _objectSpread({}, this.options, {
+      const meta = (0, _getMeta.default)(agg, _objectSpread(_objectSpread({}, this.options), {}, {
         context: ['aggregations', idx]
       }));
       if (!meta) return prev; // no types? weird
@@ -49,9 +49,11 @@ class AnalyticsQuery {
     this.executeStream = async ({
       onError,
       format,
+      tupleFraction,
       transform
     } = {}) => (0, _export.default)({
       analytics: true,
+      tupleFraction,
       format,
       transform,
       onError,

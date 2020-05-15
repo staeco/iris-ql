@@ -65,8 +65,10 @@ class Query {
     this.executeStream = async ({
       onError,
       format,
+      tupleFraction,
       transform
     } = {}) => (0, _export.default)({
+      tupleFraction,
       format,
       transform,
       onError,
@@ -90,7 +92,7 @@ class Query {
     this.input = obj;
     this.options = options;
     this._parsed = (0, _parse.default)(obj, options);
-    this._parsedCollection = (0, _parse.default)(obj, _objectSpread({}, options, {
+    this._parsedCollection = (0, _parse.default)(obj, _objectSpread(_objectSpread({}, options), {}, {
       instanceQuery: false
     }));
   }

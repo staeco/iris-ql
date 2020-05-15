@@ -52,7 +52,7 @@ var _default = ({
 
   if (direction && value && isDirectionValid) {
     try {
-      out = [new _QueryValue.default(value, _objectSpread({}, opt, {
+      out = [new _QueryValue.default(value, _objectSpread(_objectSpread({}, opt), {}, {
         context: [...context, 'value']
       })).value(), direction];
     } catch (err) {

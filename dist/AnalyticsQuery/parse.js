@@ -66,7 +66,7 @@ var _default = (query = {}, opt) => {
 
   function _ref(a, idx) {
     try {
-      return new _Aggregation.default(a, _objectSpread({}, opt, {
+      return new _Aggregation.default(a, _objectSpread(_objectSpread({}, opt), {}, {
         fieldLimit: initialFieldLimit,
         context: [...context, 'aggregations', idx]
       })).value();
@@ -96,7 +96,7 @@ var _default = (query = {}, opt) => {
 
   const fieldLimit = initialFieldLimit.concat(attrs.filter(_ref2).map(_ref3));
 
-  const nopt = _objectSpread({}, opt, {
+  const nopt = _objectSpread(_objectSpread({}, opt), {}, {
     fieldLimit
   });
 
@@ -110,7 +110,7 @@ var _default = (query = {}, opt) => {
 
   function _ref4(i, idx) {
     try {
-      return new _QueryValue.default(i, _objectSpread({}, nopt, {
+      return new _QueryValue.default(i, _objectSpread(_objectSpread({}, nopt), {}, {
         context: [...context, 'groupings', idx]
       })).value();
     } catch (err) {

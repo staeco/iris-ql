@@ -36,7 +36,7 @@ var _default = (obj, opt) => {
   const error = new _errors.ValidationError(); // recursively walk a filter object and replace query values with the real thing
 
   const transformValues = (v, parent = '') => {
-    if ((0, _isQueryValue.default)(v)) return new _QueryValue.default(v, _objectSpread({}, opt, {
+    if ((0, _isQueryValue.default)(v)) return new _QueryValue.default(v, _objectSpread(_objectSpread({}, opt), {}, {
       hydrateJSON: false
     })).value(); // keep it raw, we hydrate it all later
 

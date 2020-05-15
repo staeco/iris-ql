@@ -111,4 +111,12 @@ describe('Query#executeStream', () => {
     }
     throw new Error('Did not throw!')
   })
+  it('should execute with tupleFraction', async () => {
+    const query = new Query({ limit: 1 }, { model: user.scope('public') })
+    const stream = await query.executeStream({ tupleFraction: 1 })
+    const res = await collect.array(stream)
+    res.length.should.equal(1)
+    should.not.exist(res[0].authToken)
+    should.exist(res[0].name)
+  })
 })

@@ -45,8 +45,9 @@ export default class Query {
       ...this.value()
     })
   }
-  executeStream = async ({ onError, format, transform }={}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform }={}) =>
     exportStream({
+      tupleFraction,
       format,
       transform,
       onError,

@@ -7,10 +7,14 @@ import through2 from 'through2'
 // it gets transformed and emitted from the stream
 // this is how you want to return millions of rows with low memory overhead
 const batchSize = 16
-const streamable = async ({ model, sql, transform, onError }) => {
+const streamable = async ({ model, sql, transform, tupleFraction, onError }) => {
   const conn = await model.sequelize.connectionManager.getConnection({
     type: 'SELECT'
   })
+  if (typeof tupleFraction === 'number') {
+    await conn.query(`set cursor_tuple_fraction=${tupleFraction}`)
+  }
+
   // a not so fun hack to tie our sequelize types into this raw cursor
   const query = conn.query(new QueryStream(sql, undefined, {
     batchSize,
@@ -42,7 +46,7 @@ const streamable = async ({ model, sql, transform, onError }) => {
 }
 
 
-export default async ({ model, value, format, transform, debug, onError, analytics=false }) => {
+export default async ({ model, value, format, transform, tupleFraction, debug, onError, analytics=false }) => {
   const nv = { ...value }
 
   // prep work findAll usually does
@@ -62,7 +66,7 @@ export default async ({ model, value, format, transform, debug, onError, analyti
 
   const sql = select({ value: nv, model })
   if (debug) debug(sql)
-  const src = await streamable({ model, sql, transform, onError })
+  const src = await streamable({ model, tupleFraction, sql, transform, onError })
   if (!format) return src
   const out = pump(src, format(), (err) => {
     if (err) out.emit('error', err)

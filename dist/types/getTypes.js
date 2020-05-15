@@ -61,7 +61,7 @@ const getFieldTypes = (fieldPath, {
 }) => {
   const desc = model.rawAttributes[fieldPath];
   if (!desc) return [];
-  const schemaType = (0, _lodash.pickBy)(_objectSpread({}, (0, _toSchemaType.default)(desc.type, subSchemas[fieldPath]), {
+  const schemaType = (0, _lodash.pickBy)(_objectSpread(_objectSpread({}, (0, _toSchemaType.default)(desc.type, subSchemas[fieldPath])), {}, {
     name: desc.name,
     notes: desc.notes
   }));
@@ -80,7 +80,7 @@ const getTypes = (v, opt = {}) => {
       const sigArgs = fn.signature || [];
       const args = v.arguments || [];
       const resolvedArgs = sigArgs.map((sig, idx) => {
-        const nopt = _objectSpread({}, opt, {
+        const nopt = _objectSpread(_objectSpread({}, opt), {}, {
           context: [...(opt.context || []), 'arguments', idx]
         });
 

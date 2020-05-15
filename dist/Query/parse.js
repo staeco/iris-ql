@@ -323,7 +323,7 @@ var _default = (query, opt = {}) => {
       });
     } else {
       try {
-        out.where.push(new _Filter.default(query.filters, _objectSpread({}, opt, {
+        out.where.push(new _Filter.default(query.filters, _objectSpread(_objectSpread({}, opt), {}, {
           fieldLimit: initialFieldLimit,
           context: [...context, 'filters']
         })).value());
@@ -336,7 +336,7 @@ var _default = (query, opt = {}) => {
 
   function _ref3(v, idx) {
     try {
-      out.order.push(new _Ordering.default(v, _objectSpread({}, opt, {
+      out.order.push(new _Ordering.default(v, _objectSpread(_objectSpread({}, opt), {}, {
         fieldLimit: initialFieldLimit,
         context: [...context, 'orderings', idx]
       })).value());

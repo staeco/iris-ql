@@ -68,7 +68,7 @@ var _default = (url, opt = {}) => {
 
 
   _sequelize.default.Validator.notNull = _ref;
-  const conn = typeof url === 'object' ? new _sequelize.default(_objectSpread({}, defaultOptions, {}, url)) : new _sequelize.default(url, _objectSpread({}, defaultOptions, {}, opt)); // fix sequelize types overriding pg-types
+  const conn = typeof url === 'object' ? new _sequelize.default(_objectSpread(_objectSpread({}, defaultOptions), url)) : new _sequelize.default(url, _objectSpread(_objectSpread({}, defaultOptions), opt)); // fix sequelize types overriding pg-types
 
   const override = () => {
     alignTypeParser(conn, 20); // bigint

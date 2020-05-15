@@ -32,11 +32,17 @@ const streamable = async ({
   model,
   sql,
   transform,
+  tupleFraction,
   onError
 }) => {
   const conn = await model.sequelize.connectionManager.getConnection({
     type: 'SELECT'
-  }); // a not so fun hack to tie our sequelize types into this raw cursor
+  });
+
+  if (typeof tupleFraction === 'number') {
+    await conn.query(`set cursor_tuple_fraction=${tupleFraction}`);
+  } // a not so fun hack to tie our sequelize types into this raw cursor
+
 
   const query = conn.query(new _pgQueryStream.default(sql, undefined, {
     batchSize,
@@ -72,6 +78,7 @@ var _default = async ({
   value,
   format,
   transform,
+  tupleFraction,
   debug,
   onError,
   analytics = false
@@ -105,6 +112,7 @@ var _default = async ({
   if (debug) debug(sql);
   const src = await streamable({
     model,
+    tupleFraction,
     sql,
     transform,
     onError

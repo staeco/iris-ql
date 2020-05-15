@@ -63,7 +63,7 @@ var _default = (a, opt) => {
   }
 
   try {
-    agg = new _QueryValue.default(a.value, _objectSpread({}, opt, {
+    agg = new _QueryValue.default(a.value, _objectSpread(_objectSpread({}, opt), {}, {
       context: [...context, 'value']
     })).value();
   } catch (err) {
@@ -79,7 +79,7 @@ var _default = (a, opt) => {
   }
 
   try {
-    parsedFilters = a.filters && new _Filter.default(a.filters, _objectSpread({}, opt, {
+    parsedFilters = a.filters && new _Filter.default(a.filters, _objectSpread(_objectSpread({}, opt), {}, {
       context: [...context, 'filters']
     })).value();
   } catch (err) {

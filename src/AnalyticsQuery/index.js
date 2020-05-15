@@ -37,9 +37,10 @@ export default class AnalyticsQuery {
       ...this.value()
     })
 
-  executeStream = async ({ onError, format, transform }={}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform }={}) =>
     exportStream({
       analytics: true,
+      tupleFraction,
       format,
       transform,
       onError,
