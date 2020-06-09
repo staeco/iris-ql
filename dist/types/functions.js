@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.boundingBox = exports.geojson = exports.distance = exports.intersects = exports.length = exports.area = exports.extract = exports.bucket = exports.interval = exports.last = exports.now = exports.eq = exports.lte = exports.gte = exports.lt = exports.gt = exports.remainder = exports.divide = exports.multiply = exports.subtract = exports.add = exports.count = exports.median = exports.average = exports.sum = exports.max = exports.min = exports.expand = void 0;
+exports.boundingBox = exports.geojson = exports.distance = exports.intersects = exports.length = exports.area = exports.extract = exports.bucket = exports.interval = exports.last = exports.now = exports.eq = exports.lte = exports.gte = exports.lt = exports.gt = exports.remainder = exports.percentage = exports.divide = exports.multiply = exports.subtract = exports.add = exports.count = exports.median = exports.average = exports.sum = exports.max = exports.min = exports.expand = void 0;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
@@ -365,6 +365,29 @@ const divide = {
   execute: ([a, b]) => _sequelize.default.fn('div', numeric(a), numeric(b))
 };
 exports.divide = divide;
+const percentage = {
+  name: 'Percentage',
+  notes: 'Returns the percentage of Value A in Value B',
+  signature: [{
+    name: 'Value A',
+    types: ['number'],
+    required: true
+  }, {
+    name: 'Value B',
+    types: ['number'],
+    required: true
+  }],
+  returns: {
+    static: {
+      type: 'number',
+      measurement: {
+        type: 'percentage'
+      }
+    }
+  },
+  execute: ([a, b]) => _sequelize.default.fn('div', numeric(b), numeric(a))
+};
+exports.percentage = percentage;
 const remainder = {
   name: 'Remainder',
   notes: 'Applies division to multiple numbers and returns the remainder/modulus',

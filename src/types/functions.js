@@ -314,6 +314,32 @@ export const divide = {
   execute: ([ a, b ]) =>
     types.fn('div', numeric(a), numeric(b))
 }
+export const percentage = {
+  name: 'Percentage',
+  notes: 'Returns the percentage of Value A in Value B',
+  signature: [
+    {
+      name: 'Value A',
+      types: [ 'number' ],
+      required: true
+    },
+    {
+      name: 'Value B',
+      types: [ 'number' ],
+      required: true
+    }
+  ],
+  returns: {
+    static: {
+      type: 'number',
+      measurement: {
+        type: 'percentage'
+      }
+    }
+  },
+  execute: ([ a, b ]) =>
+    types.fn('div', numeric(b), numeric(a))
+}
 export const remainder = {
   name: 'Remainder',
   notes: 'Applies division to multiple numbers and returns the remainder/modulus',

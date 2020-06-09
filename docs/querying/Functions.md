@@ -207,6 +207,20 @@ Divides argument A by argument B.
 }
 ```
 
+### percentage(A numeric, B numeric) -> numeric
+
+Returns the percentage of Value A in Value B.
+
+```js
+{
+  function: 'percentage',
+  arguments: [
+    { field: 'tax' }, // A
+    { field: 'cost' } // B
+  ]
+}
+```
+
 ### remainder(A numeric, B numeric) -> numeric
 
 Returns the remainder left over when argument A is divided by argument B.
