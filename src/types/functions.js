@@ -338,7 +338,7 @@ export const percentage = {
     }
   },
   execute: ([ a, b ]) =>
-    types.fn('divide', numeric(b), numeric(a))
+    types.fn('divide', numeric(a), numeric(b))
 }
 export const remainder = {
   name: 'Remainder',

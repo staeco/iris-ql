@@ -26,8 +26,8 @@ describe('types#functions#percentage', () => {
       ]
     }
     const expectedResponse = [
-      { total: 1, type: 'electric', avgTaxRatio: 3.2327044025157234 },
-      { total: 1, type: 'regular', avgTaxRatio: 4.872691933916424 }
+      { total: 1, type: 'electric', avgTaxRatio: 0.3093385214007782 },
+      { total: 1, type: 'regular', avgTaxRatio: 0.2052253689668927 }
     ]
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()
@@ -53,8 +53,8 @@ describe('types#functions#percentage', () => {
       ]
     }
     const expectedResponse = [
-      { total: 1, type: 'electric', costRatio: 5.14 },
-      { total: 1, type: 'regular', costRatio: 50.14 }
+      { total: 1, type: 'electric', costRatio: 0.19455252918287938 },
+      { total: 1, type: 'regular', costRatio: 0.01994415636218588 }
     ]
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()

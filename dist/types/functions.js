@@ -385,7 +385,7 @@ const percentage = {
       }
     }
   },
-  execute: ([a, b]) => _sequelize.default.fn('divide', numeric(b), numeric(a))
+  execute: ([a, b]) => _sequelize.default.fn('divide', numeric(a), numeric(b))
 };
 exports.percentage = percentage;
 const remainder = {
