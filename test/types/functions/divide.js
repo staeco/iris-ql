@@ -26,8 +26,8 @@ describe('types#functions#divide', () => {
       ]
     }
     const expectedResponse = [
-      { total: 1, type: 'electric', cost: 3 },
-      { total: 1, type: 'regular', cost: 4 }
+      { total: 1, type: 'electric', cost: 3.2327044025157234 },
+      { total: 1, type: 'regular', cost: 4.872691933916424 }
     ]
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()
@@ -53,8 +53,8 @@ describe('types#functions#divide', () => {
       ]
     }
     const expectedResponse = [
-      { total: 1, type: 'electric', cost: 2 },
-      { total: 1, type: 'regular', cost: 25 }
+      { total: 1, type: 'electric', cost: 2.57 },
+      { total: 1, type: 'regular', cost: 25.07 }
     ]
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()
@@ -86,8 +86,8 @@ describe('types#functions#divide', () => {
       ]
     }
     const expectedResponse = [
-      { total: 1, type: 'electric', cost: 2 },
-      { total: 1, type: 'regular', cost: 4 }
+      { total: 1, type: 'electric', cost: 2.6037735849056602 },
+      { total: 1, type: 'regular', cost: 4.775510204081633 }
     ]
     const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()

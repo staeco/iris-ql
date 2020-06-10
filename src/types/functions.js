@@ -268,7 +268,7 @@ export const subtract = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   execute: ([ a, b ]) =>
-    types.fn('sub', numeric(a), numeric(b))
+    types.fn('subtract', numeric(a), numeric(b))
 }
 export const multiply = {
   name: 'Multiply',
@@ -290,7 +290,7 @@ export const multiply = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
   execute: ([ a, b ]) =>
-    types.fn('mult', numeric(a), numeric(b))
+    types.fn('multiply', numeric(a), numeric(b))
 }
 export const divide = {
   name: 'Divide',
@@ -312,7 +312,7 @@ export const divide = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
   execute: ([ a, b ]) =>
-    types.fn('div', numeric(a), numeric(b))
+    types.fn('divide', numeric(a), numeric(b))
 }
 export const percentage = {
   name: 'Percentage',
@@ -338,7 +338,7 @@ export const percentage = {
     }
   },
   execute: ([ a, b ]) =>
-    types.fn('div', numeric(b), numeric(a))
+    types.fn('divide', numeric(b), numeric(a))
 }
 export const remainder = {
   name: 'Remainder',
@@ -360,7 +360,7 @@ export const remainder = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
   execute: ([ a, b ]) =>
-    types.fn('mod', numeric(a), numeric(b))
+    types.fn('modulus', numeric(a), numeric(b))
 }
 
 // Comparisons
@@ -524,7 +524,7 @@ export const interval = {
     }
   },
   execute: ([ start, end ]) =>
-    types.fn('sub', types.fn('time_to_ms', end.value), types.fn('time_to_ms', start.value))
+    types.fn('subtract', types.fn('time_to_ms', end.value), types.fn('time_to_ms', start.value))
 }
 export const bucket = {
   name: 'Bucket',

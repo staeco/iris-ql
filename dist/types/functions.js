@@ -316,7 +316,7 @@ const subtract = {
       retainPercentage: true
     })
   },
-  execute: ([a, b]) => _sequelize.default.fn('sub', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('subtract', numeric(a), numeric(b))
 };
 exports.subtract = subtract;
 const multiply = {
@@ -339,7 +339,7 @@ const multiply = {
       retainPercentage: false
     })
   },
-  execute: ([a, b]) => _sequelize.default.fn('mult', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('multiply', numeric(a), numeric(b))
 };
 exports.multiply = multiply;
 const divide = {
@@ -362,7 +362,7 @@ const divide = {
       retainPercentage: false
     })
   },
-  execute: ([a, b]) => _sequelize.default.fn('div', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('divide', numeric(a), numeric(b))
 };
 exports.divide = divide;
 const percentage = {
@@ -385,7 +385,7 @@ const percentage = {
       }
     }
   },
-  execute: ([a, b]) => _sequelize.default.fn('div', numeric(b), numeric(a))
+  execute: ([a, b]) => _sequelize.default.fn('divide', numeric(b), numeric(a))
 };
 exports.percentage = percentage;
 const remainder = {
@@ -408,7 +408,7 @@ const remainder = {
       retainPercentage: false
     })
   },
-  execute: ([a, b]) => _sequelize.default.fn('mod', numeric(a), numeric(b))
+  execute: ([a, b]) => _sequelize.default.fn('modulus', numeric(a), numeric(b))
 }; // Comparisons
 
 exports.remainder = remainder;
@@ -572,7 +572,7 @@ const interval = {
       }
     }
   },
-  execute: ([start, end]) => _sequelize.default.fn('sub', _sequelize.default.fn('time_to_ms', end.value), _sequelize.default.fn('time_to_ms', start.value))
+  execute: ([start, end]) => _sequelize.default.fn('subtract', _sequelize.default.fn('time_to_ms', end.value), _sequelize.default.fn('time_to_ms', start.value))
 };
 exports.interval = interval;
 const bucket = {
