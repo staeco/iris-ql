@@ -3,6 +3,9 @@
 exports.__esModule = true;
 exports.select = exports.column = exports.jsonPath = exports.value = exports.where = void 0;
 
+// sequelize < 6 uses QueryGenerator, > 6 uses queryGenerator
+const getQueryGenerator = model => model.sequelize.dialect.queryGenerator || model.sequelize.dialect.QueryGenerator;
+
 const table = ({
   model,
   instanceQuery = true
@@ -12,7 +15,7 @@ const where = ({
   value,
   model,
   instanceQuery = true
-}) => model.sequelize.dialect.QueryGenerator.getWhereConditions(value, table({
+}) => getQueryGenerator(model).getWhereConditions(value, table({
   model,
   instanceQuery
 }), model);
@@ -23,7 +26,7 @@ const value = ({
   value,
   model,
   instanceQuery = true
-}) => model.sequelize.dialect.QueryGenerator.handleSequelizeMethod(value, table({
+}) => getQueryGenerator(model).handleSequelizeMethod(value, table({
   model,
   instanceQuery
 }), model);
@@ -36,7 +39,7 @@ const jsonPath = ({
   path,
   instanceQuery = true
 }) => {
-  const ncol = model.sequelize.dialect.QueryGenerator.jsonPathExtractionQuery(column, path) // remove parens it puts on for literally no reason
+  const ncol = getQueryGenerator(model).jsonPathExtractionQuery(column, path) // remove parens it puts on for literally no reason
   .replace(/^\(/, '').replace(/\)$/, '');
   return `"${table({
     model,
@@ -51,7 +54,7 @@ const column = ({
   model,
   instanceQuery = true
 }) => {
-  const ncol = model.sequelize.dialect.QueryGenerator.quoteIdentifier(column);
+  const ncol = getQueryGenerator(model).quoteIdentifier(column);
   return `"${table({
     model,
     instanceQuery
@@ -63,6 +66,6 @@ exports.column = column;
 const select = ({
   value,
   model
-}) => model.sequelize.dialect.QueryGenerator.selectQuery(model.getTableName(), value, model);
+}) => getQueryGenerator(model).selectQuery(model.getTableName(), value, model);
 
 exports.select = select;
