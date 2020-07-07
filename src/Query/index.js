@@ -37,8 +37,8 @@ export default class Query {
     }, {})
   }
 
-  execute = async ({ count=true, raw=false }={}) => {
-    const fn = count ? 'findAndCountAll' : 'findAll'
+  execute = async ({ raw=false }={}) => {
+    const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll'
     return this.options.model[fn]({
       raw,
       logging: this.options.debug,

@@ -9,6 +9,8 @@ var _export = _interopRequireDefault(require("../util/export"));
 
 var _getMeta = _interopRequireDefault(require("../Aggregation/getMeta"));
 
+var _Query = _interopRequireDefault(require("../Query"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -64,6 +66,10 @@ class AnalyticsQuery {
 
     if (!obj) throw new Error('Missing value!');
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
+    if (!obj.aggregations && !obj.groupings) return new _Query.default(obj, _objectSpread(_objectSpread({}, options), {}, {
+      count: false
+    })); // skip the advanced stuff and kick it down a level
+
     this.input = obj;
     this.options = options;
     this._parsed = (0, _parse.default)(obj, options);

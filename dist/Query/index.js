@@ -52,10 +52,9 @@ class Query {
     };
 
     this.execute = async ({
-      count = true,
       raw = false
     } = {}) => {
-      const fn = count ? 'findAndCountAll' : 'findAll';
+      const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll';
       return this.options.model[fn](_objectSpread({
         raw,
         logging: this.options.debug

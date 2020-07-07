@@ -1,11 +1,13 @@
 import parse from './parse'
 import exportStream from '../util/export'
 import getAggregationMeta from '../Aggregation/getMeta'
+import Query from '../Query'
 
 export default class AnalyticsQuery {
   constructor(obj, options={}) {
     if (!obj) throw new Error('Missing value!')
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
+    if (!obj.aggregations && !obj.groupings) return new Query(obj, { ...options, count: false }) // skip the advanced stuff and kick it down a level
     this.input = obj
     this.options = options
     this._parsed = parse(obj, options)

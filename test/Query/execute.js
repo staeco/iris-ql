@@ -6,8 +6,8 @@ import dataType from '../fixtures/bike-trip'
 describe('Query#execute', () => {
   const { user, datum } = db.models
   it('should execute with count off', async () => {
-    const query = new Query({ limit: 1 }, { model: user })
-    const res = await query.execute({ count: false })
+    const query = new Query({ limit: 1 }, { model: user, count: false })
+    const res = await query.execute()
     should.exist(res)
     res.length.should.equal(1)
     should.exist(res[0].authToken)

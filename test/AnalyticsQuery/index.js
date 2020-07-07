@@ -8,7 +8,9 @@ describe('AnalyticsQuery', () => {
     should.throws(() => new AnalyticsQuery({ limit: 1, groupings: [ { field: 'name' } ] }, { model: null }))
     should.throws(() => new AnalyticsQuery({ limit: 1, groupings: [ { field: 'name' } ] }))
     should.throws(() => new AnalyticsQuery(null, { model: user }))
-    should.throws(() => new AnalyticsQuery({ limit: 1 }, { model: user }))
+  })
+  it('should allow basic queries and shift back to the Query constructor', async () => {
+    new AnalyticsQuery({ limit: 1 }, { model: user })
   })
   it('should not be able to access out of scope variables', async () => {
     try {
