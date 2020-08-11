@@ -1,6 +1,6 @@
 import { select } from './toString'
 import QueryStream from 'pg-query-stream'
-import pump from 'pump'
+import { pipeline } from 'stream'
 import through2 from 'through2'
 
 // this wraps a sql query in a stream via a cursor so as each row is found
@@ -41,7 +41,7 @@ const streamable = async ({ model, sql, transform, tupleFraction, onError }) => 
     if (err && onError) onError(err)
     if (err) out.emit('error', err)
   }
-  const out = pump(query, modifier, end)
+  const out = pipeline(query, modifier, end)
   return out
 }
 
@@ -68,7 +68,7 @@ export default async ({ model, value, format, transform, tupleFraction, debug, o
   if (debug) debug(sql)
   const src = await streamable({ model, tupleFraction, sql, transform, onError })
   if (!format) return src
-  const out = pump(src, format(), (err) => {
+  const out = pipeline(src, format(), (err) => {
     if (err) out.emit('error', err)
   })
   out.contentType = format.contentType

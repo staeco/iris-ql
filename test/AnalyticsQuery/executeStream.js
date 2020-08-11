@@ -2,7 +2,7 @@ import should from 'should'
 import { AnalyticsQuery } from '../../src'
 import db from '../fixtures/db'
 import collect from 'get-stream'
-import JSONStream from 'JSONStream'
+import JSONStream from 'jsonstream-next'
 
 const json = () => JSONStream.stringify('[', ',', ']')
 json.contentType = 'application/json'
