@@ -44,13 +44,13 @@ const streamable = async ({
   } // a not so fun hack to tie our sequelize types into this raw cursor
 
 
+  let out;
   const query = conn.query(new _pgQueryStream.default(sql, undefined, {
     batchSize,
     types: {
       getTypeParser: conn.getTypeParser.bind(conn)
     }
   }));
-  const modifier = transform ? _through.default.obj((obj, _, cb) => cb(null, transform(obj))) : _through.default.obj();
 
   function _ref2(err) {
     if (err && onError) onError(err);
@@ -63,13 +63,23 @@ const streamable = async ({
   }
 
   const end = err => {
-    // clean up the connection
-    query.destroy(null, _ref3);
     if (err && onError) onError(err);
-    if (err) out.emit('error', err);
+    if (err) out.emit('error', err); // clean up the connection
+
+    query.destroy(null, _ref3);
   };
 
-  const out = (0, _stream.pipeline)(query, modifier, end);
+  function _ref4(obj, _, cb) {
+    return cb(null, transform(obj));
+  }
+
+  if (transform) {
+    out = (0, _stream.pipeline)(query, _through.default.obj(_ref4), end);
+  } else {
+    out = query;
+    (0, _stream.finished)(query, end);
+  }
+
   return out;
 };
 

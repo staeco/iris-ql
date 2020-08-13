@@ -1,6 +1,6 @@
 import { select } from './toString'
 import QueryStream from 'pg-query-stream'
-import { pipeline } from 'stream'
+import { pipeline, finished } from 'stream'
 import through2 from 'through2'
 
 // this wraps a sql query in a stream via a cursor so as each row is found
@@ -16,6 +16,7 @@ const streamable = async ({ model, sql, transform, tupleFraction, onError }) => 
   }
 
   // a not so fun hack to tie our sequelize types into this raw cursor
+  let out
   const query = conn.query(new QueryStream(sql, undefined, {
     batchSize,
     types: {
@@ -23,11 +24,10 @@ const streamable = async ({ model, sql, transform, tupleFraction, onError }) => 
     }
   }))
 
-  const modifier = transform ? through2.obj((obj, _, cb) =>
-    cb(null, transform(obj))
-  ) : through2.obj()
-
   const end = (err) => {
+    if (err && onError) onError(err)
+    if (err) out.emit('error', err)
+
     // clean up the connection
     query.destroy(null, (err) => {
       if (err && onError) onError(err)
@@ -38,10 +38,17 @@ const streamable = async ({ model, sql, transform, tupleFraction, onError }) => 
           return null
         })
     })
-    if (err && onError) onError(err)
-    if (err) out.emit('error', err)
   }
-  const out = pipeline(query, modifier, end)
+  if (transform) {
+    out = pipeline(
+      query,
+      through2.obj((obj, _, cb) => cb(null, transform(obj))),
+      end
+    )
+  } else {
+    out = query
+    finished(query, end)
+  }
   return out
 }
 
