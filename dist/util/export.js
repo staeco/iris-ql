@@ -7,7 +7,7 @@ var _toString = require("./toString");
 
 var _pgQueryStream = _interopRequireDefault(require("pg-query-stream"));
 
-var _stream = require("stream");
+var _readableStream = require("readable-stream");
 
 var _through = _interopRequireDefault(require("through2"));
 
@@ -74,10 +74,10 @@ const streamable = async ({
   }
 
   if (transform) {
-    out = (0, _stream.pipeline)(query, _through.default.obj(_ref4), end);
+    out = (0, _readableStream.pipeline)(query, _through.default.obj(_ref4), end);
   } else {
     out = query;
-    (0, _stream.finished)(query, end);
+    (0, _readableStream.finished)(query, end);
   }
 
   return out;
@@ -128,7 +128,7 @@ var _default = async ({
     onError
   });
   if (!format) return src;
-  const out = (0, _stream.pipeline)(src, format(), err => {
+  const out = (0, _readableStream.pipeline)(src, format(), err => {
     if (err) out.emit('error', err);
   });
   out.contentType = format.contentType;

@@ -1,6 +1,6 @@
 import { select } from './toString'
 import QueryStream from 'pg-query-stream'
-import { pipeline, finished } from 'stream'
+import { pipeline, finished } from 'readable-stream'
 import through2 from 'through2'
 
 // this wraps a sql query in a stream via a cursor so as each row is found
