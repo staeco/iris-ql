@@ -15,6 +15,7 @@ before_install:
   - sudo apt-get install -y postgresql-12 postgresql-client-12 postgresql-12-postgis-3 postgresql-12-postgis-3-scripts
   - sudo cp /etc/postgresql/{9.6,12}/main/pg_hba.conf
   - sudo service postgresql restart 12
+  - while ! nc -z localhost 5432 ; do sleep 1 ; done
 addons:
   postgresql: 12
 env:

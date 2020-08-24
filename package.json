@@ -26,7 +26,7 @@
     "lint": "eslint src test --fix",
     "test-make-user": "createuser postgres -lsd",
     "test-db": "dropdb iris-ql -U postgres || true && createdb iris-ql -U postgres && psql iris-ql -c 'CREATE EXTENSION IF NOT EXISTS postgis;' -U postgres",
-    "test": "npm run-script test-db && NODE_ENV=test nyc mocha --require @babel/register --recursive --reporter spec --bail --exit --timeout 36000 && npm run-script lint"
+    "test": "npm run-script test-db && NODE_ENV=test nyc mocha --require @babel/register --recursive --reporter spec --bail --exit --timeout 36000"
   },
   "nyc": {
     "extends": "@istanbuljs/nyc-config-babel",
