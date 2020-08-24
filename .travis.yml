@@ -3,6 +3,8 @@ node_js:
   - "10"
   - "11"
   - "12"
+  - "13"
+  - "14"
 cache:
   yarn: true
   directories:
