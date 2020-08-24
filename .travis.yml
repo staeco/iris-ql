@@ -1,3 +1,6 @@
+os: linux
+dist: bionic
+
 language: node_js
 node_js:
   - "10"
@@ -5,19 +8,28 @@ node_js:
   - "12"
   - "13"
   - "14"
+
+services:
+  - postgresql
+addons:
+  postgresql: '12'
+  apt:
+    packages:
+      - postgresql-12
+      - postgresql-client-12
+      - postgresql-server-dev-12
+
 cache:
-  yarn: true
+  bundler: true
   directories:
     - node_modules
+  yarn: true
+
 before_install:
-  - sudo apt-get update
-  - sudo apt-get --yes remove postgresql\*
-  - sudo apt-get install -y postgresql-12 postgresql-client-12 postgresql-12-postgis-3 postgresql-12-postgis-3-scripts
-  - sudo cp /etc/postgresql/{9.6,12}/main/pg_hba.conf
-  - sudo service postgresql restart 12
-  - while ! nc -z localhost 5432 ; do sleep 1 ; done
-addons:
-  postgresql: 12
+  - sudo pg_dropcluster --stop 12 main
+  - sudo pg_upgradecluster 11 main
+  - sudo pg_ctlcluster 12 main restart
+  - sudo pg_dropcluster 11 main
 env:
   global:
     - PGPORT=5432
