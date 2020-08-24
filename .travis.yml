@@ -31,6 +31,4 @@ before_install:
   - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/12/main/postgresql.conf
   - sudo cp /etc/postgresql/{9.6,12}/main/pg_hba.conf
   - sudo pg_ctlcluster 12 main restart
-
-before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
+  - nc -vz localhost 5433
