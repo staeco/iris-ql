@@ -9,6 +9,8 @@ node_js:
 env:
   global:
     - PGPORT=5433
+services:
+  - postgresql
 
 addons:
   postgresql: '12'
@@ -27,7 +29,7 @@ cache:
 
 before_install:
   - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/12/main/postgresql.conf
-  - sudo cp /etc/postgresql/{9.3,12}/main/pg_hba.conf
+  - sudo cp /etc/postgresql/{9.6,12}/main/pg_hba.conf
   - sudo pg_ctlcluster 12 main restart
 
 before_script:
