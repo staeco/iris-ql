@@ -14,7 +14,7 @@ cache:
 services:
   - postgresql
 
-matrix:
+jobs:
   include:
     - addons:
         postgresql: "11"
