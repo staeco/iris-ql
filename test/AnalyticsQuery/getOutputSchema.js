@@ -46,7 +46,14 @@ describe('AnalyticsQuery#getOutputSchema', () => {
     const res = query.getOutputSchema()
     should.exist(res)
     should(res).eql({
-      day: { name: 'Day', type: 'date' },
+      day: {
+        name: 'Day',
+        type: 'date',
+        measurement: {
+          type: 'dateTrunc',
+          value: 'day'
+        }
+      },
       total: { name: 'Total', type: 'number' }
     })
   })

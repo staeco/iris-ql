@@ -528,7 +528,7 @@ export const interval = {
 }
 export const bucket = {
   name: 'Bucket',
-  notes: 'Returns a date rounded to a unit of time',
+  notes: 'Returns a date truncated to a unit of time',
   signature: [
     {
       name: 'Unit',
@@ -543,7 +543,14 @@ export const bucket = {
     }
   ],
   returns: {
-    static: { type: 'date' }
+    static: { type: 'date' },
+    dynamic: ([ p ]) => ({
+      type: 'date',
+      measurement: {
+        type: 'dateTrunc',
+        value: p.raw
+      }
+    })
   },
   execute: ([ p, f ], opt) => {
     const useTZ = !!opt?.timezone
