@@ -150,15 +150,15 @@ var _default = (query = {}, opt) => {
   if (!error.isEmpty()) throw error; // validate each aggregation and ensure it is either used in groupings, or contains an aggregate function
 
   query.aggregations.forEach((agg, idx) => {
-    const hasAggregateFunction = (0, _search.default)(agg, _ref5);
+    const hasAggregateFunction = (0, _search.default)(agg.value, _ref5);
     if (hasAggregateFunction) return; // valid
 
     const matchedGrouping = (0, _search.default)(query.groupings, (k, v) => typeof (v === null || v === void 0 ? void 0 : v.field) === 'string' && v.field === agg.alias);
     if (matchedGrouping) return; // valid
 
     error.add({
-      path: [...context, 'aggregations', idx],
-      value: agg,
+      path: [...context, 'aggregations', idx, 'value'],
+      value: agg.value,
       message: 'Must contain an aggregate function or be used in a grouping.'
     });
   });

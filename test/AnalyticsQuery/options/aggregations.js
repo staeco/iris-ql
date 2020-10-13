@@ -180,11 +180,8 @@ describe('AnalyticsQuery#options#aggregations', () => {
       should.exist(err)
       should.exist(err.fields)
       err.fields.should.eql([ {
-        path: [ 'aggregations', 1 ],
-        value: {
-          value: { field: 'name' },
-          alias: 'name'
-        },
+        path: [ 'aggregations', 1, 'value' ],
+        value: { field: 'name' },
         message: 'Must contain an aggregate function or be used in a grouping.'
       } ])
       return

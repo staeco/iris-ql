@@ -103,13 +103,13 @@ export default (query={}, opt) => {
 
   // validate each aggregation and ensure it is either used in groupings, or contains an aggregate function
   query.aggregations.forEach((agg, idx) => {
-    const hasAggregateFunction = search(agg, (k, v) => typeof v?.function === 'string' && aggregateFunctions.includes(v.function))
+    const hasAggregateFunction = search(agg.value, (k, v) => typeof v?.function === 'string' && aggregateFunctions.includes(v.function))
     if (hasAggregateFunction) return // valid
     const matchedGrouping = search(query.groupings, (k, v) => typeof v?.field === 'string' && v.field === agg.alias)
     if (matchedGrouping) return // valid
     error.add({
-      path: [ ...context, 'aggregations', idx ],
-      value: agg,
+      path: [ ...context, 'aggregations', idx, 'value' ],
+      value: agg.value,
       message: 'Must contain an aggregate function or be used in a grouping.'
     })
   })
