@@ -182,7 +182,7 @@ describe('AnalyticsQuery#options#aggregations', () => {
       err.fields.should.eql([ {
         path: [ 'aggregations', 1, 'value' ],
         value: { field: 'name' },
-        message: 'Must contain an aggregate function or be used in a grouping.'
+        message: 'Must contain an aggregation.'
       } ])
       return
     }

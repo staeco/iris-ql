@@ -110,7 +110,7 @@ export default (query={}, opt) => {
     error.add({
       path: [ ...context, 'aggregations', idx, 'value' ],
       value: agg.value,
-      message: 'Must contain an aggregate function or be used in a grouping.'
+      message: 'Must contain an aggregation.'
     })
   })
 
