@@ -3,8 +3,14 @@ import Query from '../Query'
 import QueryValue from '../QueryValue'
 import Aggregation from '../Aggregation'
 import { ValidationError } from '../errors'
+import * as functions from '../types/functions'
+import search from '../util/search'
 import getScopedAttributes from '../util/getScopedAttributes'
 
+const aggregateFunctions = Object.entries(functions).reduce((acc, [ k, v ]) => {
+  if (v.aggregate) acc.push(k)
+  return acc
+}, [])
 const zones = new Set(moment.tz.names())
 
 // this is an extension of parseQuery that allows for aggregations and groupings
@@ -92,6 +98,22 @@ export default (query={}, opt) => {
       })
     }
   }
+
+  if (!error.isEmpty()) throw error
+
+  // validate each aggregation and ensure it is either used in groupings, or contains an aggregate function
+  query.aggregations.forEach((agg, idx) => {
+    const hasAggregateFunction = search(agg, (k, v) => typeof v?.function === 'string' && aggregateFunctions.includes(v.function))
+    if (hasAggregateFunction) return // valid
+    const matchedGrouping = search(query.groupings, (k, v) => typeof v?.field === 'string' && v.field === agg.alias)
+    if (matchedGrouping) return // valid
+    error.add({
+      path: [ ...context, 'aggregations', idx ],
+      value: agg,
+      message: 'Must contain an aggregate function or be used in a grouping.'
+    })
+  })
+
   if (!error.isEmpty()) throw error
 
   out.attributes = attrs

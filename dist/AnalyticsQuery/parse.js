@@ -13,7 +13,15 @@ var _Aggregation = _interopRequireDefault(require("../Aggregation"));
 
 var _errors = require("../errors");
 
+var functions = _interopRequireWildcard(require("../types/functions"));
+
+var _search = _interopRequireDefault(require("../util/search"));
+
 var _getScopedAttributes = _interopRequireDefault(require("../util/getScopedAttributes"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23,6 +31,10 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+const aggregateFunctions = Object.entries(functions).reduce((acc, [k, v]) => {
+  if (v.aggregate) acc.push(k);
+  return acc;
+}, []);
 const zones = new Set(_momentTimezone.default.tz.names()); // this is an extension of parseQuery that allows for aggregations and groupings
 
 function _ref2(i) {
@@ -31,6 +43,10 @@ function _ref2(i) {
 
 function _ref3(i) {
   return i[1];
+}
+
+function _ref5(k, v) {
+  return typeof (v === null || v === void 0 ? void 0 : v.function) === 'string' && aggregateFunctions.includes(v.function);
 }
 
 var _default = (query = {}, opt) => {
@@ -131,6 +147,21 @@ var _default = (query = {}, opt) => {
     }
   }
 
+  if (!error.isEmpty()) throw error; // validate each aggregation and ensure it is either used in groupings, or contains an aggregate function
+
+  query.aggregations.forEach((agg, idx) => {
+    const hasAggregateFunction = (0, _search.default)(agg, _ref5);
+    if (hasAggregateFunction) return; // valid
+
+    const matchedGrouping = (0, _search.default)(query.groupings, (k, v) => typeof (v === null || v === void 0 ? void 0 : v.field) === 'string' && v.field === agg.alias);
+    if (matchedGrouping) return; // valid
+
+    error.add({
+      path: [...context, 'aggregations', idx],
+      value: agg,
+      message: 'Must contain an aggregate function or be used in a grouping.'
+    });
+  });
   if (!error.isEmpty()) throw error;
   out.attributes = attrs;
   return out;
