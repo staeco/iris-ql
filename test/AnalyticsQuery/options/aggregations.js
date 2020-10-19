@@ -188,4 +188,40 @@ describe('AnalyticsQuery#options#aggregations', () => {
     }
     throw new Error('Did not throw!')
   })
+  it('should return errors for duplicate aggregation', async () => {
+    try {
+      new AnalyticsQuery({
+        aggregations: [
+          {
+            value: { function: 'count' },
+            alias: 'count',
+            filters: {
+              createdAt: { $gte: { function: 'last', arguments: [ 'P1W' ] } }
+            }
+          },
+          {
+            value: { field: 'name' },
+            alias: 'name'
+          },
+          {
+            value: { field: 'name' },
+            alias: 'name'
+          }
+        ],
+        groupings: [
+          { field: 'name' }
+        ]
+      }, { model: user })
+    } catch (err) {
+      should.exist(err)
+      should.exist(err.fields)
+      err.fields.should.eql([ {
+        path: [ 'aggregations', 2, 'alias' ],
+        value: 'name',
+        message: 'Duplicate aggregation.'
+      } ])
+      return
+    }
+    throw new Error('Did not throw!')
+  })
 })

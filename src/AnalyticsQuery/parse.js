@@ -114,6 +114,19 @@ export default (query={}, opt) => {
     })
   })
 
+  // check for duplicate aggregations
+  query.aggregations.reduce((seen, agg, idx) => {
+    if (seen.includes(agg.alias)) {
+      error.add({
+        path: [ ...context, 'aggregations', idx, 'alias' ],
+        value: agg.alias,
+        message: 'Duplicate aggregation.'
+      })
+    } else {
+      seen.push(agg.alias)
+    }
+    return seen
+  }, [])
   if (!error.isEmpty()) throw error
 
   out.attributes = attrs
