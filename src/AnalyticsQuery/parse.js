@@ -69,6 +69,8 @@ export default (query={}, opt) => {
     })
   }
 
+  if (!error.isEmpty()) throw error
+
   const aggFieldLimit = query.aggregations
     .map((i) => ({ type: 'aggregation', field: i.alias, value: i.value }))
 

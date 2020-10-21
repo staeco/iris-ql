@@ -35,11 +35,6 @@ describe('AnalyticsQuery', () => {
           path: [ 'aggregations', 1, 'value', 'field' ],
           value: 'authToken',
           message: 'Field does not exist.'
-        },
-        {
-          path: [ 'groupings', 0, 'field' ],
-          value: 'authToken',
-          message: 'Field does not exist.'
         }
       ])
       return

@@ -110,6 +110,7 @@ var _default = (query = {}, opt) => {
     attrs = query.aggregations.map(_ref);
   }
 
+  if (!error.isEmpty()) throw error;
   const aggFieldLimit = query.aggregations.map(_ref2);
   const fieldLimit = initialFieldLimit.concat(aggFieldLimit);
 
