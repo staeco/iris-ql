@@ -80,7 +80,7 @@ var _default = (query, opt = {}) => {
 
 
   function _ref(f) {
-    return attrs[f.value].searchable;
+    return attrs[f.field].searchable;
   }
 
   if (query.search) {
@@ -108,7 +108,7 @@ var _default = (query, opt = {}) => {
       const trimmed = query.search.trim();
       out.where.push({
         $or: searchable.map(f => ({
-          [f.value]: {
+          [f.field]: {
             $iLike: `%${trimmed}%`
           }
         }))
@@ -270,7 +270,7 @@ var _default = (query, opt = {}) => {
   function _ref2(k, idx) {
     const [first] = k.split('.');
 
-    if (!first || !initialFieldLimit.find(f => f.value === first)) {
+    if (!first || !initialFieldLimit.find(f => f.field === first)) {
       error.add({
         path: [...context, 'exclusions', idx],
         value: k,

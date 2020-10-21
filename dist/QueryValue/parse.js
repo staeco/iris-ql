@@ -168,6 +168,8 @@ const parse = (v, opt) => {
   }
 
   if (v.field) {
+    var _resolvedAggregation$;
+
     const resolvedField = resolveField(v.field, opt);
 
     if (typeof v.field !== 'string') {
@@ -182,26 +184,31 @@ const parse = (v, opt) => {
       hydrate: hydrateJSON
     }));
 
-    if (!fieldLimit.find(i => i.value === resolvedField)) {
+    if (!fieldLimit.find(i => i.field === resolvedField)) {
       throw new _errors.ValidationError({
         path: [...context, 'field'],
         value: resolvedField,
         message: 'Field does not exist.'
       });
-    } // aggregation fields take precendence, so check for this first
-
-
-    if (fieldLimit.find(i => i.value === resolvedField && i.type === 'aggregation')) {
-      return _sequelize.default.col(resolvedField);
-    } // a model column, serialize this differently
-
-
-    if (fieldLimit.find(i => i.value === resolvedField && i.type === 'column')) {
-      return _sequelize.default.literal((0, _toString.column)(_objectSpread(_objectSpread({}, opt), {}, {
-        column: resolvedField
-      })));
     }
 
+    const resolvedAggregation = fieldLimit.find(i => i.field === resolvedField && i.type === 'aggregation');
+    const resolvedColumn = fieldLimit.find(i => i.field === resolvedField && i.type === 'column'); // If the aggregation has the same name as a column, and the aggregation isn't just a simple alias of the column
+    // it needs to be renamed to something else, or grouping/ordering has no idea if you are referencing the column
+    // or the aggregation
+
+    if (resolvedAggregation && resolvedColumn && ((_resolvedAggregation$ = resolvedAggregation.value) === null || _resolvedAggregation$ === void 0 ? void 0 : _resolvedAggregation$.field) !== resolvedColumn.field) {
+      throw new _errors.ValidationError({
+        path: [...context, 'field'],
+        value: resolvedField,
+        message: 'Field is ambigous - exists as both a column and an aggregation.'
+      });
+    }
+
+    if (resolvedAggregation) return _sequelize.default.col(resolvedField);
+    if (resolvedColumn) return _sequelize.default.literal((0, _toString.column)(_objectSpread(_objectSpread({}, opt), {}, {
+      column: resolvedField
+    })));
     throw new Error(`Unknown field type for: ${resolvedField}`);
   }
 

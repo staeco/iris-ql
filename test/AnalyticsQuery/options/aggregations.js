@@ -1,9 +1,10 @@
 import should from 'should'
 import { AnalyticsQuery } from '../../../src'
 import db from '../../fixtures/db'
+import dataType from '../../fixtures/911-call'
 
 describe('AnalyticsQuery#options#aggregations', () => {
-  const { user } = db.models
+  const { user, datum } = db.models
   it('should execute a basic query', async () => {
     const query = new AnalyticsQuery({
       aggregations: [
@@ -106,11 +107,11 @@ describe('AnalyticsQuery#options#aggregations', () => {
           },
           {
             value: { field: 'does-not-exist' },
-            alias: 'name'
+            alias: 'test'
           }
         ],
         groupings: [
-          { field: 'name' }
+          { field: 'test' }
         ]
       }, { model: user })
     } catch (err) {
@@ -219,6 +220,41 @@ describe('AnalyticsQuery#options#aggregations', () => {
         path: [ 'aggregations', 2, 'alias' ],
         value: 'name',
         message: 'Duplicate aggregation.'
+      } ])
+      return
+    }
+    throw new Error('Did not throw!')
+  })
+  it('should handle conflicting variables in aggregations', async () => {
+    try {
+      new AnalyticsQuery({
+        filters: {
+          sourceId: '911-calls'
+        },
+        aggregations: [
+          {
+            value: { function: 'count' },
+            alias: 'count'
+          },
+          {
+            value: { field: 'data.id' },
+            alias: 'id'
+          }
+        ],
+        orderings: [
+          { value: { field: 'data.receivedAt' }, direction: 'asc' }
+        ],
+        groupings: [
+          { field: 'id' }
+        ]
+      }, { model: datum, subSchemas: { data: dataType.schema } })
+    } catch (err) {
+      should.exist(err)
+      should.exist(err.fields)
+      err.fields.should.eql([ {
+        path: [ 'groupings', 0, 'field' ],
+        value: 'id',
+        message: 'Field is ambigous - exists as both a column and an aggregation.'
       } ])
       return
     }

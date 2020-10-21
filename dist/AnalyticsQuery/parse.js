@@ -38,17 +38,14 @@ const aggregateFunctions = Object.entries(functions).reduce((acc, [k, v]) => {
 const zones = new Set(_momentTimezone.default.tz.names()); // this is an extension of parseQuery that allows for aggregations and groupings
 
 function _ref2(i) {
-  return !!i;
-}
-
-function _ref3(i) {
   return {
     type: 'aggregation',
-    value: i[1]
+    field: i.alias,
+    value: i.value
   };
 }
 
-function _ref5(k, v) {
+function _ref4(k, v) {
   return typeof (v === null || v === void 0 ? void 0 : v.function) === 'string' && aggregateFunctions.includes(v.function);
 }
 
@@ -113,7 +110,8 @@ var _default = (query = {}, opt) => {
     attrs = query.aggregations.map(_ref);
   }
 
-  const fieldLimit = initialFieldLimit.concat(attrs.filter(_ref2).map(_ref3));
+  const aggFieldLimit = query.aggregations.map(_ref2);
+  const fieldLimit = initialFieldLimit.concat(aggFieldLimit);
 
   const nopt = _objectSpread(_objectSpread({}, opt), {}, {
     fieldLimit
@@ -127,7 +125,7 @@ var _default = (query = {}, opt) => {
     error.add(err);
   }
 
-  function _ref4(i, idx) {
+  function _ref3(i, idx) {
     try {
       return new _QueryValue.default(i, _objectSpread(_objectSpread({}, nopt), {}, {
         context: [...context, 'groupings', idx]
@@ -146,14 +144,14 @@ var _default = (query = {}, opt) => {
         message: 'Must be an array.'
       });
     } else {
-      out.group = query.groupings.map(_ref4);
+      out.group = query.groupings.map(_ref3);
     }
   }
 
   if (!error.isEmpty()) throw error; // validate each aggregation and ensure it is either used in groupings, or contains an aggregate function
 
   query.aggregations.forEach((agg, idx) => {
-    const hasAggregateFunction = (0, _search.default)(agg.value, _ref5);
+    const hasAggregateFunction = (0, _search.default)(agg.value, _ref4);
     if (hasAggregateFunction) return; // valid
 
     const matchedGrouping = (0, _search.default)(query.groupings, (k, v) => typeof (v === null || v === void 0 ? void 0 : v.field) === 'string' && v.field === agg.alias);

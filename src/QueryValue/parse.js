@@ -120,21 +120,29 @@ const parse = (v, opt) => {
       })
     }
     if (resolvedField.includes('.')) return getJSONField(resolvedField, { ...opt, hydrate: hydrateJSON })
-    if (!fieldLimit.find((i) => i.value === resolvedField)) {
+    if (!fieldLimit.find((i) => i.field === resolvedField)) {
       throw new ValidationError({
         path: [ ...context, 'field' ],
         value: resolvedField,
         message: 'Field does not exist.'
       })
     }
-    // aggregation fields take precendence, so check for this first
-    if (fieldLimit.find((i) => i.value === resolvedField && i.type === 'aggregation')) {
-      return types.col(resolvedField)
+    const resolvedAggregation = fieldLimit.find((i) => i.field === resolvedField && i.type === 'aggregation')
+    const resolvedColumn = fieldLimit.find((i) => i.field === resolvedField && i.type === 'column')
+
+    // If the aggregation has the same name as a column, and the aggregation isn't just a simple alias of the column
+    // it needs to be renamed to something else, or grouping/ordering has no idea if you are referencing the column
+    // or the aggregation
+    if (resolvedAggregation && resolvedColumn && resolvedAggregation.value?.field !== resolvedColumn.field) {
+      throw new ValidationError({
+        path: [ ...context, 'field' ],
+        value: resolvedField,
+        message: 'Field is ambigous - exists as both a column and an aggregation.'
+      })
     }
-    // a model column, serialize this differently
-    if (fieldLimit.find((i) => i.value === resolvedField && i.type === 'column')) {
-      return types.literal(column({ ...opt, column: resolvedField }))
-    }
+    if (resolvedAggregation) return types.col(resolvedField)
+    if (resolvedColumn) return types.literal(column({ ...opt, column: resolvedField }))
+
     throw new Error(`Unknown field type for: ${resolvedField}`)
   }
   if (v.val) {

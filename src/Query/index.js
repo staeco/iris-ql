@@ -29,9 +29,12 @@ export default class Query {
   value = ({ instanceQuery=true }={}) => instanceQuery ? this._parsed : this._parsedCollection
   toJSON = () => this.input
   getOutputSchema = () => {
-    const fieldLimit = this.options.fieldLimit || getModelFieldLimit(this.options.model)
+    let fieldLimit = this.options.fieldLimit || getModelFieldLimit(this.options.model)
+    if (this.input.exclusions) {
+      fieldLimit = fieldLimit.filter((i) => !this.input.exclusions.includes(i.field))
+    }
     return fieldLimit.reduce((acc, f) => {
-      acc[f.value] = getTypes({ field: f.value }, this.options)[0]
+      acc[f.field] = getTypes({ field: f.field }, this.options)[0]
       return acc
     }, {})
   }

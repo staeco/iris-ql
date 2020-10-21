@@ -29,7 +29,7 @@ export default (obj, opt) => {
           if (fullPath.includes('.')) {
             getJSONField(fullPath, opt) // performs the check, don't need the value
           } else {
-            if (!fieldLimit.find((i) => i.value === fullPath)) {
+            if (!fieldLimit.find((i) => i.field === fullPath)) {
               error.add({
                 path: [ ...context, ...fullPath.split('.') ],
                 value: k,

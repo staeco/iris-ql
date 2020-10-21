@@ -22,7 +22,7 @@ describe('AnalyticsQuery', () => {
           },
           {
             value: { field: 'authToken' },
-            alias: 'authToken'
+            alias: 'authToken2'
           }
         ],
         groupings: [

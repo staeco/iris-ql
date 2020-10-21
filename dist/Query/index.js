@@ -41,10 +41,15 @@ class Query {
     this.toJSON = () => this.input;
 
     this.getOutputSchema = () => {
-      const fieldLimit = this.options.fieldLimit || (0, _getModelFieldLimit.default)(this.options.model);
+      let fieldLimit = this.options.fieldLimit || (0, _getModelFieldLimit.default)(this.options.model);
+
+      if (this.input.exclusions) {
+        fieldLimit = fieldLimit.filter(i => !this.input.exclusions.includes(i.field));
+      }
+
       return fieldLimit.reduce((acc, f) => {
-        acc[f.value] = (0, _getTypes.default)({
-          field: f.value
+        acc[f.field] = (0, _getTypes.default)({
+          field: f.field
         }, this.options)[0];
         return acc;
       }, {});

@@ -69,11 +69,10 @@ export default (query={}, opt) => {
     })
   }
 
-  const fieldLimit = initialFieldLimit.concat(
-    attrs
-      .filter((i) => !!i)
-      .map((i) => ({ type: 'aggregation', value: i[1] }))
-  )
+  const aggFieldLimit = query.aggregations
+    .map((i) => ({ type: 'aggregation', field: i.alias, value: i.value }))
+
+  const fieldLimit = initialFieldLimit.concat(aggFieldLimit)
   const nopt = { ...opt, fieldLimit }
   let out = {}
   try {

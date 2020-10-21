@@ -43,20 +43,22 @@ class ValidationError extends BadRequestError {
 
       if (err instanceof Error) throw err;
       this.fields.push(err);
+      this.message = this.toString(); // update msg
+
       return this;
     };
 
     this.isEmpty = () => this.fields.length === 0;
 
     this.toString = () => {
-      const original = super.toString();
+      const original = 'Error: Validation Error';
       if (this.isEmpty()) return original; // no custom validation
 
       return `${original}\nIssues:${serializeIssues(this.fields)}`;
     };
 
-    this.fields = fields;
-    if (!Array.isArray(this.fields)) this.fields = [this.fields];
+    this.fields = Array.isArray(fields) ? fields : [fields];
+    this.message = this.toString();
     Error.captureStackTrace(this, ValidationError);
   }
 

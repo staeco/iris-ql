@@ -10,7 +10,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _ref(f) {
   return {
     type: 'column',
-    value: f
+    field: f
   };
 }
 

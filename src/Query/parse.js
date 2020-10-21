@@ -53,7 +53,7 @@ export default (query, opt={}) => {
 
   // searching
   if (query.search) {
-    const searchable = initialFieldLimit.filter((f) => attrs[f.value].searchable)
+    const searchable = initialFieldLimit.filter((f) => attrs[f.field].searchable)
     const isSearchable = searchable.length !== 0
     const isValid = typeof query.search === 'string'
     if (!isValid) {
@@ -73,7 +73,7 @@ export default (query, opt={}) => {
     if (isValid && isSearchable) {
       const trimmed = query.search.trim()
       out.where.push({
-        $or: searchable.map((f) => ({ [f.value]: { $iLike: `%${trimmed}%` } }))
+        $or: searchable.map((f) => ({ [f.field]: { $iLike: `%${trimmed}%` } }))
       })
     }
   }
@@ -201,7 +201,7 @@ export default (query, opt={}) => {
   if (query.exclusions) {
     const parsed = parseIffyStringArray(query.exclusions).map((k, idx) => {
       const [ first ] = k.split('.')
-      if (!first || !initialFieldLimit.find((f) => f.value === first)) {
+      if (!first || !initialFieldLimit.find((f) => f.field === first)) {
         error.add({
           path: [ ...context, 'exclusions', idx ],
           value: k,

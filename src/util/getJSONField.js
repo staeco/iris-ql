@@ -16,7 +16,7 @@ export default (v, opt) => {
   const path = v.split('.')
   const col = path.shift()
   const colInfo = model.rawAttributes[col]
-  if (!colInfo || !fieldLimit.find((i) => i.value === col)) {
+  if (!colInfo || !fieldLimit.find((i) => i.field === col)) {
     throw new ValidationError({
       path: context,
       value: v,

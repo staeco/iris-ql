@@ -48,7 +48,7 @@ var _default = (obj, opt) => {
       let fullPath; // verify
 
       function _ref(i) {
-        return i.value === fullPath;
+        return i.field === fullPath;
       }
 
       if (!reserved.has(k)) {
