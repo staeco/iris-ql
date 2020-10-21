@@ -5,7 +5,7 @@ import Aggregation from '../Aggregation'
 import { ValidationError } from '../errors'
 import * as functions from '../types/functions'
 import search from '../util/search'
-import getScopedAttributes from '../util/getScopedAttributes'
+import getModelFieldLimit from '../util/getModelFieldLimit'
 
 const aggregateFunctions = Object.entries(functions).reduce((acc, [ k, v ]) => {
   if (v.aggregate) acc.push(k)
@@ -18,7 +18,7 @@ export default (query={}, opt) => {
   const { model, context=[] } = opt
   const error = new ValidationError()
   let attrs = []
-  const initialFieldLimit = opt.fieldLimit || Object.keys(getScopedAttributes(model))
+  const initialFieldLimit = opt.fieldLimit || getModelFieldLimit(model)
 
   // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
   if (query.timezone) {
@@ -69,7 +69,11 @@ export default (query={}, opt) => {
     })
   }
 
-  const fieldLimit = initialFieldLimit.concat(attrs.filter((i) => !!i).map((i) => i[1]))
+  const fieldLimit = initialFieldLimit.concat(
+    attrs
+      .filter((i) => !!i)
+      .map((i) => ({ type: 'aggregation', value: i[1] }))
+  )
   const nopt = { ...opt, fieldLimit }
   let out = {}
   try {
@@ -114,7 +118,7 @@ export default (query={}, opt) => {
     })
   })
 
-  // check for duplicate aggregations
+  // validate each aggregation is unique
   query.aggregations.reduce((seen, agg, idx) => {
     if (seen.includes(agg.alias)) {
       error.add({
@@ -127,6 +131,7 @@ export default (query={}, opt) => {
     }
     return seen
   }, [])
+
   if (!error.isEmpty()) throw error
 
   out.attributes = attrs

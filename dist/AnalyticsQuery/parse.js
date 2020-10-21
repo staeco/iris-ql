@@ -17,7 +17,7 @@ var functions = _interopRequireWildcard(require("../types/functions"));
 
 var _search = _interopRequireDefault(require("../util/search"));
 
-var _getScopedAttributes = _interopRequireDefault(require("../util/getScopedAttributes"));
+var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
@@ -42,7 +42,10 @@ function _ref2(i) {
 }
 
 function _ref3(i) {
-  return i[1];
+  return {
+    type: 'aggregation',
+    value: i[1]
+  };
 }
 
 function _ref5(k, v) {
@@ -56,7 +59,7 @@ var _default = (query = {}, opt) => {
   } = opt;
   const error = new _errors.ValidationError();
   let attrs = [];
-  const initialFieldLimit = opt.fieldLimit || Object.keys((0, _getScopedAttributes.default)(model)); // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
+  const initialFieldLimit = opt.fieldLimit || (0, _getModelFieldLimit.default)(model); // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
 
   if (query.timezone) {
     if (typeof query.timezone !== 'string') {
@@ -161,7 +164,7 @@ var _default = (query = {}, opt) => {
       value: agg.value,
       message: 'Must contain an aggregation.'
     });
-  }); // check for duplicate aggregations
+  }); // validate each aggregation is unique
 
   query.aggregations.reduce((seen, agg, idx) => {
     if (seen.includes(agg.alias)) {

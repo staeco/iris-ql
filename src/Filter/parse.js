@@ -4,6 +4,7 @@ import hydrateFields from '../util/hydrateFields'
 import { ValidationError } from '../errors'
 import isObject from 'is-plain-obj'
 import isQueryValue from '../util/isQueryValue'
+import getModelFieldLimit from '../util/getModelFieldLimit'
 import QueryValue from '../QueryValue'
 
 const reserved = new Set(Object.keys(operators))
@@ -12,7 +13,7 @@ export default (obj, opt) => {
   const {
     model,
     context = [],
-    fieldLimit = Object.keys(model.rawAttributes)
+    fieldLimit = getModelFieldLimit(model)
   } = opt
   const error = new ValidationError()
   // recursively walk a filter object and replace query values with the real thing
@@ -28,7 +29,7 @@ export default (obj, opt) => {
           if (fullPath.includes('.')) {
             getJSONField(fullPath, opt) // performs the check, don't need the value
           } else {
-            if (fieldLimit && !fieldLimit.includes(fullPath)) {
+            if (!fieldLimit.find((i) => i.value === fullPath)) {
               error.add({
                 path: [ ...context, ...fullPath.split('.') ],
                 value: k,

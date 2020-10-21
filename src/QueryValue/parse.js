@@ -5,6 +5,7 @@ import getTypes from '../types/getTypes'
 import * as funcs from '../types/functions'
 import getJSONField from '../util/getJSONField'
 import { column } from '../util/toString'
+import getModelFieldLimit from '../util/getModelFieldLimit'
 
 const resolveField = (field, opt) => {
   if (!opt?.substitutions) return field
@@ -90,7 +91,7 @@ const getFunction = (v, opt) => {
 const parse = (v, opt) => {
   const {
     model,
-    fieldLimit = Object.keys(opt.model.rawAttributes),
+    fieldLimit = getModelFieldLimit(opt.model),
     hydrateJSON = true,
     context = []
   } = opt
@@ -119,20 +120,22 @@ const parse = (v, opt) => {
       })
     }
     if (resolvedField.includes('.')) return getJSONField(resolvedField, { ...opt, hydrate: hydrateJSON })
-    if (fieldLimit && !fieldLimit.includes(resolvedField)) {
+    if (!fieldLimit.find((i) => i.value === resolvedField)) {
       throw new ValidationError({
         path: [ ...context, 'field' ],
         value: resolvedField,
         message: 'Field does not exist.'
       })
     }
-    // a model field, serialize this differently
-    const baseFieldLimit = Object.keys(opt.model.rawAttributes)
-    if (baseFieldLimit.includes(resolvedField)) {
+    // aggregation fields take precendence, so check for this first
+    if (fieldLimit.find((i) => i.value === resolvedField && i.type === 'aggregation')) {
+      return types.col(resolvedField)
+    }
+    // a model column, serialize this differently
+    if (fieldLimit.find((i) => i.value === resolvedField && i.type === 'column')) {
       return types.literal(column({ ...opt, column: resolvedField }))
     }
-    // a non-model field, but still in fieldLimit - probably an aggregation
-    return types.col(resolvedField)
+    throw new Error(`Unknown field type for: ${resolvedField}`)
   }
   if (v.val) {
     throw new ValidationError({

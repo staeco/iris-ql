@@ -20,7 +20,7 @@ export default ({ value, direction }={}, opt) => {
       message: 'Missing ordering direction.'
     })
   }
-  if (!isDirectionValid) {
+  if (direction != null && !isDirectionValid) {
     error.add({
       path: [ ...context, 'direction' ],
       value: direction,

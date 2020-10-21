@@ -64,4 +64,32 @@ describe('AnalyticsQuery#execute', () => {
       }
     ])
   })
+  it('should handle conflicting variables in aggregations', async () => {
+    const query = new AnalyticsQuery({
+      filters: {
+        sourceId: '911-calls'
+      },
+      aggregations: [
+        {
+          value: { function: 'count' },
+          alias: 'count'
+        },
+        {
+          value: { field: 'data.id' },
+          alias: 'id'
+        }
+      ],
+      orderings: [
+        { value: { field: 'data.receivedAt' }, direction: 'asc' }
+      ],
+      groupings: [
+        { field: 'id' }
+      ]
+    }, { model: datum, subSchemas: { data: dataType.schema } })
+    const res = await query.execute()
+    should(res).eql([
+      { count: 1, id: 'SRC-2' },
+      { count: 1, id: 'SRC-1' }
+    ])
+  })
 })

@@ -1,7 +1,7 @@
 import parse from './parse'
 import exportStream from '../util/export'
 import getTypes from '../types/getTypes'
-import getScopedAttributes from '../util/getScopedAttributes'
+import getModelFieldLimit from '../util/getModelFieldLimit'
 
 export default class Query {
   constructor(obj, options={}) {
@@ -29,10 +29,9 @@ export default class Query {
   value = ({ instanceQuery=true }={}) => instanceQuery ? this._parsed : this._parsedCollection
   toJSON = () => this.input
   getOutputSchema = () => {
-    const attrs = getScopedAttributes(this.options.model)
-    const fieldLimit = this.options.fieldLimit || Object.keys(attrs)
-    return fieldLimit.reduce((acc, k) => {
-      acc[k] = getTypes({ field: k }, this.options)[0]
+    const fieldLimit = this.options.fieldLimit || getModelFieldLimit(this.options.model)
+    return fieldLimit.reduce((acc, f) => {
+      acc[f.value] = getTypes({ field: f.value }, this.options)[0]
       return acc
     }, {})
   }

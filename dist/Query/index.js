@@ -9,7 +9,7 @@ var _export = _interopRequireDefault(require("../util/export"));
 
 var _getTypes = _interopRequireDefault(require("../types/getTypes"));
 
-var _getScopedAttributes = _interopRequireDefault(require("../util/getScopedAttributes"));
+var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -41,11 +41,10 @@ class Query {
     this.toJSON = () => this.input;
 
     this.getOutputSchema = () => {
-      const attrs = (0, _getScopedAttributes.default)(this.options.model);
-      const fieldLimit = this.options.fieldLimit || Object.keys(attrs);
-      return fieldLimit.reduce((acc, k) => {
-        acc[k] = (0, _getTypes.default)({
-          field: k
+      const fieldLimit = this.options.fieldLimit || (0, _getModelFieldLimit.default)(this.options.model);
+      return fieldLimit.reduce((acc, f) => {
+        acc[f.value] = (0, _getTypes.default)({
+          field: f.value
         }, this.options)[0];
         return acc;
       }, {});

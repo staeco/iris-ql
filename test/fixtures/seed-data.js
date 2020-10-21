@@ -4,7 +4,7 @@ const data = [
   {
     sourceId: '911-calls',
     data: {
-      id: 'SRC-123',
+      id: 'SRC-1',
       receivedAt: new Date(1494980629649).toISOString(),
       dispatchedAt: new Date(1494980639649).toISOString(),
       arrivedAt: new Date(1494980649649).toISOString(),
@@ -26,7 +26,7 @@ const data = [
   {
     sourceId: '911-calls',
     data: {
-      id: 'SRC-223',
+      id: 'SRC-2',
       receivedAt: new Date(1494880639649).toISOString(),
       dispatchedAt: new Date(1494880649649).toISOString(),
       arrivedAt: new Date(1494880659649).toISOString(),
@@ -48,7 +48,7 @@ const data = [
   {
     sourceId: 'bike-trips',
     data: {
-      id: 'SRC-123',
+      id: 'SRC-1',
       startedAt: new Date(1494980629649).toISOString(),
       endedAt: new Date(1494980649649).toISOString(),
       issues: [ 'flat tire' ],
@@ -76,7 +76,7 @@ const data = [
   {
     sourceId: 'bike-trips',
     data: {
-      id: 'SRC-223',
+      id: 'SRC-2',
       startedAt: new Date(1494880639649).toISOString(),
       endedAt: new Date(1494880659649).toISOString(),
       type: 'electric',

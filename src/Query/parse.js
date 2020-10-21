@@ -8,6 +8,7 @@ import parseIffyDate from '../util/iffy/date'
 import parseIffyNumber from '../util/iffy/number'
 import parseIffyStringArray from '../util/iffy/stringArray'
 import getScopedAttributes from '../util/getScopedAttributes'
+import getModelFieldLimit from '../util/getModelFieldLimit'
 import Filter from '../Filter'
 import Ordering from '../Ordering'
 
@@ -18,7 +19,7 @@ export default (query, opt={}) => {
   const error = new ValidationError()
   const { model, context=[] } = opt
   const attrs = getScopedAttributes(model)
-  const initialFieldLimit = opt.fieldLimit || Object.keys(attrs)
+  const initialFieldLimit = opt.fieldLimit || getModelFieldLimit(model)
 
   // options we pass on, default in fieldLimit
   const out = {
@@ -52,7 +53,7 @@ export default (query, opt={}) => {
 
   // searching
   if (query.search) {
-    const searchable = initialFieldLimit.filter((k) => attrs[k].searchable)
+    const searchable = initialFieldLimit.filter((f) => attrs[f.value].searchable)
     const isSearchable = searchable.length !== 0
     const isValid = typeof query.search === 'string'
     if (!isValid) {
@@ -72,7 +73,7 @@ export default (query, opt={}) => {
     if (isValid && isSearchable) {
       const trimmed = query.search.trim()
       out.where.push({
-        $or: searchable.map((f) => ({ [f]: { $iLike: `%${trimmed}%` } }))
+        $or: searchable.map((f) => ({ [f.value]: { $iLike: `%${trimmed}%` } }))
       })
     }
   }
@@ -200,7 +201,7 @@ export default (query, opt={}) => {
   if (query.exclusions) {
     const parsed = parseIffyStringArray(query.exclusions).map((k, idx) => {
       const [ first ] = k.split('.')
-      if (!first || !attrs[first] || !initialFieldLimit.includes(first)) {
+      if (!first || !initialFieldLimit.find((f) => f.value === first)) {
         error.add({
           path: [ ...context, 'exclusions', idx ],
           value: k,

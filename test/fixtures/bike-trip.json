@@ -1,5 +1,13 @@
 {
   "schema": {
+    "id": {
+      "name": "ID",
+      "type": "text",
+      "validation": {
+        "required": true,
+        "notEmpty": true
+      }
+    },
     "startedAt": {
       "name": "Received",
       "type": "date",

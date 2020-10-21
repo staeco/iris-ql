@@ -17,6 +17,8 @@ var _getJSONField = _interopRequireDefault(require("../util/getJSONField"));
 
 var _toString = require("../util/toString");
 
+var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
+
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -139,7 +141,7 @@ const getFunction = (v, opt) => {
 const parse = (v, opt) => {
   const {
     model,
-    fieldLimit = Object.keys(opt.model.rawAttributes),
+    fieldLimit = (0, _getModelFieldLimit.default)(opt.model),
     hydrateJSON = true,
     context = []
   } = opt;
@@ -180,25 +182,27 @@ const parse = (v, opt) => {
       hydrate: hydrateJSON
     }));
 
-    if (fieldLimit && !fieldLimit.includes(resolvedField)) {
+    if (!fieldLimit.find(i => i.value === resolvedField)) {
       throw new _errors.ValidationError({
         path: [...context, 'field'],
         value: resolvedField,
         message: 'Field does not exist.'
       });
-    } // a model field, serialize this differently
+    } // aggregation fields take precendence, so check for this first
 
 
-    const baseFieldLimit = Object.keys(opt.model.rawAttributes);
+    if (fieldLimit.find(i => i.value === resolvedField && i.type === 'aggregation')) {
+      return _sequelize.default.col(resolvedField);
+    } // a model column, serialize this differently
 
-    if (baseFieldLimit.includes(resolvedField)) {
+
+    if (fieldLimit.find(i => i.value === resolvedField && i.type === 'column')) {
       return _sequelize.default.literal((0, _toString.column)(_objectSpread(_objectSpread({}, opt), {}, {
         column: resolvedField
       })));
-    } // a non-model field, but still in fieldLimit - probably an aggregation
+    }
 
-
-    return _sequelize.default.col(resolvedField);
+    throw new Error(`Unknown field type for: ${resolvedField}`);
   }
 
   if (v.val) {

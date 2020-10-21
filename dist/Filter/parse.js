@@ -15,6 +15,8 @@ var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 var _isQueryValue = _interopRequireDefault(require("../util/isQueryValue"));
 
+var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
+
 var _QueryValue = _interopRequireDefault(require("../QueryValue"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -31,7 +33,7 @@ var _default = (obj, opt) => {
   const {
     model,
     context = [],
-    fieldLimit = Object.keys(model.rawAttributes)
+    fieldLimit = (0, _getModelFieldLimit.default)(model)
   } = opt;
   const error = new _errors.ValidationError(); // recursively walk a filter object and replace query values with the real thing
 
@@ -42,8 +44,12 @@ var _default = (obj, opt) => {
 
     if (Array.isArray(v)) return v.map(i => transformValues(i, parent));
 
-    function _ref(p, k) {
+    function _ref2(p, k) {
       let fullPath; // verify
+
+      function _ref(i) {
+        return i.value === fullPath;
+      }
 
       if (!reserved.has(k)) {
         fullPath = `${parent}${parent ? '.' : ''}${k}`;
@@ -51,7 +57,7 @@ var _default = (obj, opt) => {
         if (fullPath.includes('.')) {
           (0, _getJSONField.default)(fullPath, opt); // performs the check, don't need the value
         } else {
-          if (fieldLimit && !fieldLimit.includes(fullPath)) {
+          if (!fieldLimit.find(_ref)) {
             error.add({
               path: [...context, ...fullPath.split('.')],
               value: k,
@@ -67,7 +73,7 @@ var _default = (obj, opt) => {
     }
 
     if ((0, _isPlainObj.default)(v)) {
-      return Object.keys(v).reduce(_ref, {});
+      return Object.keys(v).reduce(_ref2, {});
     }
 
     return v;

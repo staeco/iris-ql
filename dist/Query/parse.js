@@ -23,6 +23,8 @@ var _stringArray = _interopRequireDefault(require("../util/iffy/stringArray"));
 
 var _getScopedAttributes = _interopRequireDefault(require("../util/getScopedAttributes"));
 
+var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
+
 var _Filter = _interopRequireDefault(require("../Filter"));
 
 var _Ordering = _interopRequireDefault(require("../Ordering"));
@@ -46,7 +48,7 @@ var _default = (query, opt = {}) => {
     context = []
   } = opt;
   const attrs = (0, _getScopedAttributes.default)(model);
-  const initialFieldLimit = opt.fieldLimit || Object.keys(attrs); // options we pass on, default in fieldLimit
+  const initialFieldLimit = opt.fieldLimit || (0, _getModelFieldLimit.default)(model); // options we pass on, default in fieldLimit
 
   const out = {
     where: [{} // very dumb fix for https://github.com/sequelize/sequelize/issues/10142
@@ -77,8 +79,8 @@ var _default = (query, opt = {}) => {
   } // searching
 
 
-  function _ref(k) {
-    return attrs[k].searchable;
+  function _ref(f) {
+    return attrs[f.value].searchable;
   }
 
   if (query.search) {
@@ -106,7 +108,7 @@ var _default = (query, opt = {}) => {
       const trimmed = query.search.trim();
       out.where.push({
         $or: searchable.map(f => ({
-          [f]: {
+          [f.value]: {
             $iLike: `%${trimmed}%`
           }
         }))
@@ -268,7 +270,7 @@ var _default = (query, opt = {}) => {
   function _ref2(k, idx) {
     const [first] = k.split('.');
 
-    if (!first || !attrs[first] || !initialFieldLimit.includes(first)) {
+    if (!first || !initialFieldLimit.find(f => f.value === first)) {
       error.add({
         path: [...context, 'exclusions', idx],
         value: k,

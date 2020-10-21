@@ -42,7 +42,7 @@ var _default = ({
     });
   }
 
-  if (!isDirectionValid) {
+  if (direction != null && !isDirectionValid) {
     error.add({
       path: [...context, 'direction'],
       value: direction,

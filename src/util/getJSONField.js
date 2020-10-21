@@ -2,20 +2,21 @@ import types from 'sequelize'
 import { jsonPath } from './toString'
 import * as schemaTypes from '../types'
 import { ValidationError } from '../errors'
+import getModelFieldLimit from './getModelFieldLimit'
 
 export default (v, opt) => {
   const {
     context = [],
     subSchemas = {},
     model,
-    fieldLimit = Object.keys(model.rawAttributes),
+    fieldLimit = getModelFieldLimit(model),
     instanceQuery,
     hydrate = true
   } = opt
   const path = v.split('.')
   const col = path.shift()
   const colInfo = model.rawAttributes[col]
-  if (fieldLimit && !fieldLimit.includes(col) || !colInfo) {
+  if (!colInfo || !fieldLimit.find((i) => i.value === col)) {
     throw new ValidationError({
       path: context,
       value: v,
