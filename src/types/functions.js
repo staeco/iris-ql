@@ -76,17 +76,17 @@ const getGeometryValue = (raw) => {
 }
 
 const partsToDB = {
-  millisecond: 'milliseconds',
-  second: 'second',
-  minute: 'minute',
+  //millisecond: 'milliseconds',
+  //second: 'second',
+  //minute: 'minute',
   hourOfDay: 'hour',
-  dayOfWeek: 'dow',
+  dayOfWeek: 'isodow',
   dayOfMonth: 'day',
   dayOfYear: 'doy',
   week: 'week',
   month: 'month',
   quarter: 'quarter',
-  year: 'year',
+  year: 'isoyear',
   decade: 'decade'
 }
 const parts = Object.keys(partsToDB).map((k) => ({
@@ -95,7 +95,7 @@ const parts = Object.keys(partsToDB).map((k) => ({
 }))
 
 const truncatesToDB = {
-  millisecond: 'milliseconds',
+  //millisecond: 'milliseconds',
   second: 'second',
   minute: 'minute',
   hour: 'hour',
