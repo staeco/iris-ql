@@ -23,7 +23,12 @@ const getJSONTypes = (fieldPath, { model, subSchemas = {} }) => {
   if (!attrDef) return []
   const desc = schemaTypes[attrDef.type]
   if (!desc) return []
-  return [ pickBy({ type: attrDef.type, measurement: attrDef.measurement, items: attrDef.items }) ]
+  return [ pickBy({
+    type: attrDef.type,
+    measurement: attrDef.measurement,
+    items: attrDef.items,
+    validation: attrDef.validation
+  }) ]
 }
 
 const getFieldTypes = (fieldPath, { model, subSchemas = {} }) => {

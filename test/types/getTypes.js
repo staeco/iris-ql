@@ -29,12 +29,16 @@ describe('types#getTypes', () => {
     } ])
   })
   it('should work on plain fields', () => {
-    should(fn({ field: 'data.startedAt' }, opt)).eql([ { type: 'date' } ])
+    should(fn({ field: 'data.startedAt' }, opt)).eql([ { type: 'date', validation: { required: true } } ])
     should(fn({ field: 'data.cost' }, opt)).eql([ {
       type: 'number',
       measurement: {
         type: 'currency',
         value: 'usd'
+      },
+      validation: {
+        max: 10000,
+        min: 0
       }
     } ])
   })

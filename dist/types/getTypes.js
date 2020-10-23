@@ -51,7 +51,8 @@ const getJSONTypes = (fieldPath, {
   return [(0, _lodash.pickBy)({
     type: attrDef.type,
     measurement: attrDef.measurement,
-    items: attrDef.items
+    items: attrDef.items,
+    validation: attrDef.validation
   })];
 };
 

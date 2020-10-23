@@ -22,7 +22,8 @@ export default (agg, opt={}) => {
     name: agg.name || fieldSchema?.name || fmt(agg.alias),
     notes: agg.notes || fieldSchema?.notes,
     type: primaryType.type,
+    items: primaryType.items,
     measurement: primaryType.measurement,
-    validation: primaryType.validation || fieldSchema?.validation
+    validation: primaryType.validation
   })
 }
