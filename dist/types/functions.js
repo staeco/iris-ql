@@ -114,7 +114,7 @@ const partsToDB = {
   week: 'week',
   month: 'month',
   quarter: 'quarter',
-  year: 'isoyear',
+  year: 'year',
   decade: 'decade'
 };
 const parts = Object.keys(partsToDB).map(k => ({
