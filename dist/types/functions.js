@@ -143,7 +143,7 @@ function _ref2(i) {
 }
 
 const expand = {
-  name: 'Expand',
+  name: 'Expand List',
   notes: 'Expands a list to a set of rows',
   signature: [{
     name: 'List',
@@ -576,7 +576,7 @@ const interval = {
 };
 exports.interval = interval;
 const bucket = {
-  name: 'Bucket',
+  name: 'Bucket Date',
   notes: 'Returns a date truncated to a unit of time',
   signature: [{
     name: 'Unit',
@@ -608,7 +608,7 @@ const bucket = {
 };
 exports.bucket = bucket;
 const extract = {
-  name: 'Extract',
+  name: 'Part of Date',
   notes: 'Converts a date to a unit of time',
   signature: [{
     name: 'Unit',

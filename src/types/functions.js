@@ -113,7 +113,7 @@ const truncates = Object.keys(truncatesToDB).map((k) => ({
 
 // Arrays
 export const expand = {
-  name: 'Expand',
+  name: 'Expand List',
   notes: 'Expands a list to a set of rows',
   signature: [
     {
@@ -527,7 +527,7 @@ export const interval = {
     types.fn('subtract', types.fn('time_to_ms', end.value), types.fn('time_to_ms', start.value))
 }
 export const bucket = {
-  name: 'Bucket',
+  name: 'Bucket Date',
   notes: 'Returns a date truncated to a unit of time',
   signature: [
     {
@@ -559,7 +559,7 @@ export const bucket = {
   }
 }
 export const extract = {
-  name: 'Extract',
+  name: 'Part of Date',
   notes: 'Converts a date to a unit of time',
   signature: [
     {
