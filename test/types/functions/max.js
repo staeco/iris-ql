@@ -118,7 +118,7 @@ describe('types#functions#max', () => {
     const expectedResponse = {
       maxStart: {
         name: 'Max Start',
-        type: 'number'
+        type: 'date'
       },
       type: {
         name: 'Type',

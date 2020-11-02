@@ -35,12 +35,12 @@ const isPercentage = i => {
 const inheritNumeric = ({
   retainPercentage
 }, [infoA, infoB]) => {
-  const filter = i => i.type === 'number' && (retainPercentage || !isPercentage(i));
+  const filter = i => (i.type === 'number' || i.type === 'date') && (retainPercentage || !isPercentage(i));
 
   const primaryTypeA = infoA === null || infoA === void 0 ? void 0 : infoA.types.find(filter);
   const primaryTypeB = infoB === null || infoB === void 0 ? void 0 : infoB.types.find(filter);
   return {
-    type: 'number',
+    type: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.type) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.type),
     measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
   };
 };

@@ -17,7 +17,14 @@ describe('types#getTypes', () => {
     should(fn({ function: 'add', arguments: [ 1, 1 ] })).eql([ { type: 'number' } ])
   })
   it('should work on functions that bubble up types', () => {
-    should(fn({ function: 'max', arguments: [ { field: 'data.startedAt' } ] }, opt)).eql([ { type: 'number' } ])
+    should(fn({ function: 'max', arguments: [ { field: 'data.startedAt' } ] }, opt)).eql([ { type: 'date' } ])
+    should(fn({ function: 'max', arguments: [ { field: 'data.cost' } ] }, opt)).eql([ {
+      type: 'number',
+      measurement: {
+        type: 'currency',
+        value: 'usd'
+      }
+    } ])
   })
   it('should work on functions that bubble up measurements', () => {
     should(fn({ function: 'add', arguments: [ { field: 'data.cost' }, 1 ] }, opt)).eql([ {

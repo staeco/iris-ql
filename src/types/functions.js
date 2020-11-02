@@ -14,11 +14,11 @@ import ms from 'pretty-ms'
 // 100,000 / 77% should return 130,000 as a flat integer
 const isPercentage = (i) => i.measurement?.type === 'percentage'
 const inheritNumeric = ({ retainPercentage }, [ infoA, infoB ]) => {
-  const filter = (i) => i.type === 'number' && (retainPercentage || !isPercentage(i))
+  const filter = (i) => (i.type === 'number' || i.type === 'date') && (retainPercentage || !isPercentage(i))
   const primaryTypeA = infoA?.types.find(filter)
   const primaryTypeB = infoB?.types.find(filter)
   return {
-    type: 'number',
+    type: primaryTypeA?.type || primaryTypeB?.type,
     measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
   }
 }
