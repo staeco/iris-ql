@@ -4,7 +4,7 @@ import decamelize from 'decamelize'
 import moment from 'moment-timezone'
 import { BadRequestError } from '../errors'
 import { multiline, line, point, polygon, multipolygon } from './'
-import { force as forceTZ, shift as shiftTZ } from '../util/tz'
+import { force as forceTZ } from '../util/tz'
 import isObject from 'is-plain-obj'
 import ms from 'pretty-ms'
 
@@ -552,11 +552,10 @@ export const bucket = {
       }
     })
   },
-  execute: ([ p, f ], opt) => {
-    const useTZ = !!opt?.timezone
-    if (useTZ) return shiftTZ(types.fn('date_trunc', truncatesToDB[p.raw], f.value), opt)
-    return types.fn('date_trunc', truncatesToDB[p.raw], f.value)
-  }
+  execute: ([ p, f ], opt) =>
+    opt?.timezone
+      ? types.fn('date_trunc', truncatesToDB[p.raw], f.value, opt.timezone)
+      : types.fn('date_trunc', truncatesToDB[p.raw], f.value)
 }
 export const extract = {
   name: 'Part of Date',

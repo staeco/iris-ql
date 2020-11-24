@@ -83,7 +83,7 @@ const results = await crimeTimeSeries.execute()
 
 ## DB Support
 
-Currently only works with Postgres. In the future, the database layer will be broken out into adapters and multiple stores will be supported.
+Currently only works with Postgres 11+. Some features and specific functions may require newer versions. In the future, the database layer will be broken out into adapters and multiple stores will be supported.
 
 [downloads-image]: http://img.shields.io/npm/dm/iris-ql.svg
 [npm-url]: https://npmjs.org/package/iris-ql
