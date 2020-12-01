@@ -14,8 +14,8 @@ const aggregateFunctions = Object.entries(functions).reduce((acc, [ k, v ]) => {
 const zones = new Set(moment.tz.names())
 
 // this is an extension of parseQuery that allows for aggregations and groupings
-export default (query={}, opt) => {
-  const { model, context=[] } = opt
+export default (query = {}, opt) => {
+  const { model, context = [] } = opt
   const error = new ValidationError()
   let attrs = []
   const initialFieldLimit = opt.fieldLimit || getModelFieldLimit(model)

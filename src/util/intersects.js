@@ -1,7 +1,7 @@
 import getGeoFields from './getGeoFields'
 import { fn, or, cast, col, literal } from 'sequelize'
 
-export default (geo, { model, column=model.name }) => {
+export default (geo, { model, column = model.name }) => {
   const geoFields = getGeoFields(model)
   if (!geo || !geoFields) return literal(false)
   const wheres = geoFields.map((f) =>

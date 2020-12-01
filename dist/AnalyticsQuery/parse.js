@@ -46,7 +46,7 @@ function _ref2(i) {
 }
 
 function _ref4(k, v) {
-  return typeof (v === null || v === void 0 ? void 0 : v.function) === 'string' && aggregateFunctions.includes(v.function);
+  return typeof v?.function === 'string' && aggregateFunctions.includes(v.function);
 }
 
 var _default = (query = {}, opt) => {
@@ -155,7 +155,7 @@ var _default = (query = {}, opt) => {
     const hasAggregateFunction = (0, _search.default)(agg.value, _ref4);
     if (hasAggregateFunction) return; // valid
 
-    const matchedGrouping = (0, _search.default)(query.groupings, (k, v) => typeof (v === null || v === void 0 ? void 0 : v.field) === 'string' && v.field === agg.alias);
+    const matchedGrouping = (0, _search.default)(query.groupings, (k, v) => typeof v?.field === 'string' && v.field === agg.alias);
     if (matchedGrouping) return; // valid
 
     error.add({

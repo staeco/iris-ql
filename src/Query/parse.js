@@ -15,9 +15,9 @@ import Ordering from '../Ordering'
 const srid = (v) => fn('ST_SetSRID', v, 4326)
 const zones = new Set(moment.tz.names())
 
-export default (query, opt={}) => {
+export default (query, opt = {}) => {
   const error = new ValidationError()
-  const { model, context=[] } = opt
+  const { model, context = [] } = opt
   const attrs = getScopedAttributes(model)
   const initialFieldLimit = opt.fieldLimit || getModelFieldLimit(model)
 

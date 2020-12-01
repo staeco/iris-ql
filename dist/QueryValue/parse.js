@@ -32,9 +32,9 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 const resolveField = (field, opt) => {
-  if (!(opt === null || opt === void 0 ? void 0 : opt.substitutions)) return field;
+  if (!opt?.substitutions) return field;
   const subs = typeof opt.substitutions === 'function' ? opt.substitutions(opt) : opt.substitutions;
-  return (subs === null || subs === void 0 ? void 0 : subs[field]) || field;
+  return subs?.[field] || field;
 };
 
 function _ref(i) {
@@ -46,8 +46,6 @@ function _ref2(t) {
 }
 
 const validateArgumentTypes = (func, sig, arg, opt) => {
-  var _sig$options;
-
   if (sig.types === 'any') return true; // allows anything
 
   if (!sig.required && arg == null) return true; // not present, so has a default
@@ -60,7 +58,7 @@ const validateArgumentTypes = (func, sig, arg, opt) => {
     });
   }
 
-  const enumm = (_sig$options = sig.options) === null || _sig$options === void 0 ? void 0 : _sig$options.map(_ref);
+  const enumm = sig.options?.map(_ref);
 
   if (enumm && !enumm.includes(arg)) {
     throw new _errors.ValidationError({
@@ -168,8 +166,6 @@ const parse = (v, opt) => {
   }
 
   if (v.field) {
-    var _resolvedAggregation$;
-
     const resolvedField = resolveField(v.field, opt);
 
     if (typeof v.field !== 'string') {
@@ -197,7 +193,7 @@ const parse = (v, opt) => {
     // it needs to be renamed to something else, or grouping/ordering has no idea if you are referencing the column
     // or the aggregation
 
-    if (resolvedAggregation && resolvedColumn && ((_resolvedAggregation$ = resolvedAggregation.value) === null || _resolvedAggregation$ === void 0 ? void 0 : _resolvedAggregation$.field) !== resolvedColumn.field) {
+    if (resolvedAggregation && resolvedColumn && resolvedAggregation.value?.field !== resolvedColumn.field) {
       throw new _errors.ValidationError({
         path: [...context, 'field'],
         value: resolvedField,

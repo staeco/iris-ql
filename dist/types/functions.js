@@ -26,22 +26,18 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // some operations we don't want to display a percentage after, for example:
 // 33% * 100,000 should return 33,000 as a flat integer
 // 100,000 / 77% should return 130,000 as a flat integer
-const isPercentage = i => {
-  var _i$measurement;
-
-  return ((_i$measurement = i.measurement) === null || _i$measurement === void 0 ? void 0 : _i$measurement.type) === 'percentage';
-};
+const isPercentage = i => i.measurement?.type === 'percentage';
 
 const inheritNumeric = ({
   retainPercentage
 }, [infoA, infoB]) => {
   const filter = i => (i.type === 'number' || i.type === 'date') && (retainPercentage || !isPercentage(i));
 
-  const primaryTypeA = infoA === null || infoA === void 0 ? void 0 : infoA.types.find(filter);
-  const primaryTypeB = infoB === null || infoB === void 0 ? void 0 : infoB.types.find(filter);
+  const primaryTypeA = infoA?.types.find(filter);
+  const primaryTypeB = infoB?.types.find(filter);
   return {
-    type: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.type) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.type),
-    measurement: (primaryTypeA === null || primaryTypeA === void 0 ? void 0 : primaryTypeA.measurement) || (primaryTypeB === null || primaryTypeB === void 0 ? void 0 : primaryTypeB.measurement)
+    type: primaryTypeA?.type || primaryTypeB?.type,
+    measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
   };
 };
 
@@ -600,7 +596,7 @@ const bucket = {
       }
     })
   },
-  execute: ([p, f], opt) => (opt === null || opt === void 0 ? void 0 : opt.timezone) ? _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value, opt.timezone) : _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value)
+  execute: ([p, f], opt) => opt?.timezone ? _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value, opt.timezone) : _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value)
 };
 exports.bucket = bucket;
 const extract = {

@@ -4,7 +4,7 @@ import getTypes from '../types/getTypes'
 import getModelFieldLimit from '../util/getModelFieldLimit'
 
 export default class Query {
-  constructor(obj, options={}) {
+  constructor(obj, options = {}) {
     if (!obj) throw new Error('Missing query!')
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
     this.input = obj
@@ -26,7 +26,7 @@ export default class Query {
     this._parsedCollection = newCollectionValue
     return this
   }
-  value = ({ instanceQuery=true }={}) => instanceQuery ? this._parsed : this._parsedCollection
+  value = ({ instanceQuery = true } = {}) => instanceQuery ? this._parsed : this._parsedCollection
   toJSON = () => this.input
   getOutputSchema = () => {
     let fieldLimit = this.options.fieldLimit || getModelFieldLimit(this.options.model)
@@ -39,7 +39,7 @@ export default class Query {
     }, {})
   }
 
-  execute = async ({ raw=false }={}) => {
+  execute = async ({ raw = false } = {}) => {
     const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll'
     return this.options.model[fn]({
       raw,
@@ -47,7 +47,7 @@ export default class Query {
       ...this.value()
     })
   }
-  executeStream = async ({ onError, format, tupleFraction, transform }={}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform } = {}) =>
     exportStream({
       tupleFraction,
       format,

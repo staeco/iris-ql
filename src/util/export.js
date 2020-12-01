@@ -53,7 +53,7 @@ const streamable = async ({ model, sql, transform, tupleFraction, onError }) => 
 }
 
 
-export default async ({ model, value, format, transform, tupleFraction, debug, onError, analytics=false }) => {
+export default async ({ model, value, format, transform, tupleFraction, debug, onError, analytics = false }) => {
   const nv = { ...value }
 
   // prep work findAll usually does

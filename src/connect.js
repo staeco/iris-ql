@@ -21,7 +21,7 @@ const defaultOptions = {
   native: false,
   operatorsAliases: operators
 }
-export default (url, opt={}) => {
+export default (url, opt = {}) => {
   // fix issues with pg types
   pg.types.setTypeParser(20, 'text', pg.types.getTypeParser(23, 'text')) // bigint = int
   pg.types.setTypeParser(1016, 'text', pg.types.getTypeParser(1007, 'text')) // bigint[] = int[]

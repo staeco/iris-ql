@@ -9,7 +9,7 @@ const serializeIssues = (fields) =>
   fields.map((f) => `\n - ${inspect(f, inspectOptions)}`)
 
 export class BadRequestError extends Error {
-  constructor(message='Bad Request', status=400) {
+  constructor(message = 'Bad Request', status = 400) {
     super(message)
     this.message = message
     this.status = status
@@ -20,7 +20,7 @@ export class BadRequestError extends Error {
 }
 
 export class ValidationError extends BadRequestError {
-  constructor(fields=[]) {
+  constructor(fields = []) {
     super('Validation Error')
     this.fields = Array.isArray(fields) ? fields : [ fields ]
     this.message = this.toString()

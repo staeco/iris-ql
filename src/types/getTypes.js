@@ -43,7 +43,7 @@ const getFieldTypes = (fieldPath, { model, subSchemas = {} }) => {
 }
 
 // return empty on any invalid condition, `parse` will handle main validation before this function is called
-const getTypes = (v, opt={}) => {
+const getTypes = (v, opt = {}) => {
   if (!isQueryValue(v)) return getValueTypes(v)
   if (v.function) {
     const fn = functions[v.function]

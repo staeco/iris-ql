@@ -17,7 +17,7 @@ export default (obj, opt) => {
   } = opt
   const error = new ValidationError()
   // recursively walk a filter object and replace query values with the real thing
-  const transformValues = (v, parent='') => {
+  const transformValues = (v, parent = '') => {
     if (isQueryValue(v)) return new QueryValue(v, { ...opt, hydrateJSON: false }).value() // keep it raw, we hydrate it all later
     if (Array.isArray(v)) return v.map((i) => transformValues(i, parent))
     if (isObject(v)) {

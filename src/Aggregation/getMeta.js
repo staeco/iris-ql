@@ -5,7 +5,7 @@ import getTypes from '../types/getTypes'
 
 const fmt = (v) => capitalize.words(decamelize(v, ' '))
 
-export default (agg, opt={}) => {
+export default (agg, opt = {}) => {
   const types = getTypes(agg.value, opt)
   if (types.length === 0) return // no types? weird
   const primaryType = types[0]

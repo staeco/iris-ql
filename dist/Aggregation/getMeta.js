@@ -16,8 +16,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const fmt = v => _capitalize.default.words((0, _decamelize.default)(v, ' '));
 
 var _default = (agg, opt = {}) => {
-  var _fieldSchema, _fieldSchema2;
-
   const types = (0, _getTypes.default)(agg.value, opt);
   if (types.length === 0) return; // no types? weird
 
@@ -34,8 +32,8 @@ var _default = (agg, opt = {}) => {
   }
 
   return (0, _lodash.pickBy)({
-    name: agg.name || ((_fieldSchema = fieldSchema) === null || _fieldSchema === void 0 ? void 0 : _fieldSchema.name) || fmt(agg.alias),
-    notes: agg.notes || ((_fieldSchema2 = fieldSchema) === null || _fieldSchema2 === void 0 ? void 0 : _fieldSchema2.notes),
+    name: agg.name || fieldSchema?.name || fmt(agg.alias),
+    notes: agg.notes || fieldSchema?.notes,
     type: primaryType.type,
     items: primaryType.items,
     measurement: primaryType.measurement,

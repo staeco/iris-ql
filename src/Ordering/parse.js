@@ -1,10 +1,10 @@
 import QueryValue from '../QueryValue'
 import { ValidationError } from '../errors'
 
-export default ({ value, direction }={}, opt) => {
+export default ({ value, direction } = {}, opt) => {
   const error = new ValidationError()
   let out
-  const { context=[] } = opt
+  const { context = [] } = opt
   const isDirectionValid = direction === 'asc' || direction === 'desc'
   if (!value) {
     error.add({

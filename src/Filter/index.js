@@ -1,7 +1,7 @@
 import parse from './parse'
 
 export default class Filter {
-  constructor(obj, options={}) {
+  constructor(obj, options = {}) {
     if (!obj) throw new Error('Missing value!')
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
     this.input = obj
