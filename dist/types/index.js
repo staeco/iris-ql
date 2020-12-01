@@ -56,7 +56,7 @@ const boolean = {
 exports.boolean = boolean;
 const date = {
   name: 'Date/Time',
-  check: v => (0, _momentTimezone.default)(v, _momentTimezone.default.ISO_8601).isValid(),
+  check: v => typeof v === 'string' && (0, _momentTimezone.default)(v, _momentTimezone.default.ISO_8601).isValid(),
   hydrate: txt => _sequelize.default.fn('parse_iso', txt)
 }; // geo (EPSG:4979 / WGS84)
 

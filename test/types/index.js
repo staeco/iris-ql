@@ -48,6 +48,8 @@ describe('types', () => {
     should(types.number.check(NaN)).equal(false)
     should(types.number.check(0)).equal(true)
     should(types.number.check(12)).equal(true)
+    should(types.number.check(1000)).equal(true)
+    should(types.number.check(10000000000)).equal(true)
   })
 
   it('should check for boolean', () => {
@@ -78,6 +80,9 @@ describe('types', () => {
 
   it('should have a date check', () => {
     should(types.date.check({})).equal(false)
+    should(types.date.check(0)).equal(false)
+    should(types.date.check(1000)).equal(false)
+    should(types.date.check('2019-07-29T15:57:02.156Z')).equal(true)
   })
 
   it('should hydrate array', () => {

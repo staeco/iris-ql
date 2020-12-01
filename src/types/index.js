@@ -44,7 +44,7 @@ export const boolean = {
 
 export const date = {
   name: 'Date/Time',
-  check: (v) => moment(v, moment.ISO_8601).isValid(),
+  check: (v) => typeof v === 'string' && moment(v, moment.ISO_8601).isValid(),
   hydrate: (txt) => types.fn('parse_iso', txt)
 }
 

@@ -7,8 +7,8 @@ describe('types#getTypes', () => {
   const opt = { model: db.models.datum, subSchemas: { data: dataType.schema } }
   it('should work on plain values', () => {
     should(fn(1)).eql([ { type: 'number' } ])
+    should(fn(1000)).eql([ { type: 'number' } ])
     should(fn('test')).eql([ { type: 'text' } ])
-    should(fn(new Date())).eql([ { type: 'date' } ])
     should(fn(new Date().toISOString())).eql([ { type: 'text' }, { type: 'date' } ])
     should(fn({ type: 'Point', coordinates: [ 1, 1 ] })).eql([ { type: 'object' }, { type: 'point' } ])
   })
