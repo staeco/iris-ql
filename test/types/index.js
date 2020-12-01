@@ -82,6 +82,7 @@ describe('types', () => {
     should(types.date.check({})).equal(false)
     should(types.date.check(0)).equal(false)
     should(types.date.check(1000)).equal(false)
+    should(types.date.check('1000')).equal(false)
     should(types.date.check('2019-07-29T15:57:02.156Z')).equal(true)
   })
 
