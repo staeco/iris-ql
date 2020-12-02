@@ -3,8 +3,6 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
-
 var _Query = _interopRequireDefault(require("../Query"));
 
 var _QueryValue = _interopRequireDefault(require("../QueryValue"));
@@ -18,6 +16,8 @@ var functions = _interopRequireWildcard(require("../types/functions"));
 var _search = _interopRequireDefault(require("../util/search"));
 
 var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
+
+var _parseTimeOptions = _interopRequireDefault(require("../util/parseTimeOptions"));
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
 
@@ -34,8 +34,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 const aggregateFunctions = Object.entries(functions).reduce((acc, [k, v]) => {
   if (v.aggregate) acc.push(k);
   return acc;
-}, []);
-const zones = new Set(_momentTimezone.default.tz.names()); // this is an extension of parseQuery that allows for aggregations and groupings
+}, []); // this is an extension of parseQuery that allows for aggregations and groupings
 
 function _ref2(i) {
   return {
@@ -56,28 +55,12 @@ var _default = (query = {}, opt) => {
   } = opt;
   const error = new _errors.ValidationError();
   let attrs = [];
-  const initialFieldLimit = opt.fieldLimit || (0, _getModelFieldLimit.default)(model); // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
+  const initialFieldLimit = opt.fieldLimit || (0, _getModelFieldLimit.default)(model); // if user specified time settins, tack them onto options from the query so downstream knows about it
 
-  if (query.timezone) {
-    if (typeof query.timezone !== 'string') {
-      error.add({
-        path: [...context, 'timezone'],
-        value: query.timezone,
-        message: 'Must be a string.'
-      });
-    } else {
-      if (!zones.has(query.timezone)) {
-        error.add({
-          path: [...context, 'timezone'],
-          value: query.timezone,
-          message: 'Not a valid timezone.'
-        });
-      } else {
-        opt.timezone = query.timezone;
-      }
-    }
-
-    delete query.timezone;
+  try {
+    opt = _objectSpread(_objectSpread({}, (0, _parseTimeOptions.default)(query)), opt);
+  } catch (err) {
+    error.add(err);
   }
 
   function _ref(a, idx) {

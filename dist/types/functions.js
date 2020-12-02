@@ -11,8 +11,6 @@ var _decamelize = _interopRequireDefault(require("decamelize"));
 
 var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
 
-var _errors = require("../errors");
-
 var _ = require("./");
 
 var _tz = require("../util/tz");
@@ -23,9 +21,10 @@ var _prettyMs = _interopRequireDefault(require("pretty-ms"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// some operations we don't want to display a percentage after, for example:
+const wgs84 = 4326; // some operations we don't want to display a percentage after, for example:
 // 33% * 100,000 should return 33,000 as a flat integer
 // 100,000 / 77% should return 130,000 as a flat integer
+
 const isPercentage = i => i.measurement?.type === 'percentage';
 
 const inheritNumeric = ({
@@ -86,11 +85,11 @@ const getGeometryValue = raw => {
   try {
     o = JSON.parse(raw);
   } catch (err) {
-    throw new _errors.BadRequestError('Not a valid object!');
+    throw new Error('Not a valid object!');
   }
 
-  if (!(0, _isPlainObj.default)(o)) throw new _errors.BadRequestError('Not a valid object!');
-  if (typeof o.type !== 'string') throw new _errors.BadRequestError('Not a valid GeoJSON object!'); // FeatureCollection
+  if (!(0, _isPlainObj.default)(o)) throw new Error('Not a valid object!');
+  if (typeof o.type !== 'string') throw new Error('Not a valid GeoJSON object!'); // FeatureCollection
 
   if (Array.isArray(o.features)) return _sequelize.default.fn('from_geojson_collection', raw); // Feature
 
@@ -109,8 +108,11 @@ const partsToDB = {
   dayOfYear: 'doy',
   week: 'week',
   month: 'month',
+  customMonth: 'custom_month',
   quarter: 'quarter',
+  customQuarter: 'custom_quarter',
   year: 'year',
+  customYear: 'custom_year',
   decade: 'decade'
 };
 const parts = Object.keys(partsToDB).map(k => ({
@@ -540,7 +542,7 @@ const last = {
 
     const milli = _momentTimezone.default.duration(raw).asMilliseconds();
 
-    if (milli === 0) throw new _errors.BadRequestError('Invalid duration');
+    if (milli === 0) throw new Error('Invalid duration!');
     return _sequelize.default.literal(`CURRENT_DATE - INTERVAL ${opt.model.sequelize.escape((0, _prettyMs.default)(milli, {
       verbose: true
     }))}`);
@@ -624,7 +626,18 @@ const extract = {
       }
     })
   },
-  execute: ([p, f], opt) => _sequelize.default.fn('date_part', partsToDB[p.raw], (0, _tz.force)(f.value, opt))
+  execute: ([p, f], opt) => {
+    const part = partsToDB[p.raw];
+    const d = (0, _tz.force)(f.value, opt);
+
+    if (part.startsWith('custom')) {
+      // default custom year start to october, which is relatively standard
+      if (typeof opt?.customYearStart !== 'number') throw new Error('Missing customYearStart!');
+      return _sequelize.default.fn('date_part_with_custom', part, d, opt.customYearStart);
+    }
+
+    return _sequelize.default.fn('date_part', part, d);
+  }
 }; // Geospatial
 
 exports.extract = extract;
@@ -756,6 +769,6 @@ const boundingBox = {
       type: 'polygon'
     }
   },
-  execute: ([xmin, ymin, xmax, ymax]) => _sequelize.default.fn('ST_SetSRID', _sequelize.default.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value), 4326)
+  execute: ([xmin, ymin, xmax, ymax]) => _sequelize.default.fn('ST_SetSRID', _sequelize.default.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value), wgs84)
 };
 exports.boundingBox = boundingBox;

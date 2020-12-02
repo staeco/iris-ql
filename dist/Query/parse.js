@@ -3,8 +3,6 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
-
 var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 var _sequelize = require("sequelize");
@@ -25,6 +23,8 @@ var _getScopedAttributes = _interopRequireDefault(require("../util/getScopedAttr
 
 var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
 
+var _parseTimeOptions = _interopRequireDefault(require("../util/parseTimeOptions"));
+
 var _Filter = _interopRequireDefault(require("../Filter"));
 
 var _Ordering = _interopRequireDefault(require("../Ordering"));
@@ -37,9 +37,9 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-const srid = v => (0, _sequelize.fn)('ST_SetSRID', v, 4326);
+const wgs84 = 4326;
 
-const zones = new Set(_momentTimezone.default.tz.names());
+const srid = v => (0, _sequelize.fn)('ST_SetSRID', v, wgs84);
 
 var _default = (query, opt = {}) => {
   const error = new _errors.ValidationError();
@@ -54,28 +54,12 @@ var _default = (query, opt = {}) => {
     where: [{} // very dumb fix for https://github.com/sequelize/sequelize/issues/10142
     ],
     order: []
-  }; // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
+  }; // if user specified time settins, tack them onto options from the query so downstream knows about it
 
-  if (query.timezone) {
-    if (typeof query.timezone !== 'string') {
-      error.add({
-        path: [...context, 'timezone'],
-        value: query.timezone,
-        message: 'Must be a string.'
-      });
-    } else {
-      if (!zones.has(query.timezone)) {
-        error.add({
-          path: [...context, 'timezone'],
-          value: query.timezone,
-          message: 'Not a valid timezone.'
-        });
-      } else {
-        opt.timezone = query.timezone;
-      }
-    }
-
-    delete query.timezone;
+  try {
+    opt = _objectSpread(_objectSpread({}, (0, _parseTimeOptions.default)(query)), opt);
+  } catch (err) {
+    error.add(err);
   } // searching
 
 
