@@ -1,11 +1,15 @@
 import sql from 'sequelize'
+import isNumber from 'is-number'
 import { types } from 'human-schema'
 
 const wgs84 = 4326
 const geoCast = (txt) =>
   sql.fn('ST_SetSRID', sql.fn('ST_GeomFromGeoJSON', txt), wgs84)
 
-// hydrate is used to hydrate db text values to their properly typed values
+// Extend human-schema types and:
+// - add a hydrate function to go from db text values -> properly typed values
+// - make some types more permissive, since queries are often passed in via querystring
+
 export const array = {
   ...types.array,
   // TODO: recursively map the array against the right types
@@ -23,6 +27,7 @@ export const text = {
 }
 export const number = {
   ...types.number,
+  test: isNumber,
   hydrate: (txt) => sql.cast(txt, 'numeric')
 }
 export const boolean = {

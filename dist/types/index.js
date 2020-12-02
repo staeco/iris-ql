@@ -5,6 +5,8 @@ exports.multipolygon = exports.polygon = exports.multiline = exports.line = expo
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
+var _isNumber = _interopRequireDefault(require("is-number"));
+
 var _humanSchema = require("human-schema");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -17,7 +19,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 const wgs84 = 4326;
 
-const geoCast = txt => _sequelize.default.fn('ST_SetSRID', _sequelize.default.fn('ST_GeomFromGeoJSON', txt), wgs84); // hydrate is used to hydrate db text values to their properly typed values
+const geoCast = txt => _sequelize.default.fn('ST_SetSRID', _sequelize.default.fn('ST_GeomFromGeoJSON', txt), wgs84); // Extend human-schema types and:
+// - add a hydrate function to go from db text values -> properly typed values
+// - make some types more permissive, since queries are often passed in via querystring
 
 
 const array = _objectSpread(_objectSpread({}, _humanSchema.types.array), {}, {
@@ -42,6 +46,7 @@ const text = _objectSpread(_objectSpread({}, _humanSchema.types.text), {}, {
 exports.text = text;
 
 const number = _objectSpread(_objectSpread({}, _humanSchema.types.number), {}, {
+  test: _isNumber.default,
   hydrate: txt => _sequelize.default.cast(txt, 'numeric')
 });
 
