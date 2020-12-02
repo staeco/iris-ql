@@ -1,4 +1,3 @@
-import moment from 'moment-timezone'
 import Query from '../Query'
 import QueryValue from '../QueryValue'
 import Aggregation from '../Aggregation'
@@ -6,12 +5,12 @@ import { ValidationError } from '../errors'
 import * as functions from '../types/functions'
 import search from '../util/search'
 import getModelFieldLimit from '../util/getModelFieldLimit'
+import parseTimeOptions from '../util/parseTimeOptions'
 
 const aggregateFunctions = Object.entries(functions).reduce((acc, [ k, v ]) => {
   if (v.aggregate) acc.push(k)
   return acc
 }, [])
-const zones = new Set(moment.tz.names())
 
 // this is an extension of parseQuery that allows for aggregations and groupings
 export default (query = {}, opt) => {
@@ -20,27 +19,16 @@ export default (query = {}, opt) => {
   let attrs = []
   const initialFieldLimit = opt.fieldLimit || getModelFieldLimit(model)
 
-  // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
-  if (query.timezone) {
-    if (typeof query.timezone !== 'string') {
-      error.add({
-        path: [ ...context, 'timezone' ],
-        value: query.timezone,
-        message: 'Must be a string.'
-      })
-    } else {
-      if (!zones.has(query.timezone)) {
-        error.add({
-          path: [ ...context, 'timezone' ],
-          value: query.timezone,
-          message: 'Not a valid timezone.'
-        })
-      } else {
-        opt.timezone = query.timezone
-      }
+  // if user specified time settins, tack them onto options from the query so downstream knows about it
+  try {
+    opt = {
+      ...parseTimeOptions(query),
+      ...opt
     }
-    delete query.timezone
+  } catch (err) {
+    error.add(err)
   }
+
   if (!Array.isArray(query.aggregations)) {
     error.add({
       path: [ ...context, 'aggregations' ],
