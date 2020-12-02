@@ -6,6 +6,24 @@ import dataType from '../fixtures/911-call'
 
 describe('AnalyticsQuery#execute', () => {
   const { user, datum } = db.models
+  it('should report invalid timezone', async () => {
+    try {
+      new AnalyticsQuery({ limit: 1, timezone: 'abcdefg' }, { model: user })
+    } catch (err) {
+      err.fields.should.eql([ { path: [ 'timezone' ], value: 'abcdefg', message: 'Not a valid timezone.' } ])
+      return
+    }
+    throw new Error('Did not throw!')
+  })
+  it('should report invalid customYearStart', async () => {
+    try {
+      new AnalyticsQuery({ limit: 1, customYearStart: 100 }, { model: user })
+    } catch (err) {
+      err.fields.should.eql([ { path: [ 'customYearStart' ], value: 100, message: 'Not a valid month.' } ])
+      return
+    }
+    throw new Error('Did not throw!')
+  })
   it('should execute', async () => {
     const query = new AnalyticsQuery({
       aggregations: [

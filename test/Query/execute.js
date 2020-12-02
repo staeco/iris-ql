@@ -5,6 +5,24 @@ import dataType from '../fixtures/bike-trip'
 
 describe('Query#execute', () => {
   const { user, datum } = db.models
+  it('should report invalid timezone', async () => {
+    try {
+      new Query({ limit: 1, timezone: 'abcdefg' }, { model: user })
+    } catch (err) {
+      err.fields.should.eql([ { path: [ 'timezone' ], value: 'abcdefg', message: 'Not a valid timezone.' } ])
+      return
+    }
+    throw new Error('Did not throw!')
+  })
+  it('should report invalid customYearStart', async () => {
+    try {
+      new Query({ limit: 1, customYearStart: 100 }, { model: user })
+    } catch (err) {
+      err.fields.should.eql([ { path: [ 'customYearStart' ], value: 100, message: 'Not a valid month.' } ])
+      return
+    }
+    throw new Error('Did not throw!')
+  })
   it('should execute with count off', async () => {
     const query = new Query({ limit: 1 }, { model: user, count: false })
     const res = await query.execute()

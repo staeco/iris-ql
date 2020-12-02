@@ -4,7 +4,7 @@ import { ValidationError } from '../errors'
 
 const zones = new Set(moment.tz.names())
 
-export default (query) => {
+export default (query, { context = [] }) => {
   const error = new ValidationError()
   const out = {}
 

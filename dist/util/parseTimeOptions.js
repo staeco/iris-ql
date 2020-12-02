@@ -12,7 +12,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* eslint-disable no-magic-numbers */
 const zones = new Set(_momentTimezone.default.tz.names());
 
-var _default = query => {
+var _default = (query, {
+  context = []
+}) => {
   const error = new _errors.ValidationError();
   const out = {}; // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
 

@@ -58,7 +58,7 @@ var _default = (query = {}, opt) => {
   const initialFieldLimit = opt.fieldLimit || (0, _getModelFieldLimit.default)(model); // if user specified time settins, tack them onto options from the query so downstream knows about it
 
   try {
-    opt = _objectSpread(_objectSpread({}, (0, _parseTimeOptions.default)(query)), opt);
+    opt = _objectSpread(_objectSpread({}, opt), (0, _parseTimeOptions.default)(query, opt));
   } catch (err) {
     error.add(err);
   }

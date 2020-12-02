@@ -32,8 +32,8 @@ export default (query, opt = {}) => {
   // if user specified time settins, tack them onto options from the query so downstream knows about it
   try {
     opt = {
-      ...parseTimeOptions(query),
-      ...opt
+      ...opt,
+      ...parseTimeOptions(query, opt)
     }
   } catch (err) {
     error.add(err)
