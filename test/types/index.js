@@ -2,16 +2,16 @@ import should from 'should'
 import * as types from '../../src/types'
 
 describe('types', () => {
-  it('should have a check func on each type', () => {
-    should(typeof types.text.check).equal('function')
-    should(typeof types.number.check).equal('function')
-    should(typeof types.boolean.check).equal('function')
-    should(typeof types.date.check).equal('function')
-    should(typeof types.point.check).equal('function')
-    should(typeof types.line.check).equal('function')
-    should(typeof types.multiline.check).equal('function')
-    should(typeof types.polygon.check).equal('function')
-    should(typeof types.multipolygon.check).equal('function')
+  it('should have a test func on each type', () => {
+    should(typeof types.text.test).equal('function')
+    should(typeof types.number.test).equal('function')
+    should(typeof types.boolean.test).equal('function')
+    should(typeof types.date.test).equal('function')
+    should(typeof types.point.test).equal('function')
+    should(typeof types.line.test).equal('function')
+    should(typeof types.multiline.test).equal('function')
+    should(typeof types.polygon.test).equal('function')
+    should(typeof types.multipolygon.test).equal('function')
   })
 
   it('should have a hydrate func each type', () => {
@@ -27,63 +27,63 @@ describe('types', () => {
     should(typeof types.multipolygon.hydrate).equal('function')
   })
 
-  it('should check for object', () => {
-    should(types.object.check('str')).equal(false)
-    should(types.object.check([])).equal(false)
-    should(types.object.check({})).equal(true)
-    should(types.object.check(new Object())).equal(true)
+  it('should test for object', () => {
+    should(types.object.test('str')).equal(false)
+    should(types.object.test([])).equal(false)
+    should(types.object.test({})).equal(true)
+    should(types.object.test(new Object())).equal(true)
   })
 
-  it('should check for text', () => {
-    should(types.text.check([])).equal(false)
-    should(types.text.check({})).equal(false)
-    should(types.text.check(NaN)).equal(false)
-    should(types.text.check('')).equal(true)
-    should(types.text.check('str')).equal(true)
+  it('should test for text', () => {
+    should(types.text.test([])).equal(false)
+    should(types.text.test({})).equal(false)
+    should(types.text.test(NaN)).equal(false)
+    should(types.text.test('')).equal(true)
+    should(types.text.test('str')).equal(true)
   })
 
-  it('should check for number', () => {
-    should(types.number.check([])).equal(false)
-    should(types.number.check({})).equal(false)
-    should(types.number.check(NaN)).equal(false)
-    should(types.number.check(0)).equal(true)
-    should(types.number.check(12)).equal(true)
-    should(types.number.check(1000)).equal(true)
-    should(types.number.check(10000000000)).equal(true)
+  it('should test for number', () => {
+    should(types.number.test([])).equal(false)
+    should(types.number.test({})).equal(false)
+    should(types.number.test(NaN)).equal(false)
+    should(types.number.test(0)).equal(true)
+    should(types.number.test(12)).equal(true)
+    should(types.number.test(1000)).equal(true)
+    should(types.number.test(10000000000)).equal(true)
   })
 
-  it('should check for boolean', () => {
-    should(types.boolean.check('check')).equal(false)
-    should(types.boolean.check([])).equal(false)
-    should(types.boolean.check({})).equal(false)
-    should(types.boolean.check(NaN)).equal(false)
-    should(types.boolean.check(true)).equal(true)
-    should(types.boolean.check(false)).equal(true)
+  it('should test for boolean', () => {
+    should(types.boolean.test('test')).equal(false)
+    should(types.boolean.test([])).equal(false)
+    should(types.boolean.test({})).equal(false)
+    should(types.boolean.test(NaN)).equal(false)
+    should(types.boolean.test(true)).equal(true)
+    should(types.boolean.test(false)).equal(true)
   })
 
-  it('should have a geojson check for geo types', () => {
-    should(types.point.check({})).equal(false)
-    should(types.point.check({ type: 'invalid' })).equal(false)
+  it('should have a geojson test for geo types', () => {
+    should(types.point.test({})).not.equal(true)
+    should(types.point.test({ type: 'invalid' })).not.equal(true)
 
-    should(types.line.check({})).equal(false)
-    should(types.line.check({ type: 'invalid' })).equal(false)
+    should(types.line.test({})).not.equal(true)
+    should(types.line.test({ type: 'invalid' })).not.equal(true)
 
-    should(types.multiline.check({})).equal(false)
-    should(types.multiline.check({ type: 'invalid' })).equal(false)
+    should(types.multiline.test({})).not.equal(true)
+    should(types.multiline.test({ type: 'invalid' })).not.equal(true)
 
-    should(types.polygon.check({})).equal(false)
-    should(types.polygon.check({ type: 'invalid' })).equal(false)
+    should(types.polygon.test({})).not.equal(true)
+    should(types.polygon.test({ type: 'invalid' })).not.equal(true)
 
-    should(types.multipolygon.check({})).equal(false)
-    should(types.multipolygon.check({ type: 'invalid' })).equal(false)
+    should(types.multipolygon.test({})).not.equal(true)
+    should(types.multipolygon.test({ type: 'invalid' })).not.equal(true)
   })
 
-  it('should have a date check', () => {
-    should(types.date.check({})).equal(false)
-    should(types.date.check(0)).equal(false)
-    should(types.date.check(1000)).equal(false)
-    should(types.date.check('1000')).equal(false)
-    should(types.date.check('2019-07-29T15:57:02.156Z')).equal(true)
+  it('should have a date test', () => {
+    should(types.date.test({})).equal(false)
+    should(types.date.test(0)).equal(false)
+    should(types.date.test(1000)).equal(false)
+    should(types.date.test('1000')).equal(false)
+    should(types.date.test('2019-07-29T15:57:02.156Z')).equal(true)
   })
 
   it('should hydrate array', () => {

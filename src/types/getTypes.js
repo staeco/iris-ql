@@ -6,8 +6,8 @@ import toSchemaType from './toSchemaType'
 
 const getValueTypes = (v) =>
   sortBy(Object.entries(schemaTypes).reduce((prev, [ type, desc ]) => {
-    if (!desc || typeof desc.check !== 'function') return prev
-    if (desc.check(v)) prev.push({ type })
+    if (!desc || typeof desc.test !== 'function') return prev
+    if (desc.test(v) === true) prev.push({ type })
     return prev
   }, []))
 

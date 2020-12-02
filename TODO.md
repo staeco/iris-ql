@@ -9,7 +9,7 @@
 - Reduce excess casting for numeric types
   - Need more variadic math function overloads!
 - Function name consistency (min/max but average/median/subtract?)
-- Query.getOutputSchema should respect exclusions, custom attributes added in `.update()`
+- Query.getOutputSchema should include custom attributes added in `.update()`
 
 ## Future
 

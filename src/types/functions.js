@@ -47,11 +47,11 @@ const getGeoReturnType = (raw) => {
   // Feature
   if (o.geometry) return getGeoReturnType(JSON.stringify(o.geometry))
   // Regular types
-  if (point.check(o)) return 'point'
-  if (line.check(o)) return 'line'
-  if (multiline.check(o)) return 'multiline'
-  if (polygon.check(o)) return 'polygon'
-  if (multipolygon.check(o)) return 'multipolygon'
+  if (point.test(o) === true) return 'point'
+  if (line.test(o) === true) return 'line'
+  if (multiline.test(o) === true) return 'multiline'
+  if (polygon.test(o) === true) return 'polygon'
+  if (multipolygon.test(o) === true) return 'multipolygon'
   return 'geometry'
 }
 

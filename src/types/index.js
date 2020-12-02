@@ -1,82 +1,55 @@
-import types from 'sequelize'
-import moment from 'moment-timezone'
-import isNumber from 'is-number'
-import isObject from 'is-plain-obj'
+import sql from 'sequelize'
+import { types } from 'human-schema'
 
-const getBasicGeoJSONIssues = (v, type) => {
-  if (!isObject(v)) return 'Not a valid object'
-  if (v.type !== type) return `Not a valid type value (Expected ${type} not ${v.type})`
-}
+const wgs84 = 4326
+const geoCast = (txt) =>
+  sql.fn('ST_SetSRID', sql.fn('ST_GeomFromGeoJSON', txt), wgs84)
 
-// test is used to validate and type user-inputted values
 // hydrate is used to hydrate db text values to their properly typed values
 export const array = {
-  name: 'List',
-  items: true,
-  check: (v) => Array.isArray(v),
+  ...types.array,
   // TODO: recursively map the array against the right types
   // this treats everything as a text array
   // probably need to pass in type and let the db figure out hydrating
-  hydrate: (txt) => types.fn('fix_jsonb_array', txt)
+  hydrate: (txt) => sql.fn('fix_jsonb_array', txt)
 }
-
 export const object = {
-  name: 'Map',
-  check: isObject,
-  hydrate: (txt) => types.cast(txt, 'jsonb')
+  ...types.object,
+  hydrate: (txt) => sql.cast(txt, 'jsonb')
 }
-
 export const text = {
-  name: 'Text',
-  check: (v) => typeof v === 'string',
+  ...types.text,
   hydrate: (txt) => txt
 }
 export const number = {
-  name: 'Number',
-  check: (v) => isNumber(v),
-  hydrate: (txt) => types.cast(txt, 'numeric')
+  ...types.number,
+  hydrate: (txt) => sql.cast(txt, 'numeric')
 }
 export const boolean = {
-  name: 'True/False',
-  check: (v) => typeof v === 'boolean',
-  hydrate: (txt) => types.cast(txt, 'boolean')
+  ...types.boolean,
+  hydrate: (txt) => sql.cast(txt, 'boolean')
 }
-
 export const date = {
-  name: 'Date/Time',
-  check: (v) => {
-    const parsed = moment(v, moment.ISO_8601)
-    return parsed.isValid() && parsed.toISOString() === v
-  },
-  hydrate: (txt) => types.fn('parse_iso', txt)
+  ...types.date,
+  hydrate: (txt) => sql.fn('parse_iso', txt)
 }
-
-// geo (EPSG:4979 / WGS84)
-const geoCast = (txt) =>
-  types.fn('ST_SetSRID', types.fn('ST_GeomFromGeoJSON', txt), 4326)
-
 export const point = {
-  name: 'GeoJSON Point',
-  check: (v) => !getBasicGeoJSONIssues(v, 'Point'),
+  ...types.point,
   hydrate: geoCast
 }
 export const line = {
-  name: 'GeoJSON LineString',
-  check: (v) => !getBasicGeoJSONIssues(v, 'LineString'),
+  ...types.line,
   hydrate: geoCast
 }
 export const multiline = {
-  name: 'GeoJSON MultiLineString',
-  check: (v) => !getBasicGeoJSONIssues(v, 'MultiLineString'),
+  ...types.multiline,
   hydrate: geoCast
 }
 export const polygon = {
-  name: 'GeoJSON Polygon',
-  check: (v) => !getBasicGeoJSONIssues(v, 'Polygon'),
+  ...types.polygon,
   hydrate: geoCast
 }
 export const multipolygon = {
-  name: 'GeoJSON MultiPolygon',
-  check: (v) => !getBasicGeoJSONIssues(v, 'MultiPolygon'),
+  ...types.multipolygon,
   hydrate: geoCast
 }

@@ -26,8 +26,8 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 const getValueTypes = v => (0, _lodash.sortBy)(Object.entries(schemaTypes).reduce((prev, [type, desc]) => {
-  if (!desc || typeof desc.check !== 'function') return prev;
-  if (desc.check(v)) prev.push({
+  if (!desc || typeof desc.test !== 'function') return prev;
+  if (desc.test(v) === true) prev.push({
     type
   });
   return prev;

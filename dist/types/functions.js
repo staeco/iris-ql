@@ -72,11 +72,11 @@ const getGeoReturnType = raw => {
 
   if (o.geometry) return getGeoReturnType(JSON.stringify(o.geometry)); // Regular types
 
-  if (_.point.check(o)) return 'point';
-  if (_.line.check(o)) return 'line';
-  if (_.multiline.check(o)) return 'multiline';
-  if (_.polygon.check(o)) return 'polygon';
-  if (_.multipolygon.check(o)) return 'multipolygon';
+  if (_.point.test(o) === true) return 'point';
+  if (_.line.test(o) === true) return 'line';
+  if (_.multiline.test(o) === true) return 'multiline';
+  if (_.polygon.test(o) === true) return 'polygon';
+  if (_.multipolygon.test(o) === true) return 'multipolygon';
   return 'geometry';
 };
 

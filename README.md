@@ -5,7 +5,7 @@
 
 # iris-ql [![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][npm-url] [![Build Status][travis-image]][travis-url]
 
-Iris is a safe and user-friendly query system for building flexible APIs with intuitive UIs to match. Check out the docs folder to get started!
+Iris is a safe and user-friendly query system for building flexible APIs with intuitive UIs to match. Built on top of [human-schema](https://github.com/staeco/human-schema) and Sequelize. Check out the docs folder to get started!
 
 ## Install
 

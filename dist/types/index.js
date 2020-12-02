@@ -5,95 +5,86 @@ exports.multipolygon = exports.polygon = exports.multiline = exports.line = expo
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
-var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
-
-var _isNumber = _interopRequireDefault(require("is-number"));
-
-var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
+var _humanSchema = require("human-schema");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const getBasicGeoJSONIssues = (v, type) => {
-  if (!(0, _isPlainObj.default)(v)) return 'Not a valid object';
-  if (v.type !== type) return `Not a valid type value (Expected ${type} not ${v.type})`;
-}; // test is used to validate and type user-inputted values
-// hydrate is used to hydrate db text values to their properly typed values
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+const wgs84 = 4326;
+
+const geoCast = txt => _sequelize.default.fn('ST_SetSRID', _sequelize.default.fn('ST_GeomFromGeoJSON', txt), wgs84); // hydrate is used to hydrate db text values to their properly typed values
 
 
-const array = {
-  name: 'List',
-  items: true,
-  check: v => Array.isArray(v),
+const array = _objectSpread(_objectSpread({}, _humanSchema.types.array), {}, {
   // TODO: recursively map the array against the right types
   // this treats everything as a text array
   // probably need to pass in type and let the db figure out hydrating
   hydrate: txt => _sequelize.default.fn('fix_jsonb_array', txt)
-};
+});
+
 exports.array = array;
-const object = {
-  name: 'Map',
-  check: _isPlainObj.default,
+
+const object = _objectSpread(_objectSpread({}, _humanSchema.types.object), {}, {
   hydrate: txt => _sequelize.default.cast(txt, 'jsonb')
-};
+});
+
 exports.object = object;
-const text = {
-  name: 'Text',
-  check: v => typeof v === 'string',
+
+const text = _objectSpread(_objectSpread({}, _humanSchema.types.text), {}, {
   hydrate: txt => txt
-};
+});
+
 exports.text = text;
-const number = {
-  name: 'Number',
-  check: v => (0, _isNumber.default)(v),
+
+const number = _objectSpread(_objectSpread({}, _humanSchema.types.number), {}, {
   hydrate: txt => _sequelize.default.cast(txt, 'numeric')
-};
+});
+
 exports.number = number;
-const boolean = {
-  name: 'True/False',
-  check: v => typeof v === 'boolean',
+
+const boolean = _objectSpread(_objectSpread({}, _humanSchema.types.boolean), {}, {
   hydrate: txt => _sequelize.default.cast(txt, 'boolean')
-};
+});
+
 exports.boolean = boolean;
-const date = {
-  name: 'Date/Time',
-  check: v => {
-    const parsed = (0, _momentTimezone.default)(v, _momentTimezone.default.ISO_8601);
-    return parsed.isValid() && parsed.toISOString() === v;
-  },
+
+const date = _objectSpread(_objectSpread({}, _humanSchema.types.date), {}, {
   hydrate: txt => _sequelize.default.fn('parse_iso', txt)
-}; // geo (EPSG:4979 / WGS84)
+});
 
 exports.date = date;
 
-const geoCast = txt => _sequelize.default.fn('ST_SetSRID', _sequelize.default.fn('ST_GeomFromGeoJSON', txt), 4326);
+const point = _objectSpread(_objectSpread({}, _humanSchema.types.point), {}, {
+  hydrate: geoCast
+});
 
-const point = {
-  name: 'GeoJSON Point',
-  check: v => !getBasicGeoJSONIssues(v, 'Point'),
-  hydrate: geoCast
-};
 exports.point = point;
-const line = {
-  name: 'GeoJSON LineString',
-  check: v => !getBasicGeoJSONIssues(v, 'LineString'),
+
+const line = _objectSpread(_objectSpread({}, _humanSchema.types.line), {}, {
   hydrate: geoCast
-};
+});
+
 exports.line = line;
-const multiline = {
-  name: 'GeoJSON MultiLineString',
-  check: v => !getBasicGeoJSONIssues(v, 'MultiLineString'),
+
+const multiline = _objectSpread(_objectSpread({}, _humanSchema.types.multiline), {}, {
   hydrate: geoCast
-};
+});
+
 exports.multiline = multiline;
-const polygon = {
-  name: 'GeoJSON Polygon',
-  check: v => !getBasicGeoJSONIssues(v, 'Polygon'),
+
+const polygon = _objectSpread(_objectSpread({}, _humanSchema.types.polygon), {}, {
   hydrate: geoCast
-};
+});
+
 exports.polygon = polygon;
-const multipolygon = {
-  name: 'GeoJSON MultiPolygon',
-  check: v => !getBasicGeoJSONIssues(v, 'MultiPolygon'),
+
+const multipolygon = _objectSpread(_objectSpread({}, _humanSchema.types.multipolygon), {}, {
   hydrate: geoCast
-};
+});
+
 exports.multipolygon = multipolygon;
