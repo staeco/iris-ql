@@ -21,7 +21,6 @@ RETURNS NULL ON NULL INPUT;
 -- custom utils
 CREATE OR REPLACE FUNCTION get_custom_year(v timestamp, custom_year_start integer) RETURNS double precision AS $$
   SELECT CASE
-  	WHEN custom_year_start = 1 THEN date_part('year', v)
   	WHEN date_part('month', v) >= custom_year_start THEN date_part('year', v) + 1
   	ELSE date_part('year', v)
   	END;
@@ -30,7 +29,7 @@ RETURNS NULL ON NULL INPUT;
 
 CREATE OR REPLACE FUNCTION get_custom_year(v timestamptz, custom_year_start integer) RETURNS double precision AS $$
   SELECT CASE
-  	WHEN custom_year_start != 1 AND date_part('month', v) >= custom_year_start THEN date_part('year', v) + 1
+  	WHEN date_part('month', v) >= custom_year_start THEN date_part('year', v) + 1
   	ELSE date_part('year', v)
   	END;
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
@@ -60,16 +59,16 @@ RETURNS NULL ON NULL INPUT;
 -- date_part wrappers
 CREATE OR REPLACE FUNCTION date_part_with_custom(part text, v timestamp, custom_year_start integer) RETURNS double precision AS $$
 BEGIN
-  IF part = 'custom_year'
-  THEN
+  IF custom_year_start = 1 THEN
+    RETURN date_part(replace(part, 'custom_', ''), v);
+  END IF;
+  IF part = 'custom_year' THEN
     RETURN get_custom_year(v, custom_year_start);
   END IF;
-  IF part = 'custom_quarter'
-  THEN
+  IF part = 'custom_quarter' THEN
     RETURN get_custom_quarter(v, custom_year_start);
   END IF;
-  IF part = 'custom_month'
-  THEN
+  IF part = 'custom_month' THEN
     RETURN get_custom_month(v, custom_year_start);
   END IF;
   RETURN date_part(part, v);
@@ -79,6 +78,9 @@ RETURNS NULL ON NULL INPUT;
 
 CREATE OR REPLACE FUNCTION date_part_with_custom(part text, v timestamptz, custom_year_start integer) RETURNS double precision AS $$
 BEGIN
+  IF custom_year_start = 1 THEN
+    RETURN date_part(replace(part, 'custom_', ''), v);
+  END IF;
   IF part = 'custom_year'
   THEN
     RETURN get_custom_year(v, custom_year_start);

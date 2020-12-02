@@ -34,6 +34,38 @@ describe('types#functions#extract', () => {
     const res = await query.execute()
     should(res).eql(expectedResponse)
   })
+  it('should work extacting custom year when set to 1', async () => {
+    const funcVal = {
+      function: 'extract',
+      arguments: [
+        'customYear',
+        { field: 'data.startedAt' }
+      ]
+    }
+    const fullQuery = {
+      customYearStart: 1, // data is all month 5
+      filters: { sourceId: 'bike-trips' },
+      aggregations: [
+        { value: { function: 'count' }, alias: 'total' },
+        { value: { field: 'data.type' }, alias: 'type' },
+        { value: funcVal, alias: 'year' }
+      ],
+      groupings: [
+        { field: 'type' },
+        { field: 'year' }
+      ]
+    }
+    const expectedResponse = [
+      { total: 1, type: 'electric', year: 2017 },
+      { total: 1, type: 'regular', year: 2017 }
+    ]
+    const query = new AnalyticsQuery(fullQuery, {
+      model: datum,
+      subSchemas: { data: dataType.schema }
+    })
+    const res = await query.execute()
+    should(res).eql(expectedResponse)
+  })
   it('should work extacting custom year forwards', async () => {
     const funcVal = {
       function: 'extract',
