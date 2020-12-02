@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 import pg from 'pg'
 import Sequelize from 'sequelize'
 import { plural, singular } from 'pluralize'

@@ -1,4 +1,3 @@
-import moment from 'moment-timezone'
 import isObject from 'is-plain-obj'
 import { fn } from 'sequelize'
 import { lat, lon } from '../util/isValidCoordinate'
@@ -9,11 +8,12 @@ import parseIffyNumber from '../util/iffy/number'
 import parseIffyStringArray from '../util/iffy/stringArray'
 import getScopedAttributes from '../util/getScopedAttributes'
 import getModelFieldLimit from '../util/getModelFieldLimit'
+import parseTimeOptions from '../util/parseTimeOptions'
 import Filter from '../Filter'
 import Ordering from '../Ordering'
 
-const srid = (v) => fn('ST_SetSRID', v, 4326)
-const zones = new Set(moment.tz.names())
+const wgs84 = 4326
+const srid = (v) => fn('ST_SetSRID', v, wgs84)
 
 export default (query, opt = {}) => {
   const error = new ValidationError()
@@ -29,26 +29,14 @@ export default (query, opt = {}) => {
     order: []
   }
 
-  // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
-  if (query.timezone) {
-    if (typeof query.timezone !== 'string') {
-      error.add({
-        path: [ ...context, 'timezone' ],
-        value: query.timezone,
-        message: 'Must be a string.'
-      })
-    } else {
-      if (!zones.has(query.timezone)) {
-        error.add({
-          path: [ ...context, 'timezone' ],
-          value: query.timezone,
-          message: 'Not a valid timezone.'
-        })
-      } else {
-        opt.timezone = query.timezone
-      }
+  // if user specified time settins, tack them onto options from the query so downstream knows about it
+  try {
+    opt = {
+      ...parseTimeOptions(query),
+      ...opt
     }
-    delete query.timezone
+  } catch (err) {
+    error.add(err)
   }
 
   // searching

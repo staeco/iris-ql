@@ -2,12 +2,12 @@ import types from 'sequelize'
 import capitalize from 'capitalize'
 import decamelize from 'decamelize'
 import moment from 'moment-timezone'
-import { BadRequestError } from '../errors'
 import { multiline, line, point, polygon, multipolygon } from './'
 import { force as forceTZ } from '../util/tz'
 import isObject from 'is-plain-obj'
 import ms from 'pretty-ms'
 
+const wgs84 = 4326
 
 // some operations we don't want to display a percentage after, for example:
 // 33% * 100,000 should return 33,000 as a flat integer
@@ -60,10 +60,10 @@ const getGeometryValue = (raw) => {
   try {
     o = JSON.parse(raw)
   } catch (err) {
-    throw new BadRequestError('Not a valid object!')
+    throw new Error('Not a valid object!')
   }
-  if (!isObject(o)) throw new BadRequestError('Not a valid object!')
-  if (typeof o.type !== 'string') throw new BadRequestError('Not a valid GeoJSON object!')
+  if (!isObject(o)) throw new Error('Not a valid object!')
+  if (typeof o.type !== 'string') throw new Error('Not a valid GeoJSON object!')
 
   // FeatureCollection
   if (Array.isArray(o.features)) return types.fn('from_geojson_collection', raw)
@@ -85,8 +85,11 @@ const partsToDB = {
   dayOfYear: 'doy',
   week: 'week',
   month: 'month',
+  customMonth: 'custom_month',
   quarter: 'quarter',
+  customQuarter: 'custom_quarter',
   year: 'year',
+  customYear: 'custom_year',
   decade: 'decade'
 }
 const parts = Object.keys(partsToDB).map((k) => ({
@@ -495,7 +498,7 @@ export const last = {
   execute: ([ a ], opt) => {
     const { raw } = a
     const milli = moment.duration(raw).asMilliseconds()
-    if (milli === 0) throw new BadRequestError('Invalid duration')
+    if (milli === 0) throw new Error('Invalid duration!')
     return types.literal(`CURRENT_DATE - INTERVAL ${opt.model.sequelize.escape(ms(milli, { verbose: true }))}`)
   }
 }
@@ -583,8 +586,16 @@ export const extract = {
       }
     })
   },
-  execute: ([ p, f ], opt) =>
-    types.fn('date_part', partsToDB[p.raw], forceTZ(f.value, opt))
+  execute: ([ p, f ], opt) => {
+    const part = partsToDB[p.raw]
+    const d = forceTZ(f.value, opt)
+    if (part.startsWith('custom')) {
+      // default custom year start to october, which is relatively standard
+      if (typeof opt?.customYearStart !== 'number') throw new Error('Missing customYearStart!')
+      return types.fn('date_part_with_custom', part, d, opt.customYearStart)
+    }
+    return types.fn('date_part', part, d)
+  }
 }
 
 // Geospatial
@@ -727,5 +738,5 @@ export const boundingBox = {
     static: { type: 'polygon' }
   },
   execute: ([ xmin, ymin, xmax, ymax ]) =>
-    types.fn('ST_SetSRID', types.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value), 4326)
+    types.fn('ST_SetSRID', types.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value), wgs84)
 }

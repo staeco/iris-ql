@@ -108,7 +108,15 @@ const parse = (v, opt) => {
   }
   if (v.function) {
     const { fn, args } = getFunction(v, opt)
-    return fn.execute(args, opt)
+    try {
+      return fn.execute(args, opt)
+    } catch (err) {
+      throw new ValidationError({
+        path: context,
+        value: v,
+        message: err.message
+      })
+    }
   }
   if (v.field) {
     const resolvedField = resolveField(v.field, opt)

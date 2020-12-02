@@ -1,6 +1,7 @@
 ## Immediate
 
 - Tests for every function variation
+- Test every custom SQL function
 - Test every code path
 - More SQL injection tests
 - Add missing math functions https://www.postgresql.org/docs/11/functions-math.html

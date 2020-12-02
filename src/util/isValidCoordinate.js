@@ -1,3 +1,5 @@
+/* eslint-disable no-magic-numbers */
+
 export const lat = (lat) => {
   if (typeof lat !== 'number') return `Latitude not a number, got ${typeof lat}`
   if (lat > 90) return 'Latitude greater than 90'
