@@ -206,7 +206,7 @@ describe('types#functions#extract', () => {
     const res = query.getOutputSchema()
     should(res).eql(expectedResponse)
   })
-  it('should fail when missing customYearStart', async () => {
+  it('should default customYearStart', async () => {
     const funcVal = {
       function: 'extract',
       arguments: [
@@ -226,17 +226,6 @@ describe('types#functions#extract', () => {
         { field: 'year' }
       ]
     }
-    try {
-      new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
-    } catch (err) {
-      should.exist(err)
-      should(err.fields).eql([ {
-        path: [ 'aggregations', 2, 'value' ],
-        value: funcVal,
-        message: 'Missing customYearStart!'
-      } ])
-      return
-    }
-    throw new Error('Did not throw!')
+    new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
   })
 })

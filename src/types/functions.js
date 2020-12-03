@@ -590,9 +590,8 @@ export const extract = {
     const part = partsToDB[p.raw]
     const d = forceTZ(f.value, opt)
     if (part.startsWith('custom')) {
-      // default custom year start to october, which is relatively standard
-      if (typeof opt?.customYearStart !== 'number') throw new Error('Missing customYearStart!')
-      return types.fn('date_part_with_custom', part, d, opt.customYearStart)
+      // defaults to january if not specified
+      return types.fn('date_part_with_custom', part, d, typeof opt?.customYearStart === 'number' ? opt?.customYearStart : 1)
     }
     return types.fn('date_part', part, d)
   }
