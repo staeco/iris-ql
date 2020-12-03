@@ -45,7 +45,12 @@ CREATE OR REPLACE FUNCTION get_custom_quarter(v timestamptz, custom_year_start i
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
--- need to invert this for some reason? (12 + (v - 1) + custom_year_start) % 12
+/*
+need to invert this for some reason?
+(v, customYearStart) =>
+  if (v + customYearStart - 1 === 12) return 12
+  return (12 + (v - 1) + custom_year_start) % 12
+*/
 CREATE OR REPLACE FUNCTION get_custom_month(v timestamp, custom_year_start integer) RETURNS double precision AS $$
   SELECT ((12 + date_part('month', v)::integer - custom_year_start) % 12) + 1;
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
