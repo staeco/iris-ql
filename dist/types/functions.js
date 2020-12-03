@@ -631,9 +631,8 @@ const extract = {
     const d = (0, _tz.force)(f.value, opt);
 
     if (part.startsWith('custom')) {
-      // default custom year start to october, which is relatively standard
-      if (typeof opt?.customYearStart !== 'number') throw new Error('Missing customYearStart!');
-      return _sequelize.default.fn('date_part_with_custom', part, d, opt.customYearStart);
+      // defaults to january if not specified
+      return _sequelize.default.fn('date_part_with_custom', part, d, typeof opt?.customYearStart === 'number' ? opt?.customYearStart : 1);
     }
 
     return _sequelize.default.fn('date_part', part, d);
