@@ -19,7 +19,7 @@ $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
 -- custom utils
-CREATE OR REPLACE FUNCTION get_custom_year(v timestamp, custom_year_start integer) RETURNS double precision AS $$
+CREATE OR REPLACE FUNCTION get_custom_year(v timestamp, custom_year_start integer) RETURNS integer AS $$
   SELECT CASE
   	WHEN date_part('month', v) >= custom_year_start THEN date_part('year', v) + 1
   	ELSE date_part('year', v)
@@ -27,7 +27,7 @@ CREATE OR REPLACE FUNCTION get_custom_year(v timestamp, custom_year_start intege
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
-CREATE OR REPLACE FUNCTION get_custom_year(v timestamptz, custom_year_start integer) RETURNS double precision AS $$
+CREATE OR REPLACE FUNCTION get_custom_year(v timestamptz, custom_year_start integer) RETURNS integer AS $$
   SELECT CASE
   	WHEN date_part('month', v) >= custom_year_start THEN date_part('year', v) + 1
   	ELSE date_part('year', v)
@@ -35,29 +35,35 @@ CREATE OR REPLACE FUNCTION get_custom_year(v timestamptz, custom_year_start inte
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
-CREATE OR REPLACE FUNCTION get_custom_quarter(v timestamp, custom_year_start integer) RETURNS double precision AS $$
+CREATE OR REPLACE FUNCTION get_custom_quarter(v timestamp, custom_year_start integer) RETURNS integer AS $$
   SELECT floor(((12 + date_part('month', v)::integer - custom_year_start) % 12) / 3 ) + 1;
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
-CREATE OR REPLACE FUNCTION get_custom_quarter(v timestamptz, custom_year_start integer) RETURNS double precision AS $$
+CREATE OR REPLACE FUNCTION get_custom_quarter(v timestamptz, custom_year_start integer) RETURNS integer AS $$
   SELECT floor(((12 + date_part('month', v)::integer - custom_year_start) % 12) / 3 ) + 1;
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
-CREATE OR REPLACE FUNCTION get_custom_month(v timestamp, custom_year_start integer) RETURNS double precision AS $$
+/*
+need to invert this for some reason?
+(v, customYearStart) =>
+  if (v + customYearStart - 1 === 12) return 12
+  return (12 + (v - 1) + custom_year_start) % 12
+*/
+CREATE OR REPLACE FUNCTION get_custom_month(v timestamp, custom_year_start integer) RETURNS integer AS $$
   SELECT ((12 + date_part('month', v)::integer - custom_year_start) % 12) + 1;
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
-CREATE OR REPLACE FUNCTION get_custom_month(v timestamptz, custom_year_start integer) RETURNS double precision AS $$
+CREATE OR REPLACE FUNCTION get_custom_month(v timestamptz, custom_year_start integer) RETURNS integer AS $$
   SELECT ((12 + date_part('month', v)::integer - custom_year_start) % 12) + 1;
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
 
 -- date_part wrappers
-CREATE OR REPLACE FUNCTION date_part_with_custom(part text, v timestamp, custom_year_start integer) RETURNS double precision AS $$
+CREATE OR REPLACE FUNCTION date_part_with_custom(part text, v timestamp, custom_year_start integer) RETURNS integer AS $$
 BEGIN
   IF custom_year_start = 1 THEN
     RETURN date_part(replace(part, 'custom_', ''), v);
@@ -76,7 +82,7 @@ END;
 $$ LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
-CREATE OR REPLACE FUNCTION date_part_with_custom(part text, v timestamptz, custom_year_start integer) RETURNS double precision AS $$
+CREATE OR REPLACE FUNCTION date_part_with_custom(part text, v timestamptz, custom_year_start integer) RETURNS integer AS $$
 BEGIN
   IF custom_year_start = 1 THEN
     RETURN date_part(replace(part, 'custom_', ''), v);
