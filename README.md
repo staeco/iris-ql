@@ -3,7 +3,7 @@
   <p align='center'>User friendly API query language</p>
 </p>
 
-# iris-ql [![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][npm-url] [![Build Status][travis-image]][travis-url]
+# iris-ql [![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][npm-url] [![Build Status][circle-image]][circle-url]
 
 Iris is a safe and user-friendly query system for building flexible APIs with intuitive UIs to match. Built on top of [human-schema](https://github.com/staeco/human-schema) and Sequelize. Check out the docs folder to get started!
 
@@ -89,5 +89,5 @@ Currently only works with Postgres 11+. Some features and specific functions may
 [npm-url]: https://npmjs.org/package/iris-ql
 [npm-image]: http://img.shields.io/npm/v/iris-ql.svg
 
-[travis-url]: https://travis-ci.org/staeco/iris-ql
-[travis-image]: https://travis-ci.org/staeco/iris-ql.png?branch=master
+[circle-url]: https://circleci.com/gh/staeco/iris-ql
+[circle-image]: https://circleci.com/gh/staeco/iris-ql.svg?style=svg

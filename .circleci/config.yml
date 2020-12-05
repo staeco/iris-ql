@@ -1,0 +1,89 @@
+version: 2.1
+
+# Shared sections
+references:
+  container_config: &container_config
+    working_directory: /home/circleci/iris-ql
+
+  workspace_root: &workspace_root
+    /home/circleci/iris-ql
+
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: *workspace_root
+
+  restore_repo: &restore_repo
+    restore_cache:
+      keys:
+        - repo-{{ .Branch }}-{{ .Revision }}
+        - repo-{{ .Branch }}
+        - repo
+
+  # cache key should be hashing any lockfile used in tests or building
+  yarn_cache_key: &yarn_cache_key
+    yarn-{{ checksum "yarn.lock" }}
+
+  restore_node_modules: &restore_node_modules
+    restore_cache:
+      keys:
+        - *yarn_cache_key
+
+# Define all jobs
+jobs:
+  checkout_code:
+    <<: *container_config
+    docker:
+      - image: node:15
+    steps:
+      - *restore_repo
+      - checkout
+      - save_cache:
+          key: repo-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - .
+
+  install_deps:
+    <<: *container_config
+    docker:
+      - image: node:15
+    steps:
+      - *restore_repo
+      - *restore_node_modules
+      - run:
+          name: Install yarn modules
+          command: "yarn --pure-lockfile --prefer-offline"
+      - save_cache:
+          key: *yarn_cache_key
+          paths:
+            - /home/circleci/iris-ql/node_modules
+
+  test_13:
+    <<: *container_config
+    docker:
+      - image: node:15
+      - image: circleci/postgres:13-postgis
+        environment:
+          - POSTGRES_USER: root
+          - POSTGRES_PASSWORD: ci-pass
+          - POSTGRES_DB: stae_testing
+    working_directory: /home/circleci/iris-ql
+    environment:
+      POSTGRES_URL: "postgres://root@localhost/stae_testing"
+    steps:
+      - *attach_workspace
+      - *restore_repo
+      - *restore_node_modules
+      - run: "yarn test --silent"
+
+# Actual flow, define what should run and when
+workflows:
+  version: 2
+  build_app:
+    jobs:
+      - checkout_code
+      - install_deps:
+          requires:
+            - checkout_code
+      - test_13:
+          requires:
+            - install_deps
