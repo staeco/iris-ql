@@ -72,7 +72,7 @@ jobs:
       - *attach_workspace
       - *restore_repo
       - *restore_node_modules
-      - run: "yarn test --silent"
+      - run: "yarn test:ci --silent"
   test_12:
     <<: *container_config
     docker:
