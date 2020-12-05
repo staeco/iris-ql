@@ -1,10 +1,12 @@
 language: node_js
+sudo: true
 node_js:
   - "10"
   - "11"
   - "12"
   - "13"
   - "14"
+  - "15"
 
 cache:
   yarn: true
@@ -27,6 +29,7 @@ matrix:
             - postgresql-common
             - postgresql-11-postgis-3
             - postgresql-11-postgis-3-scripts
+      dist: focal
       env:
         PGPORT: "5433"
         PGVERSION: 11
@@ -41,11 +44,26 @@ matrix:
             - postgresql-common
             - postgresql-12-postgis-3
             - postgresql-12-postgis-3-scripts
+      dist: focal
       env:
         PGPORT: "5433"
         PGVERSION: 12
+    - addons:
+        postgresql: "13"
+        apt:
+          packages:
+            - postgresql-13
+            - postgresql-client-13
+            - postgresql-server-dev-13
+            - postgresql-client-common
+            - postgresql-common
+            - postgresql-13-postgis-3
+            - postgresql-13-postgis-3-scripts
+      dist: focal
+      env:
+        PGPORT: "5433"
+        PGVERSION: 13
 
 before_install:
-  - "if [ ! -z $PGVERSION ]; then sudo cp /etc/postgresql/{9.6,$PGVERSION}/main/pg_hba.conf; fi"
-  - "if [ ! -z $PGVERSION ]; then sudo service postgresql restart $PGVERSION; fi"
-  - sh -c 'until pg_isready -p 5433; do echo "Waiting for the DB to be up..."; sleep 2; done'
+  - sudo -u postgres psql -c "CREATE USER postgres WITH PASSWORD null"
+  - sudo -u postgres psql -c "ALTER ROLE postgres SUPERUSER"
