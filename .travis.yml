@@ -1,6 +1,7 @@
 language: node_js
 sudo: true
 
+node_js: "15"
 cache:
   yarn: true
   directories:
@@ -23,11 +24,7 @@ matrix:
       env:
         PGPORT: "5433"
         PGVERSION: 11
-      node_js:
-        - "12"
-        - "13"
-        - "14"
-        - "15"
+      node_js: "15"
     - addons:
         postgresql: "12"
         apt:
@@ -43,11 +40,7 @@ matrix:
       env:
         PGPORT: "5433"
         PGVERSION: 12
-      node_js:
-        - "12"
-        - "13"
-        - "14"
-        - "15"
+      node_js: "15"
     - addons:
         postgresql: "13"
         apt:
@@ -63,11 +56,7 @@ matrix:
       env:
         PGPORT: "5433"
         PGVERSION: 13
-      node_js:
-        - "12"
-        - "13"
-        - "14"
-        - "15"
+      node_js: "15"
 
 before_install:
   - sudo -u postgres psql -c "CREATE USER postgres WITH PASSWORD null"
