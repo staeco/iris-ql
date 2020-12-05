@@ -100,9 +100,6 @@ workflows:
       - install_deps:
           requires:
             - checkout_code
-      - test_11:
-          requires:
-            - install_deps
       - test_12:
           requires:
             - install_deps
