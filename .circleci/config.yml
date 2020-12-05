@@ -56,23 +56,6 @@ jobs:
           key: *yarn_cache_key
           paths:
             - /home/circleci/iris-ql/node_modules
-  test_11:
-    <<: *container_config
-    docker:
-      - image: node:15
-      - image: circleci/postgres:11-postgis
-        environment:
-          - POSTGRES_USER: root
-          - POSTGRES_PASSWORD: ci-pass
-          - POSTGRES_DB: iris_testing
-    working_directory: /home/circleci/iris-ql
-    environment:
-      POSTGRES_URL: "postgres://root@localhost/iris_testing"
-    steps:
-      - *attach_workspace
-      - *restore_repo
-      - *restore_node_modules
-      - run: "yarn test:ci --silent"
   test_12:
     <<: *container_config
     docker:
