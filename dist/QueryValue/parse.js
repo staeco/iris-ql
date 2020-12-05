@@ -25,12 +25,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 const resolveField = (field, opt) => {
   if (!opt?.substitutions) return field;
   const subs = typeof opt.substitutions === 'function' ? opt.substitutions(opt) : opt.substitutions;
@@ -117,10 +111,9 @@ const getFunction = (v, opt) => {
 
   const sigArgs = func.signature || [];
   const resolvedArgs = sigArgs.map((sig, idx) => {
-    const nopt = _objectSpread(_objectSpread({}, opt), {}, {
+    const nopt = { ...opt,
       context: [...context, 'arguments', idx]
-    });
-
+    };
     const argValue = args[idx];
     const parsed = parse(argValue, nopt);
     validateArgumentTypes(func, sig, argValue, nopt);
@@ -185,9 +178,9 @@ const parse = (v, opt) => {
       });
     }
 
-    if (resolvedField.includes('.')) return (0, _getJSONField.default)(resolvedField, _objectSpread(_objectSpread({}, opt), {}, {
+    if (resolvedField.includes('.')) return (0, _getJSONField.default)(resolvedField, { ...opt,
       hydrate: hydrateJSON
-    }));
+    });
 
     if (!fieldLimit.find(i => i.field === resolvedField)) {
       throw new _errors.ValidationError({
@@ -211,9 +204,9 @@ const parse = (v, opt) => {
     }
 
     if (resolvedAggregation) return _sequelize.default.col(resolvedField);
-    if (resolvedColumn) return _sequelize.default.literal((0, _toString.column)(_objectSpread(_objectSpread({}, opt), {}, {
+    if (resolvedColumn) return _sequelize.default.literal((0, _toString.column)({ ...opt,
       column: resolvedField
-    })));
+    }));
     throw new Error(`Unknown field type for: ${resolvedField}`);
   }
 

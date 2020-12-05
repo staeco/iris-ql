@@ -19,12 +19,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 const getValueTypes = v => (0, _lodash.sortBy)(Object.entries(schemaTypes).reduce((prev, [type, desc]) => {
   if (!desc || typeof desc.test !== 'function') return prev;
   if (desc.test(v) === true) prev.push({
@@ -62,10 +56,10 @@ const getFieldTypes = (fieldPath, {
 }) => {
   const desc = model.rawAttributes[fieldPath];
   if (!desc) return [];
-  const schemaType = (0, _lodash.pickBy)(_objectSpread(_objectSpread({}, (0, _toSchemaType.default)(desc.type, subSchemas[fieldPath])), {}, {
+  const schemaType = (0, _lodash.pickBy)({ ...(0, _toSchemaType.default)(desc.type, subSchemas[fieldPath]),
     name: desc.name,
     notes: desc.notes
-  }));
+  });
   return schemaType ? [schemaType] : [];
 }; // return empty on any invalid condition, `parse` will handle main validation before this function is called
 
@@ -81,10 +75,9 @@ const getTypes = (v, opt = {}) => {
       const sigArgs = fn.signature || [];
       const args = v.arguments || [];
       const resolvedArgs = sigArgs.map((sig, idx) => {
-        const nopt = _objectSpread(_objectSpread({}, opt), {}, {
+        const nopt = { ...opt,
           context: [...(opt.context || []), 'arguments', idx]
-        });
-
+        };
         const argValue = args[idx];
         return {
           types: getTypes(argValue, nopt),

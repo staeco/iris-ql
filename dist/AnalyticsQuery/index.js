@@ -13,12 +13,6 @@ var _Query = _interopRequireDefault(require("../Query"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 class AnalyticsQuery {
   constructor(obj, options = {}) {
     this.update = fn => {
@@ -34,19 +28,20 @@ class AnalyticsQuery {
     this.toJSON = () => this.input;
 
     this.getOutputSchema = () => this.input.aggregations.reduce((prev, agg, idx) => {
-      const meta = (0, _getMeta.default)(agg, _objectSpread(_objectSpread({}, this.options), {}, {
+      const meta = (0, _getMeta.default)(agg, { ...this.options,
         context: ['aggregations', idx]
-      }));
+      });
       if (!meta) return prev; // no types? weird
 
       prev[agg.alias] = meta;
       return prev;
     }, {});
 
-    this.execute = async () => this.options.model.findAll(_objectSpread({
+    this.execute = async () => this.options.model.findAll({
       raw: true,
-      logging: this.options.debug
-    }, this.value()));
+      logging: this.options.debug,
+      ...this.value()
+    });
 
     this.executeStream = async ({
       onError,
@@ -66,9 +61,9 @@ class AnalyticsQuery {
 
     if (!obj) throw new Error('Missing value!');
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
-    if (!obj.aggregations && !obj.groupings) return new _Query.default(obj, _objectSpread(_objectSpread({}, options), {}, {
+    if (!obj.aggregations && !obj.groupings) return new _Query.default(obj, { ...options,
       count: false
-    })); // skip the advanced stuff and kick it down a level
+    }); // skip the advanced stuff and kick it down a level
 
     this.input = obj;
     this.options = options;

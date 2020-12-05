@@ -25,12 +25,6 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 const aggregateFunctions = Object.entries(functions).reduce((acc, [k, v]) => {
   if (v.aggregate) acc.push(k);
   return acc;
@@ -58,17 +52,19 @@ var _default = (query = {}, opt) => {
   const initialFieldLimit = opt.fieldLimit || (0, _getModelFieldLimit.default)(model); // if user specified time settins, tack them onto options from the query so downstream knows about it
 
   try {
-    opt = _objectSpread(_objectSpread({}, opt), (0, _parseTimeOptions.default)(query, opt));
+    opt = { ...opt,
+      ...(0, _parseTimeOptions.default)(query, opt)
+    };
   } catch (err) {
     error.add(err);
   }
 
   function _ref(a, idx) {
     try {
-      return new _Aggregation.default(a, _objectSpread(_objectSpread({}, opt), {}, {
+      return new _Aggregation.default(a, { ...opt,
         fieldLimit: initialFieldLimit,
         context: [...context, 'aggregations', idx]
-      })).value();
+      }).value();
     } catch (err) {
       error.add(err);
       return null;
@@ -96,11 +92,9 @@ var _default = (query = {}, opt) => {
   if (!error.isEmpty()) throw error;
   const aggFieldLimit = query.aggregations.map(_ref2);
   const fieldLimit = initialFieldLimit.concat(aggFieldLimit);
-
-  const nopt = _objectSpread(_objectSpread({}, opt), {}, {
+  const nopt = { ...opt,
     fieldLimit
-  });
-
+  };
   let out = {};
 
   try {
@@ -111,9 +105,9 @@ var _default = (query = {}, opt) => {
 
   function _ref3(i, idx) {
     try {
-      return new _QueryValue.default(i, _objectSpread(_objectSpread({}, nopt), {}, {
+      return new _QueryValue.default(i, { ...nopt,
         context: [...context, 'groupings', idx]
-      })).value();
+      }).value();
     } catch (err) {
       error.add(err);
       return null;
