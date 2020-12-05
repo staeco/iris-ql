@@ -21,7 +21,7 @@ references:
 
   # cache key should be hashing any lockfile used in tests or building
   yarn_cache_key: &yarn_cache_key
-    yarn-{{ checksum "yarn.lock" }}
+    yarn-{{ checksum "package.json" }}
 
   restore_node_modules: &restore_node_modules
     restore_cache:
@@ -51,7 +51,7 @@ jobs:
       - *restore_node_modules
       - run:
           name: Install yarn modules
-          command: "yarn --pure-lockfile --prefer-offline"
+          command: "yarn"
       - save_cache:
           key: *yarn_cache_key
           paths:
