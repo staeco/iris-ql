@@ -89,7 +89,7 @@ jobs:
       - *attach_workspace
       - *restore_repo
       - *restore_node_modules
-      - run: "yarn test --silent"
+      - run: "yarn test:ci --silent"
   test_13:
     <<: *container_config
     docker:
@@ -106,7 +106,7 @@ jobs:
       - *attach_workspace
       - *restore_repo
       - *restore_node_modules
-      - run: "yarn test --silent"
+      - run: "yarn test:ci --silent"
 
 # Actual flow, define what should run and when
 workflows:
