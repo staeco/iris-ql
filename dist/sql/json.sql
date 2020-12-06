@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION jsonb_array_to_text_array(p_input jsonb) RETURNS text[] AS $$
-  SELECT ARRAY(SELECT jsonb_array_elements_text(p_input));
+  SELECT array_agg(x) FROM jsonb_array_elements_text(p_input) t(x);
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
 CREATE OR REPLACE FUNCTION json_array_to_text_array(p_input json) RETURNS text[] AS $$
-  SELECT ARRAY(SELECT json_array_elements_text(p_input));
+  SELECT array_agg(x) FROM json_array_elements_text(p_input) t(x);
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE
 RETURNS NULL ON NULL INPUT;
 
