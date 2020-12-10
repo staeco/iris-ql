@@ -17,15 +17,6 @@ const select = async (q, returnSet = false, replacements) => {
   return res
 }
 
-describe('sql#custom-year#time_to_ms', () => {
-  it('should handle a basic date', async () => {
-    const now = new Date()
-    should(await select('time_to_ms(:time)', false, {
-      time: now
-    })).eql(now.getTime())
-  })
-})
-
 describe('sql#custom-year#date_part_with_custom', () => {
   it('should fall back to regular date part if not custom', async () => {
     const start = 9 // october
