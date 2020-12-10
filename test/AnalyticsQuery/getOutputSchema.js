@@ -50,7 +50,7 @@ describe('AnalyticsQuery#getOutputSchema', () => {
         name: 'Day',
         type: 'date',
         measurement: {
-          type: 'dateTrunc',
+          type: 'bucket',
           value: 'day'
         }
       },

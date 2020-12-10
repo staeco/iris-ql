@@ -50,7 +50,7 @@ const numeric = info => {
   const flatTypes = info.types.map(_ref); //if (flatTypes.includes('number')) return info.value // already a number
 
   if (flatTypes.includes('date')) {
-    return _sequelize.default.cast(_sequelize.default.fn('time_to_ms', info.value), 'numeric');
+    return _sequelize.default.fn('time_to_ms', info.value);
   }
 
   return _sequelize.default.cast(info.value, 'numeric');
@@ -99,9 +99,6 @@ const getGeometryValue = raw => {
 };
 
 const partsToDB = {
-  //millisecond: 'milliseconds',
-  //second: 'second',
-  //minute: 'minute',
   hourOfDay: 'hour',
   dayOfWeek: 'isodow',
   dayOfMonth: 'day',
@@ -120,7 +117,6 @@ const parts = Object.keys(partsToDB).map(k => ({
   label: _capitalize.default.words((0, _decamelize.default)(k, ' '))
 }));
 const truncatesToDB = {
-  //millisecond: 'milliseconds',
   second: 'second',
   minute: 'minute',
   hour: 'hour',
@@ -128,7 +124,9 @@ const truncatesToDB = {
   week: 'week',
   month: 'month',
   quarter: 'quarter',
+  customQuarter: 'custom_quarter',
   year: 'year',
+  customYear: 'custom_year',
   decade: 'decade'
 };
 const truncates = Object.keys(truncatesToDB).map(k => ({
@@ -593,12 +591,23 @@ const bucket = {
     dynamic: ([p]) => ({
       type: 'date',
       measurement: {
-        type: 'dateTrunc',
+        type: 'bucket',
         value: p.raw
       }
     })
   },
-  execute: ([p, f], opt) => opt?.timezone ? _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value, opt.timezone) : _sequelize.default.fn('date_trunc', truncatesToDB[p.raw], f.value)
+  execute: ([p, f], {
+    customYearStart = 1,
+    timezone = 'Etc/UTC'
+  } = {}) => {
+    const trunc = truncatesToDB[p.raw];
+
+    if (trunc.startsWith('custom')) {
+      return _sequelize.default.fn('date_trunc_with_custom', trunc, f.value, timezone, customYearStart);
+    }
+
+    return _sequelize.default.fn('date_trunc', trunc, f.value, timezone);
+  }
 };
 exports.bucket = bucket;
 const extract = {
@@ -626,13 +635,15 @@ const extract = {
       }
     })
   },
-  execute: ([p, f], opt) => {
+  execute: ([p, f], {
+    customYearStart = 1,
+    timezone = 'Etc/UTC'
+  } = {}) => {
     const part = partsToDB[p.raw];
-    const d = (0, _tz.force)(f.value, opt);
+    const d = (0, _tz.force)(f.value, timezone);
 
     if (part.startsWith('custom')) {
-      // defaults to january if not specified
-      return _sequelize.default.fn('date_part_with_custom', part, d, typeof opt?.customYearStart === 'number' ? opt?.customYearStart : 1);
+      return _sequelize.default.fn('date_part_with_custom', part, d, customYearStart);
     }
 
     return _sequelize.default.fn('date_part', part, d);

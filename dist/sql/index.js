@@ -7,7 +7,7 @@ var _gracefulFs = require("graceful-fs");
 
 var _path = require("path");
 
-const groups = ['misc', 'math', 'json', 'time', 'geospatial'].map(name => ({
+const groups = ['misc', 'math', 'json', 'time', 'geospatial', 'custom-year'].map(name => ({
   name,
   sql: (0, _gracefulFs.readFileSync)((0, _path.join)(__dirname, `./${name}.sql`), 'utf8')
 }));

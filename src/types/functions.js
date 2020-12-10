@@ -28,7 +28,7 @@ const numeric = (info) => {
   const flatTypes = info.types.map((i) => i.type)
   //if (flatTypes.includes('number')) return info.value // already a number
   if (flatTypes.includes('date')) {
-    return types.cast(types.fn('time_to_ms', info.value), 'numeric')
+    return types.fn('time_to_ms', info.value)
   }
   return types.cast(info.value, 'numeric')
 }
@@ -76,9 +76,6 @@ const getGeometryValue = (raw) => {
 }
 
 const partsToDB = {
-  //millisecond: 'milliseconds',
-  //second: 'second',
-  //minute: 'minute',
   hourOfDay: 'hour',
   dayOfWeek: 'isodow',
   dayOfMonth: 'day',
@@ -98,7 +95,6 @@ const parts = Object.keys(partsToDB).map((k) => ({
 }))
 
 const truncatesToDB = {
-  //millisecond: 'milliseconds',
   second: 'second',
   minute: 'minute',
   hour: 'hour',
@@ -106,7 +102,9 @@ const truncatesToDB = {
   week: 'week',
   month: 'month',
   quarter: 'quarter',
+  customQuarter: 'custom_quarter',
   year: 'year',
+  customYear: 'custom_year',
   decade: 'decade'
 }
 const truncates = Object.keys(truncatesToDB).map((k) => ({
@@ -550,15 +548,18 @@ export const bucket = {
     dynamic: ([ p ]) => ({
       type: 'date',
       measurement: {
-        type: 'dateTrunc',
+        type: 'bucket',
         value: p.raw
       }
     })
   },
-  execute: ([ p, f ], opt) =>
-    opt?.timezone
-      ? types.fn('date_trunc', truncatesToDB[p.raw], f.value, opt.timezone)
-      : types.fn('date_trunc', truncatesToDB[p.raw], f.value)
+  execute: ([ p, f ], { customYearStart = 1, timezone = 'Etc/UTC' } = {}) => {
+    const trunc = truncatesToDB[p.raw]
+    if (trunc.startsWith('custom')) {
+      return types.fn('date_trunc_with_custom', trunc, f.value, timezone, customYearStart)
+    }
+    return types.fn('date_trunc', trunc, f.value, timezone)
+  }
 }
 export const extract = {
   name: 'Part of Date',
@@ -586,12 +587,11 @@ export const extract = {
       }
     })
   },
-  execute: ([ p, f ], opt) => {
+  execute: ([ p, f ], { customYearStart = 1, timezone = 'Etc/UTC' } = {}) => {
     const part = partsToDB[p.raw]
-    const d = forceTZ(f.value, opt)
+    const d = forceTZ(f.value, timezone)
     if (part.startsWith('custom')) {
-      // defaults to january if not specified
-      return types.fn('date_part_with_custom', part, d, typeof opt?.customYearStart === 'number' ? opt?.customYearStart : 1)
+      return types.fn('date_part_with_custom', part, d, customYearStart)
     }
     return types.fn('date_part', part, d)
   }

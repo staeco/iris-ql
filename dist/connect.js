@@ -33,7 +33,8 @@ const alignTypeParser = (conn, id) => {
 const defaultOptions = {
   logging: false,
   native: false,
-  operatorsAliases: _operators.default
+  operatorsAliases: _operators.default,
+  timezone: 'UTC'
 };
 
 function _ref(item) {

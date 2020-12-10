@@ -6,7 +6,8 @@ export const groups = [
   'math',
   'json',
   'time',
-  'geospatial'
+  'geospatial',
+  'custom-year'
 ].map((name) => ({
   name,
   sql: readFileSync(join(__dirname, `./${name}.sql`), 'utf8')

@@ -13,10 +13,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 const zones = new Set(_momentTimezone.default.tz.names());
 
-const force = (v, {
-  timezone
-} = {}) => {
-  if (!timezone) return v;
+const force = (v, timezone = 'Etc/UTC') => {
   if (!zones.has(timezone)) throw new _errors.BadRequestError('Not a valid timezone');
   return _sequelize.default.fn('force_tz', v, timezone);
 };

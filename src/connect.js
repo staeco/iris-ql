@@ -20,7 +20,8 @@ const alignTypeParser = (conn, id) => {
 const defaultOptions = {
   logging: false,
   native: false,
-  operatorsAliases: operators
+  operatorsAliases: operators,
+  timezone: 'UTC'
 }
 export default (url, opt = {}) => {
   // fix issues with pg types

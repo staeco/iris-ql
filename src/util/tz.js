@@ -4,8 +4,7 @@ import { BadRequestError } from '../errors'
 
 const zones = new Set(moment.tz.names())
 
-export const force = (v, { timezone } = {}) => {
-  if (!timezone) return v
+export const force = (v, timezone = 'Etc/UTC') => {
   if (!zones.has(timezone)) throw new BadRequestError('Not a valid timezone')
   return types.fn('force_tz', v, timezone)
 }

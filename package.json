@@ -1,6 +1,6 @@
 {
   "name": "iris-ql",
-  "version": "3.4.8",
+  "version": "3.5.0",
   "description": "User friendly API query language",
   "main": "dist/index.js",
   "keywords": [],
@@ -25,7 +25,7 @@
     "clean": "rimraf dist",
     "lint": "eslint src test --fix",
     "test-make-user": "createuser postgres -lsd",
-    "test-db": "dropdb iris-ql -U postgres || true && createdb iris-ql -U postgres && psql iris-ql -c 'CREATE EXTENSION IF NOT EXISTS postgis;' -U postgres",
+    "test-db": "dropdb iris-ql -f -U postgres || true && createdb iris-ql -U postgres && psql iris-ql -c 'CREATE EXTENSION IF NOT EXISTS postgis;' -U postgres",
     "test": "npm run-script test-db && NODE_ENV=test nyc mocha --require @babel/register --recursive --reporter spec --bail --exit --timeout 36000 && npm run-script lint",
     "test:ci": "NODE_ENV=test nyc mocha --require @babel/register --recursive --reporter spec --bail --exit --timeout 36000 && npm run-script lint"
   },
@@ -67,7 +67,7 @@
     "decamelize": "^4.0.0",
     "deepdash": "^5.3.0",
     "graceful-fs": "^4.2.0",
-    "human-schema": "^1.1.1",
+    "human-schema": "^1.1.4",
     "inflection": "^1.12.0",
     "is-number": "^7.0.0",
     "is-plain-obj": "^3.0.0",
