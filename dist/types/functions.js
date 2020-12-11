@@ -131,7 +131,7 @@ const truncatesToDB = {
 };
 const truncates = Object.keys(truncatesToDB).map(k => ({
   value: k,
-  label: (0, _capitalize.default)(k)
+  label: _capitalize.default.words((0, _decamelize.default)(k, ' '))
 })); // Arrays
 
 function _ref2(i) {
