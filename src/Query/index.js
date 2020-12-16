@@ -26,6 +26,24 @@ export default class Query {
     this._parsedCollection = newCollectionValue
     return this
   }
+  constrain = ({ defaultLimit, maxLimit, where } = {}) => {
+    if (where && !Array.isArray(where)) throw new Error('Invalid where array!')
+    this.update((v) => {
+      const limit = v.limit || defaultLimit
+      return {
+        ...v,
+        where: where
+          ? [ ...v.where, ...where ]
+          : v.where,
+        limit: maxLimit
+          ? limit
+            ? Math.min(limit, maxLimit)
+            : maxLimit
+          : limit
+      }
+    })
+    return this
+  }
   value = ({ instanceQuery = true } = {}) => instanceQuery ? this._parsed : this._parsedCollection
   toJSON = () => this.input
   getOutputSchema = () => {
@@ -39,16 +57,18 @@ export default class Query {
     }, {})
   }
 
-  execute = async ({ raw = false } = {}) => {
+  execute = async ({ raw = false, useMaster } = {}) => {
     const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll'
     return this.options.model[fn]({
       raw,
+      useMaster,
       logging: this.options.debug,
       ...this.value()
     })
   }
-  executeStream = async ({ onError, format, tupleFraction, transform } = {}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform, useMaster } = {}) =>
     exportStream({
+      useMaster,
       tupleFraction,
       format,
       transform,
@@ -58,8 +78,9 @@ export default class Query {
       value: this.value()
     })
 
-  count = async () =>
+  count = async ({ useMaster } = {}) =>
     this.options.model.count({
+      useMaster,
       logging: this.options.debug,
       ...this.value()
     })

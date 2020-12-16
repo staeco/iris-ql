@@ -19,6 +19,24 @@ export default class AnalyticsQuery {
     this._parsed = newValue
     return this
   }
+  constrain = ({ defaultLimit, maxLimit, where } = {}) => {
+    if (where && !Array.isArray(where)) throw new Error('Invalid where array!')
+    this.update((v) => {
+      const limit = v.limit || defaultLimit
+      return {
+        ...v,
+        where: where
+          ? [ ...v.where, ...where ]
+          : v.where,
+        limit: maxLimit
+          ? limit
+            ? Math.min(limit, maxLimit)
+            : maxLimit
+          : limit
+      }
+    })
+    return this
+  }
   value = () => this._parsed
   toJSON = () => this.input
   getOutputSchema = () =>
