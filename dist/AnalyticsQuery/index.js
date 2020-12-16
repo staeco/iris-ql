@@ -23,6 +23,22 @@ class AnalyticsQuery {
       return this;
     };
 
+    this.constrain = ({
+      defaultLimit,
+      maxLimit,
+      where
+    } = {}) => {
+      if (where && !Array.isArray(where)) throw new Error('Invalid where array!');
+      this.update(v => {
+        const limit = v.limit || defaultLimit;
+        return { ...v,
+          where: where ? [...v.where, ...where] : v.where,
+          limit: maxLimit ? limit ? Math.min(limit, maxLimit) : maxLimit : limit
+        };
+      });
+      return this;
+    };
+
     this.value = () => this._parsed;
 
     this.toJSON = () => this.input;
@@ -37,8 +53,11 @@ class AnalyticsQuery {
       return prev;
     }, {});
 
-    this.execute = async () => this.options.model.findAll({
+    this.execute = async ({
+      useMaster
+    } = {}) => this.options.model.findAll({
       raw: true,
+      useMaster,
       logging: this.options.debug,
       ...this.value()
     });
@@ -47,9 +66,11 @@ class AnalyticsQuery {
       onError,
       format,
       tupleFraction,
-      transform
+      transform,
+      useMaster
     } = {}) => (0, _export.default)({
       analytics: true,
+      useMaster,
       tupleFraction,
       format,
       transform,

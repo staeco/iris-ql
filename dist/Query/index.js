@@ -28,6 +28,22 @@ class Query {
       return this;
     };
 
+    this.constrain = ({
+      defaultLimit,
+      maxLimit,
+      where
+    } = {}) => {
+      if (where && !Array.isArray(where)) throw new Error('Invalid where array!');
+      this.update(v => {
+        const limit = v.limit || defaultLimit;
+        return { ...v,
+          where: where ? [...v.where, ...where] : v.where,
+          limit: maxLimit ? limit ? Math.min(limit, maxLimit) : maxLimit : limit
+        };
+      });
+      return this;
+    };
+
     this.value = ({
       instanceQuery = true
     } = {}) => instanceQuery ? this._parsed : this._parsedCollection;
@@ -50,11 +66,13 @@ class Query {
     };
 
     this.execute = async ({
-      raw = false
+      raw = false,
+      useMaster
     } = {}) => {
       const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll';
       return this.options.model[fn]({
         raw,
+        useMaster,
         logging: this.options.debug,
         ...this.value()
       });
@@ -64,8 +82,10 @@ class Query {
       onError,
       format,
       tupleFraction,
-      transform
+      transform,
+      useMaster
     } = {}) => (0, _export.default)({
+      useMaster,
       tupleFraction,
       format,
       transform,
@@ -75,7 +95,10 @@ class Query {
       value: this.value()
     });
 
-    this.count = async () => this.options.model.count({
+    this.count = async ({
+      useMaster
+    } = {}) => this.options.model.count({
+      useMaster,
       logging: this.options.debug,
       ...this.value()
     });

@@ -23,6 +23,7 @@ function _ref() {
 }
 
 const streamable = async ({
+  useMaster,
   model,
   sql,
   transform,
@@ -30,6 +31,7 @@ const streamable = async ({
   onError
 }) => {
   const conn = await model.sequelize.connectionManager.getConnection({
+    useMaster,
     type: 'SELECT'
   });
 
@@ -78,6 +80,7 @@ const streamable = async ({
 };
 
 var _default = async ({
+  useMaster,
   model,
   value,
   format,
@@ -115,6 +118,7 @@ var _default = async ({
   });
   if (debug) debug(sql);
   const src = await streamable({
+    useMaster,
     model,
     tupleFraction,
     sql,

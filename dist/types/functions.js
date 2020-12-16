@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.boundingBox = exports.geojson = exports.distance = exports.intersects = exports.length = exports.area = exports.extract = exports.bucket = exports.interval = exports.last = exports.now = exports.eq = exports.lte = exports.gte = exports.lt = exports.gt = exports.remainder = exports.percentage = exports.divide = exports.multiply = exports.subtract = exports.add = exports.count = exports.median = exports.average = exports.sum = exports.max = exports.min = exports.expand = void 0;
+exports.boundingBox = exports.geojson = exports.distance = exports.intersects = exports.length = exports.area = exports.extract = exports.bucket = exports.interval = exports.last = exports.now = exports.eq = exports.lte = exports.gte = exports.lt = exports.gt = exports.remainder = exports.percentage = exports.divide = exports.multiply = exports.subtract = exports.add = exports.distinctCount = exports.count = exports.median = exports.average = exports.sum = exports.max = exports.min = exports.expand = void 0;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
@@ -266,9 +266,26 @@ const count = {
   },
   aggregate: true,
   execute: () => _sequelize.default.fn('count', _sequelize.default.literal('*'))
+};
+exports.count = count;
+const distinctCount = {
+  name: 'Unique Count',
+  notes: 'Aggregates the total number of unique values',
+  signature: [{
+    name: 'Field',
+    types: 'any',
+    required: true
+  }],
+  returns: {
+    static: {
+      type: 'number'
+    }
+  },
+  aggregate: true,
+  execute: ([f]) => _sequelize.default.fn('count', _sequelize.default.fn('distinct', f.value))
 }; // Math
 
-exports.count = count;
+exports.distinctCount = distinctCount;
 const add = {
   name: 'Add',
   notes: 'Applies addition to multiple numbers',
