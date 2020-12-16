@@ -21,7 +21,7 @@ LEFT JOIN census_tracts AS census
 ON ST_DWithin(census.geom, subways.geom, 200)
 WHERE subways.route = 'A';
 */
-describe.skip('AnalyticsQuery#joins', () => {
+describe('AnalyticsQuery#joins', () => {
   const { datum } = db.models
   it('should handle a basic geospatial join', async () => {
     const query = new AnalyticsQuery({
@@ -39,9 +39,6 @@ describe.skip('AnalyticsQuery#joins', () => {
           }
         ]
       },
-      filters: [
-        { sourceId: 'bike-trips' }
-      ],
       aggregations: [
         {
           value: {
@@ -71,13 +68,25 @@ describe.skip('AnalyticsQuery#joins', () => {
     }, {
       model: datum,
       subSchemas: { data: bikeTrip.schema },
-      joinOptions: {
+      joins: {
         nearbyCalls: {
           model: datum,
           subSchemas: { data: call.schema }
         }
       }
     })
+
+    query.constrain({
+      where: [
+        { sourceId: 'bike-trips' }
+      ],
+      joins: {
+        nearbyCalls: {
+          where: [ { sourceId: '911-calls' } ]
+        }
+      }
+    })
+
     const res = await query.execute()
     should.exist(res)
     console.log(res)
