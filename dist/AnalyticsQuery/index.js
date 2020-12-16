@@ -3,6 +3,8 @@
 exports.__esModule = true;
 exports.default = void 0;
 
+var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
+
 var _parse = _interopRequireDefault(require("./parse"));
 
 var _export = _interopRequireDefault(require("../util/export"));
@@ -16,6 +18,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 class AnalyticsQuery {
   constructor(obj, options = {}) {
     this.update = fn => {
+      if ((0, _isPlainObj.default)(fn)) return this.update(v => ({ ...v,
+        ...fn
+      }));
       if (typeof fn !== 'function') throw new Error('Missing update function!');
       const newValue = fn(this._parsed);
       if (!newValue || typeof newValue !== 'object') throw new Error('Invalid update function! Must return an object.');

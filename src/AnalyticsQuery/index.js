@@ -1,3 +1,4 @@
+import isObject from 'is-plain-obj'
 import parse from './parse'
 import exportStream from '../util/export'
 import getAggregationMeta from '../Aggregation/getMeta'
@@ -13,6 +14,7 @@ export default class AnalyticsQuery {
     this._parsed = parse(obj, options)
   }
   update = (fn) => {
+    if (isObject(fn)) return this.update((v) => ({ ...v, ...fn }))
     if (typeof fn !== 'function') throw new Error('Missing update function!')
     const newValue = fn(this._parsed)
     if (!newValue || typeof newValue !== 'object') throw new Error('Invalid update function! Must return an object.')

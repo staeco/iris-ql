@@ -8,7 +8,7 @@ describe('Query#constrain', () => {
     const query = new Query({ limit: 1 }, { model: user.scope('public') })
     should.throws(() => query.constrain({ where: 1 }))
   })
-  it('should update with new where clauses', async () => {
+  it('should constrain with new where clauses', async () => {
     const query = new Query({ limit: 1 }, { model: user.scope('public') })
     query.constrain({
       where: [ { createdAt: { $eq: null } } ]

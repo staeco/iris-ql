@@ -1,3 +1,4 @@
+import isObject from 'is-plain-obj'
 import parse from './parse'
 import exportStream from '../util/export'
 import getTypes from '../types/getTypes'
@@ -13,6 +14,7 @@ export default class Query {
     this._parsedCollection = parse(obj, { ...options, instanceQuery: false })
   }
   update = (fn) => {
+    if (isObject(fn)) return this.update((v) => ({ ...v, ...fn }))
     if (typeof fn !== 'function') throw new Error('Missing update function!')
 
     // update instance query

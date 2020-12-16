@@ -21,9 +21,9 @@ describe('AnalyticsQuery#constrain', () => {
       ]
     }, { model: user })
 
-    should.throws(() => query.update({ where: 1 }))
+    should.throws(() => query.constrain({ where: 1 }))
   })
-  it('should update with new where', async () => {
+  it('should constrain with new where', async () => {
     const query = new AnalyticsQuery({
       aggregations: [
         {
