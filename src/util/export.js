@@ -7,8 +7,9 @@ import through2 from 'through2'
 // it gets transformed and emitted from the stream
 // this is how you want to return millions of rows with low memory overhead
 const batchSize = 16
-const streamable = async ({ model, sql, transform, tupleFraction, onError }) => {
+const streamable = async ({ useMaster, model, sql, transform, tupleFraction, onError }) => {
   const conn = await model.sequelize.connectionManager.getConnection({
+    useMaster,
     type: 'SELECT'
   })
   if (typeof tupleFraction === 'number') {
@@ -53,7 +54,7 @@ const streamable = async ({ model, sql, transform, tupleFraction, onError }) => 
 }
 
 
-export default async ({ model, value, format, transform, tupleFraction, debug, onError, analytics = false }) => {
+export default async ({ useMaster, model, value, format, transform, tupleFraction, debug, onError, analytics = false }) => {
   const nv = { ...value }
 
   // prep work findAll usually does
@@ -73,7 +74,7 @@ export default async ({ model, value, format, transform, tupleFraction, debug, o
 
   const sql = select({ value: nv, model })
   if (debug) debug(sql)
-  const src = await streamable({ model, tupleFraction, sql, transform, onError })
+  const src = await streamable({ useMaster, model, tupleFraction, sql, transform, onError })
   if (!format) return src
   const out = pipeline(src, format(), (err) => {
     if (err) out.emit('error', err)

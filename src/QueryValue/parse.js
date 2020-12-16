@@ -77,6 +77,7 @@ const getFunction = (v, opt) => {
       context: [ ...context, 'arguments', idx ]
     }
     const argValue = args[idx]
+    if (argValue == null) return null
     const parsed = parse(argValue, nopt)
     validateArgumentTypes(func, sig, argValue, nopt)
     return {
@@ -96,7 +97,7 @@ const parse = (v, opt) => {
     context = []
   } = opt
   if (v == null) return null
-  if (typeof v === 'string' || typeof v === 'number') {
+  if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
     return types.literal(model.sequelize.escape(v))
   }
   if (!isObject(v)) {
@@ -107,7 +108,7 @@ const parse = (v, opt) => {
     })
   }
   if (v.function) {
-    const { fn, args } = getFunction(v, opt)
+    const { fn, args = [] } = getFunction(v, opt)
     try {
       return fn.execute(args, opt)
     } catch (err) {

@@ -223,7 +223,26 @@ export const count = {
     static: { type: 'number' }
   },
   aggregate: true,
-  execute: () => types.fn('count', types.literal('*'))
+  execute: () =>
+    types.fn('count', types.literal('*'))
+}
+
+export const distinctCount = {
+  name: 'Unique Count',
+  notes: 'Aggregates the total number of unique values',
+  signature: [
+    {
+      name: 'Field',
+      types: 'any',
+      required: true
+    }
+  ],
+  returns: {
+    static: { type: 'number' }
+  },
+  aggregate: true,
+  execute: ([ f ]) =>
+    types.fn('count', types.fn('distinct', f.value))
 }
 
 // Math

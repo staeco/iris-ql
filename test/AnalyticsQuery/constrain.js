@@ -2,9 +2,9 @@ import should from 'should'
 import { AnalyticsQuery } from '../../src'
 import db from '../fixtures/db'
 
-describe('AnalyticsQuery#update', () => {
+describe('AnalyticsQuery#constrain', () => {
   const { user } = db.models
-  it('should throw on bad function', async () => {
+  it('should throw on bad where', async () => {
     const query = new AnalyticsQuery({
       aggregations: [
         {
@@ -21,10 +21,9 @@ describe('AnalyticsQuery#update', () => {
       ]
     }, { model: user })
 
-    should.throws(() => query.update(null))
-    should.throws(() => query.update(() => null))
+    should.throws(() => query.update({ where: 1 }))
   })
-  it('should update with new where clauses', async () => {
+  it('should update with new where', async () => {
     const query = new AnalyticsQuery({
       aggregations: [
         {
@@ -41,13 +40,10 @@ describe('AnalyticsQuery#update', () => {
       ]
     }, { model: user })
 
-    query.update((v) => ({
-      ...v,
-      where: [
-        ...v.where,
-        { createdAt: { $eq: null } }
-      ]
-    }))
+    query.constrain({
+      where: [ { createdAt: { $eq: null } } ]
+    })
+
     const res = await query.execute()
     should.exist(res)
     res.length.should.eql(0)

@@ -19,6 +19,24 @@ export default class AnalyticsQuery {
     this._parsed = newValue
     return this
   }
+  constrain = ({ defaultLimit, maxLimit, where } = {}) => {
+    if (where && !Array.isArray(where)) throw new Error('Invalid where array!')
+    this.update((v) => {
+      const limit = v.limit || defaultLimit
+      return {
+        ...v,
+        where: where
+          ? [ ...v.where, ...where ]
+          : v.where,
+        limit: maxLimit
+          ? limit
+            ? Math.min(limit, maxLimit)
+            : maxLimit
+          : limit
+      }
+    })
+    return this
+  }
   value = () => this._parsed
   toJSON = () => this.input
   getOutputSchema = () =>
@@ -32,16 +50,18 @@ export default class AnalyticsQuery {
       return prev
     }, {})
 
-  execute = async () =>
+  execute = async ({ useMaster } = {}) =>
     this.options.model.findAll({
       raw: true,
+      useMaster,
       logging: this.options.debug,
       ...this.value()
     })
 
-  executeStream = async ({ onError, format, tupleFraction, transform } = {}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform, useMaster } = {}) =>
     exportStream({
       analytics: true,
+      useMaster,
       tupleFraction,
       format,
       transform,
