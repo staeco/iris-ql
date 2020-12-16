@@ -31,12 +31,15 @@ class AnalyticsQuery {
     this.constrain = ({
       defaultLimit,
       maxLimit,
+      attributes,
       where
     } = {}) => {
       if (where && !Array.isArray(where)) throw new Error('Invalid where array!');
+      if (attributes && !Array.isArray(attributes)) throw new Error('Invalid attributes array!');
       this.update(v => {
         const limit = v.limit || defaultLimit;
         return { ...v,
+          attributes: attributes || v.attributes,
           where: where ? [...v.where, ...where] : v.where,
           limit: maxLimit ? limit ? Math.min(limit, maxLimit) : maxLimit : limit
         };
