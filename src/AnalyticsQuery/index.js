@@ -50,16 +50,18 @@ export default class AnalyticsQuery {
       return prev
     }, {})
 
-  execute = async () =>
+  execute = async ({ useMaster } = {}) =>
     this.options.model.findAll({
       raw: true,
+      useMaster,
       logging: this.options.debug,
       ...this.value()
     })
 
-  executeStream = async ({ onError, format, tupleFraction, transform } = {}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform, useMaster } = {}) =>
     exportStream({
       analytics: true,
+      useMaster,
       tupleFraction,
       format,
       transform,
