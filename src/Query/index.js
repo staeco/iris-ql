@@ -31,7 +31,7 @@ export default class Query {
   constrain = ({ defaultLimit, maxLimit, attributes, where } = {}) => {
     if (where && !Array.isArray(where)) throw new Error('Invalid where array!')
     if (attributes && !Array.isArray(attributes)) throw new Error('Invalid attributes array!')
-    this.update((v) => {
+    return this.update((v) => {
       const limit = v.limit || defaultLimit
       return {
         ...v,
@@ -46,7 +46,6 @@ export default class Query {
           : limit
       }
     })
-    return this
   }
   value = ({ instanceQuery = true } = {}) => instanceQuery ? this._parsed : this._parsedCollection
   toJSON = () => this.input

@@ -25,6 +25,20 @@ describe.skip('AnalyticsQuery#joins', () => {
   const { datum } = db.models
   it('should handle a basic geospatial join', async () => {
     const query = new AnalyticsQuery({
+      joins: {
+        name: 'Nearby Calls',
+        alias: 'nearbyCalls',
+        filters: [
+          { sourceId: '911-calls' },
+          {
+            function: 'intersects',
+            arguments: [
+              { field: 'data.location' },
+              { field: '$parent.data.path' }
+            ]
+          }
+        ]
+      },
       filters: [
         { sourceId: 'bike-trips' }
       ],
@@ -57,24 +71,12 @@ describe.skip('AnalyticsQuery#joins', () => {
     }, {
       model: datum,
       subSchemas: { data: bikeTrip.schema },
-      joins: [
-        {
-          name: 'Nearby Calls',
-          alias: 'nearbyCalls',
-          filters: [
-            { sourceId: '911-calls' },
-            {
-              function: 'intersects',
-              arguments: [
-                { field: 'data.location' },
-                { field: '$parent.data.path' }
-              ]
-            }
-          ],
+      joinOptions: {
+        nearbyCalls: {
           model: datum,
           subSchemas: { data: call.schema }
         }
-      ]
+      }
     })
     const res = await query.execute()
     should.exist(res)

@@ -24,7 +24,7 @@ export default class AnalyticsQuery {
   constrain = ({ defaultLimit, maxLimit, attributes, where } = {}) => {
     if (where && !Array.isArray(where)) throw new Error('Invalid where array!')
     if (attributes && !Array.isArray(attributes)) throw new Error('Invalid attributes array!')
-    this.update((v) => {
+    return this.update((v) => {
       const limit = v.limit || defaultLimit
       return {
         ...v,
@@ -39,7 +39,6 @@ export default class AnalyticsQuery {
           : limit
       }
     })
-    return this
   }
   value = () => this._parsed
   toJSON = () => this.input
