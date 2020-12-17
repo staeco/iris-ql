@@ -29,7 +29,6 @@ describe('AnalyticsQuery#joins', () => {
         name: 'Nearby Calls',
         alias: 'nearbyCalls',
         filters: [
-          { sourceId: '911-calls' },
           {
             function: 'intersects',
             arguments: [
@@ -82,7 +81,9 @@ describe('AnalyticsQuery#joins', () => {
       ],
       joins: {
         nearbyCalls: {
-          where: [ { sourceId: '911-calls' } ]
+          where: [
+            { sourceId: '911-calls' }
+          ]
         }
       }
     })
