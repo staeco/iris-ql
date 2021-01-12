@@ -1,6 +1,7 @@
 import Query from '../Query'
 import QueryValue from '../QueryValue'
 import Aggregation from '../Aggregation'
+import Join from '../Join'
 import { ValidationError } from '../errors'
 import * as functions from '../types/functions'
 import search from '../util/search'
@@ -17,18 +18,47 @@ export default (query = {}, opt) => {
   const { model, context = [] } = opt
   const error = new ValidationError()
   let attrs = []
-  const initialFieldLimit = opt.fieldLimit || getModelFieldLimit(model)
 
-  // if user specified time settins, tack them onto options from the query so downstream knows about it
+  // options becomes our initial state - then we are going to mutate from here in each phase
+  let state = {
+    ...opt,
+    fieldLimit: opt.fieldLimit || getModelFieldLimit(model)
+  }
+
+  // if user specified time settings, tack them onto options from the query so downstream knows about it
   try {
-    opt = {
-      ...opt,
-      ...parseTimeOptions(query, opt)
+    state = {
+      ...state,
+      ...parseTimeOptions(query, state)
     }
   } catch (err) {
     error.add(err)
   }
 
+  // check joins before we dive in
+  if (query.joins) {
+    if (!Array.isArray(query.joins)) {
+      error.add({
+        path: [ ...context, 'joins' ],
+        value: query.joins,
+        message: 'Must be an array.'
+      })
+    } else {
+      state.joins = query.joins.map((i, idx) => {
+        try {
+          return new Join(i, {
+            ...state,
+            context: [ ...context, 'joins', idx ]
+          }).value()
+        } catch (err) {
+          error.add(err)
+          return null
+        }
+      })
+    }
+  }
+
+  // basic checks
   if (!Array.isArray(query.aggregations)) {
     error.add({
       path: [ ...context, 'aggregations' ],
@@ -46,8 +76,7 @@ export default (query = {}, opt) => {
     attrs = query.aggregations.map((a, idx) => {
       try {
         return new Aggregation(a, {
-          ...opt,
-          fieldLimit: initialFieldLimit,
+          ...state,
           context: [ ...context, 'aggregations', idx ]
         }).value()
       } catch (err) {
@@ -59,17 +88,19 @@ export default (query = {}, opt) => {
 
   if (!error.isEmpty()) throw error
 
+  // primary query check phase
   const aggFieldLimit = query.aggregations
     .map((i) => ({ type: 'aggregation', field: i.alias, value: i.value }))
 
-  const fieldLimit = initialFieldLimit.concat(aggFieldLimit)
-  const nopt = { ...opt, fieldLimit }
+  state.fieldLimit = [ ...state.fieldLimit, ...aggFieldLimit ]
   let out = {}
   try {
-    out = new Query(query, nopt).value()
+    out = new Query(query, state).value()
   } catch (err) {
     error.add(err)
   }
+
+  // groupings, last phase
   if (query.groupings) {
     if (!Array.isArray(query.groupings)) {
       error.add({
@@ -81,7 +112,7 @@ export default (query = {}, opt) => {
       out.group = query.groupings.map((i, idx) => {
         try {
           return new QueryValue(i, {
-            ...nopt,
+            ...state,
             context: [ ...context, 'groupings', idx ]
           }).value()
         } catch (err) {
@@ -94,6 +125,7 @@ export default (query = {}, opt) => {
 
   if (!error.isEmpty()) throw error
 
+  // post-parse checks
   // validate each aggregation and ensure it is either used in groupings, or contains an aggregate function
   query.aggregations.forEach((agg, idx) => {
     const hasAggregateFunction = search(agg.value, (k, v) => typeof v?.function === 'string' && aggregateFunctions.includes(v.function))

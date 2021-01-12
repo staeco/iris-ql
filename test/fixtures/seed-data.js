@@ -1,6 +1,6 @@
 import db from './db'
 
-const data = [
+const calls = [
   {
     sourceId: '911-calls',
     data: {
@@ -44,7 +44,10 @@ const data = [
       type: 'Point',
       coordinates: [ 1, 2 ]
     }
-  },
+  }
+]
+
+const bikeTrips = [
   {
     sourceId: 'bike-trips',
     data: {
@@ -100,6 +103,91 @@ const data = [
       ]
     }
   }
+]
+
+const transitPassengers = [
+  {
+    sourceId: 'transit-passenger',
+    data: {
+      id: 'SRC-1-A',
+      route: 'A',
+      year: 2018,
+      passengers: 2564
+    }
+  },
+  {
+    sourceId: 'transit-passenger',
+    data: {
+      id: 'SRC-1-B',
+      route: 'B',
+      year: 2018,
+      passengers: 6563
+    }
+  },
+  {
+    sourceId: 'transit-passenger',
+    data: {
+      id: 'SRC-2-A',
+      route: 'A',
+      year: 2019,
+      passengers: 3218
+    }
+  },
+  {
+    sourceId: 'transit-passenger',
+    data: {
+      id: 'SRC-2-B',
+      route: 'B',
+      year: 2019,
+      passengers: 7621
+    }
+  }
+]
+
+const transitTrips = [
+  {
+    sourceId: 'transit-trip',
+    data: {
+      id: 'SRC-1-A',
+      route: 'A',
+      year: 2018,
+      miles: 72364
+    }
+  },
+  {
+    sourceId: 'transit-trip',
+    data: {
+      id: 'SRC-1-B',
+      route: 'B',
+      year: 2018,
+      miles: 89321
+    }
+  },
+  {
+    sourceId: 'transit-trip',
+    data: {
+      id: 'SRC-2-A',
+      route: 'A',
+      year: 2019,
+      passengers: 703201
+    }
+  },
+  {
+    sourceId: 'transit-trip',
+    data: {
+      id: 'SRC-2-B',
+      route: 'B',
+      year: 2019,
+      passengers: 85102
+    }
+  }
+]
+
+const data = [
+  ...calls,
+  ...bikeTrips,
+  ...transitPassengers,
+  ...transitTrips
 ].map((v) => db.models.datum.build(v).toJSON()) // generate the IDs
 
 export default async () =>
