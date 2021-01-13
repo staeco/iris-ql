@@ -60,37 +60,37 @@ export default class Query {
     }, {})
   }
 
-  execute = async ({ raw = false, useMaster } = {}) => {
+  execute = async ({ raw = false, useMaster, debug } = {}) => {
     const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll'
     return this.options.model[fn]({
       raw,
       useMaster,
-      logging: this.options.debug,
+      logging: debug,
       ...this.value()
     })
   }
-  executeStream = async ({ onError, format, tupleFraction, transform, useMaster } = {}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, debug } = {}) =>
     exportStream({
       useMaster,
       tupleFraction,
       format,
       transform,
       onError,
-      debug: this.options.debug,
+      debug,
       model: this.options.model,
       value: this.value()
     })
 
-  count = async ({ useMaster } = {}) =>
+  count = async ({ useMaster, debug } = {}) =>
     this.options.model.count({
       useMaster,
-      logging: this.options.debug,
+      logging: debug,
       ...this.value()
     })
 
-  destroy = async () =>
+  destroy = async ({ debug } = {}) =>
     this.options.model.destroy({
-      logging: this.options.debug,
+      logging: debug,
       ...this.value({ instanceQuery: false })
     })
 }

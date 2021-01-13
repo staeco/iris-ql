@@ -1,4 +1,4 @@
-import types from 'sequelize'
+import sql from 'sequelize'
 import { jsonPath } from './toString'
 import * as schemaTypes from '../types'
 import { ValidationError } from '../errors'
@@ -11,7 +11,8 @@ export default (v, opt) => {
     model,
     fieldLimit = getModelFieldLimit(model),
     instanceQuery,
-    hydrate = true
+    from,
+    hydrateJSON = true
   } = opt
   const path = v.split('.')
   const col = path.shift()
@@ -23,14 +24,14 @@ export default (v, opt) => {
       message: `Field does not exist: ${col}`
     })
   }
-  if (!(colInfo.type instanceof types.JSONB || colInfo.type instanceof types.JSON)) {
+  if (!(colInfo.type instanceof sql.JSONB || colInfo.type instanceof sql.JSON)) {
     throw new ValidationError({
       path: context,
       value: v,
       message: `Field is not JSON: ${col}`
     })
   }
-  const lit = types.literal(jsonPath({ column: col, model, path, instanceQuery }))
+  const lit = sql.literal(jsonPath({ column: col, model, path, from, instanceQuery }))
   const schema = subSchemas[col] || colInfo.subSchema
   if (!schema) {
     // did not give sufficient info to query json objects safely!
@@ -40,7 +41,7 @@ export default (v, opt) => {
       message: `Field is not queryable: ${col}`
     })
   }
-  if (!hydrate) return lit // asked to keep it raw
+  if (!hydrateJSON) return lit // asked to keep it raw
 
   // if a schema is specified, check the type of the field to see if it needs hydrating
   // this is because pg treats all json values as text, so we need to explicitly hydrate types for things

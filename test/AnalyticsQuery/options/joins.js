@@ -6,11 +6,11 @@ import bikeTrip from '../../fixtures/bike-trip'
 import transitPassenger from '../../fixtures/transit-passenger'
 import transitTrip from '../../fixtures/transit-trip'
 
-describe('AnalyticsQuery#joins', () => {
+describe.skip('AnalyticsQuery#joins', () => {
   const { datum } = db.models
 
   // 911 calls around bike trips
-  it.only('should handle a geospatial join', async () => {
+  it('should handle a geospatial join', async () => {
     const query = new AnalyticsQuery({
       joins: [ {
         name: 'Nearby Calls',
@@ -52,6 +52,7 @@ describe('AnalyticsQuery#joins', () => {
         { field: 'year' }
       ]
     }, {
+      debug: console.log,
       model: datum,
       subSchemas: { data: bikeTrip.schema },
       joins: {

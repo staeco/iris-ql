@@ -1,6 +1,7 @@
 import isObject from 'is-plain-obj'
 import Query from '../Query'
 import { ValidationError } from '../errors'
+import { join } from '../util/toString'
 
 export default (a, opt) => {
   const { joins, context = [] } = opt
@@ -34,18 +35,32 @@ export default (a, opt) => {
     })
   }
 
+  if (!error.isEmpty()) throw error
+
   const joinConfig = joins[a.alias]
+  let query
   try {
-    new Query(a, {
+    query = new Query(a, {
       context,
-      fieldLimit: joinConfig.fieldLimit,
-      model: joinConfig.model,
-      subSchemas: joinConfig.subSchemas
+      ...joinConfig,
+      from: a.alias,
+      joins: {
+        parent: {
+          fieldLimit: opt.fieldLimit,
+          model: opt.model,
+          subSchemas: opt.subSchemas
+        }
+      }
     })
   } catch (err) {
     error.add(err)
   }
 
   if (!error.isEmpty()) throw error
-  return null // TODO: what does this return?
+
+  return {
+    ...joinConfig,
+    alias: a.alias,
+    value: query.value()
+  }
 }

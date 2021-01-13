@@ -1,6 +1,8 @@
+import sql, { QueryTypes } from 'sequelize'
 import isObject from 'is-plain-obj'
 import parse from './parse'
 import exportStream from '../util/export'
+import { select } from '../util/toString'
 import getAggregationMeta from '../Aggregation/getMeta'
 import Query from '../Query'
 
@@ -53,15 +55,20 @@ export default class AnalyticsQuery {
       return prev
     }, {})
 
-  execute = async ({ useMaster } = {}) =>
-    this.options.model.findAll({
-      raw: true,
+  execute = async ({ useMaster, debug } = {}) =>
+    this.options.model.sequelize.query(select({
+      value: this.value(),
+      model: this.options.model,
+      analytics: true
+    }), {
       useMaster,
-      logging: this.options.debug,
-      ...this.value()
+      raw: true,
+      type: QueryTypes.SELECT,
+      logging: debug,
+      model: this.options.model
     })
 
-  executeStream = async ({ onError, format, tupleFraction, transform, useMaster } = {}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, debug } = {}) =>
     exportStream({
       analytics: true,
       useMaster,
@@ -69,7 +76,7 @@ export default class AnalyticsQuery {
       format,
       transform,
       onError,
-      debug: this.options.debug,
+      debug: debug,
       model: this.options.model,
       value: this.value()
     })

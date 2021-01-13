@@ -38,7 +38,12 @@ export class ValidationError extends BadRequestError {
       this.fields.push(err)
     }
     this.message = this.toString() // update msg
-    Error.captureStackTrace(this, this.add)
+
+    if (err.stack) {
+      this.stack = err.stack
+    } else {
+      Error.captureStackTrace(this, this.add)
+    }
     return this
   }
   isEmpty = () =>

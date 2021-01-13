@@ -17,7 +17,7 @@ const aggregateFunctions = Object.entries(functions).reduce((acc, [ k, v ]) => {
 export default (query = {}, opt) => {
   const { model, context = [] } = opt
   const error = new ValidationError()
-  let attrs = []
+  let attrs = [], joins
 
   // options becomes our initial state - then we are going to mutate from here in each phase
   let state = {
@@ -44,7 +44,7 @@ export default (query = {}, opt) => {
         message: 'Must be an array.'
       })
     } else {
-      state.joins = query.joins.map((i, idx) => {
+      joins = query.joins.map((i, idx) => {
         try {
           return new Join(i, {
             ...state,
@@ -156,5 +156,6 @@ export default (query = {}, opt) => {
   if (!error.isEmpty()) throw error
 
   out.attributes = attrs
+  out.joins = joins
   return out
 }

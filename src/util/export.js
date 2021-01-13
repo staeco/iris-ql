@@ -56,23 +56,7 @@ const streamable = async ({ useMaster, model, sql, transform, tupleFraction, onE
 
 export default async ({ useMaster, model, value, format, transform, tupleFraction, debug, onError, analytics = false }) => {
   const nv = { ...value }
-
-  // prep work findAll usually does
-  if (!analytics) {
-    // sequelize < 5.10
-    if (model._conformOptions) {
-      model._injectScope(nv)
-      model._conformOptions(nv, model)
-      model._expandIncludeAll(nv)
-    } else {
-      model._injectScope(nv)
-      model._conformIncludes(nv, model)
-      model._expandAttributes(nv)
-      model._expandIncludeAll(nv)
-    }
-  }
-
-  const sql = select({ value: nv, model })
+  const sql = select({ value: nv, model, analytics })
   if (debug) debug(sql)
   const src = await streamable({ useMaster, model, tupleFraction, sql, transform, onError })
   if (!format) return src

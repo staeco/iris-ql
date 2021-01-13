@@ -125,7 +125,7 @@ describe('Query#getOutputSchema', () => {
       }
     })
   })
-  it.skip('should work with exclusions and scopes', async () => {
+  it('should work with exclusions and scopes', async () => {
     const query = new Query({
       filters: { sourceId: '911-calls' },
       limit: 1,

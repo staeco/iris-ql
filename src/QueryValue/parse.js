@@ -1,9 +1,10 @@
-import types from 'sequelize'
+import sql from 'sequelize'
 import isObject from 'is-plain-obj'
 import { ValidationError } from '../errors'
 import getTypes from '../types/getTypes'
 import * as funcs from '../types/functions'
 import getJSONField from '../util/getJSONField'
+import getJoinField from '../util/getJoinField'
 import { column } from '../util/toString'
 import getModelFieldLimit from '../util/getModelFieldLimit'
 
@@ -93,18 +94,17 @@ const parse = (v, opt) => {
   const {
     model,
     fieldLimit = getModelFieldLimit(opt.model),
-    hydrateJSON = true,
     context = []
   } = opt
   if (v == null) return null
   if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
-    return types.literal(model.sequelize.escape(v))
+    return sql.literal(model.sequelize.escape(v))
   }
   if (!isObject(v)) {
     throw new ValidationError({
       path: context,
       value: v,
-      message: 'Must be a function, field, string, number, or object.'
+      message: 'Must be a string, number, boolean, or object.'
     })
   }
   if (v.function) {
@@ -128,7 +128,8 @@ const parse = (v, opt) => {
         message: 'Must be a string.'
       })
     }
-    if (resolvedField.includes('.')) return getJSONField(resolvedField, { ...opt, hydrate: hydrateJSON })
+    if (resolvedField.startsWith('~')) return getJoinField(resolvedField, opt)
+    if (resolvedField.includes('.')) return getJSONField(resolvedField, opt)
     if (!fieldLimit.find((i) => i.field === resolvedField)) {
       throw new ValidationError({
         path: [ ...context, 'field' ],
@@ -149,8 +150,8 @@ const parse = (v, opt) => {
         message: 'Field is ambigous - exists as both a column and an aggregation.'
       })
     }
-    if (resolvedAggregation) return types.col(resolvedField)
-    if (resolvedColumn) return types.literal(column({ ...opt, column: resolvedField }))
+    if (resolvedAggregation) return sql.col(resolvedField)
+    if (resolvedColumn) return sql.literal(column({ ...opt, column: resolvedField }))
 
     throw new Error(`Unknown field type for: ${resolvedField}`)
   }
