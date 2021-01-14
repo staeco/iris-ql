@@ -15,6 +15,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 const fmt = v => _capitalize.default.words((0, _decamelize.default)(v, ' '));
 
+const getFieldSchema = (field, opt) => {
+  if (field.includes('.')) {
+    const [head, tail] = field.split('.');
+    return opt.subSchemas[head][tail];
+  }
+
+  return opt.model.rawAttributes[field];
+};
+
+const getJoinSchema = (field, opt) => {
+  const [join, ...rest] = field.split('.');
+  return getFieldSchema(rest.join('.'), opt.joins?.[join.replace('~', '')]);
+};
+
 var _default = (agg, opt = {}) => {
   const types = (0, _getTypes.default)(agg.value, opt);
   if (types.length === 0) return; // no types? weird
@@ -23,12 +37,7 @@ var _default = (agg, opt = {}) => {
   let fieldSchema;
 
   if (agg.value.field) {
-    if (agg.value.field.includes('.')) {
-      const [head, tail] = agg.value.field.split('.');
-      fieldSchema = opt.subSchemas[head][tail];
-    } else {
-      fieldSchema = opt.model.rawAttributes[agg.field];
-    }
+    fieldSchema = agg.value.field.startsWith('~') ? getJoinSchema(agg.value.field, opt) : getFieldSchema(agg.value.field, opt);
   }
 
   return (0, _lodash.pickBy)({

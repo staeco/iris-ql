@@ -5,13 +5,9 @@ exports.default = void 0;
 
 var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
-var _QueryValue = _interopRequireDefault(require("../QueryValue"));
-
-var _Filter = _interopRequireDefault(require("../Filter"));
+var _Query = _interopRequireDefault(require("../Query"));
 
 var _errors = require("../errors");
-
-var _aggregateWithFilter = _interopRequireDefault(require("../util/aggregateWithFilter"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -21,11 +17,9 @@ const alphanum = /[^0-9a-z]/i;
 
 var _default = (a, opt) => {
   const {
-    model,
-    context = [],
-    instanceQuery
+    joins,
+    context = []
   } = opt;
-  let agg, parsedFilters;
   const error = new _errors.ValidationError();
 
   if (!(0, _isPlainObj.default)(a)) {
@@ -48,6 +42,12 @@ var _default = (a, opt) => {
       path: [...context, 'alias'],
       value: a.alias,
       message: 'Must be a string.'
+    });
+  } else if (!joins[a.alias]) {
+    error.add({
+      path: [...context, 'alias'],
+      value: a.alias,
+      message: 'Must be a defined join!'
     });
   }
 
@@ -96,46 +96,33 @@ var _default = (a, opt) => {
     });
   }
 
-  if (!a.value) {
-    error.add({
-      path: [...context, 'value'],
-      value: a.value,
-      message: 'Missing value!'
-    });
-    throw error; // dont even bother continuing
-  }
+  if (!error.isEmpty()) throw error;
+  const joinConfig = joins[a.alias];
+  if (!joinConfig.model || !joinConfig.model.rawAttributes) throw new Error(`Missing model for join ${a.alias}!`);
+  let query;
 
   try {
-    agg = new _QueryValue.default(a.value, { ...opt,
-      context: [...context, 'value']
-    }).value();
-  } catch (err) {
-    error.add(err);
-  }
-
-  if (a.filters && !(0, _isPlainObj.default)(a.filters) && !Array.isArray(a.filters)) {
-    error.add({
-      path: [...context, 'filters'],
-      value: a.filters,
-      message: 'Must be an object or array.'
+    query = new _Query.default(a, {
+      context,
+      ...joinConfig,
+      from: a.alias,
+      joins: {
+        parent: {
+          fieldLimit: opt.fieldLimit,
+          model: opt.model,
+          subSchemas: opt.subSchemas
+        }
+      }
     });
-  }
-
-  try {
-    parsedFilters = a.filters && new _Filter.default(a.filters, { ...opt,
-      context: [...context, 'filters']
-    }).value();
   } catch (err) {
     error.add(err);
   }
 
   if (!error.isEmpty()) throw error;
-  return [parsedFilters ? (0, _aggregateWithFilter.default)({
-    aggregation: agg,
-    filters: parsedFilters,
-    model,
-    instanceQuery
-  }) : agg, a.alias];
+  return { ...joinConfig,
+    alias: a.alias,
+    where: query.value().where
+  };
 };
 
 exports.default = _default;

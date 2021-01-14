@@ -3,17 +3,35 @@
 exports.__esModule = true;
 exports.default = void 0;
 
+var _sequelize = require("sequelize");
+
 var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 var _parse = _interopRequireDefault(require("./parse"));
 
 var _export = _interopRequireDefault(require("../util/export"));
 
+var _toString = require("../util/toString");
+
 var _getMeta = _interopRequireDefault(require("../Aggregation/getMeta"));
 
 var _Query = _interopRequireDefault(require("../Query"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _ref(acc, [k, mod]) {
+  const idx = acc.findIndex(j => j.alias === k);
+  if (idx === -1) throw new Error(`Join not found: ${k}`);
+  if (mod.where && !Array.isArray(mod.where)) throw new Error(`Invalid where array on join update for ${k}!`);
+
+  if (mod.where) {
+    acc[idx] = { ...acc[idx],
+      where: [...acc[idx].where, ...mod.where]
+    };
+  }
+
+  return acc;
+}
 
 class AnalyticsQuery {
   constructor(obj, options = {}) {
@@ -32,19 +50,21 @@ class AnalyticsQuery {
       defaultLimit,
       maxLimit,
       attributes,
-      where
+      where,
+      joins
     } = {}) => {
       if (where && !Array.isArray(where)) throw new Error('Invalid where array!');
       if (attributes && !Array.isArray(attributes)) throw new Error('Invalid attributes array!');
-      this.update(v => {
+      return this.update(v => {
         const limit = v.limit || defaultLimit;
+        const newJoins = joins ? Object.entries(joins).reduce(_ref, Array.from(v.joins)) : v.joins;
         return { ...v,
           attributes: attributes || v.attributes,
           where: where ? [...v.where, ...where] : v.where,
-          limit: maxLimit ? limit ? Math.min(limit, maxLimit) : maxLimit : limit
+          limit: maxLimit ? limit ? Math.min(limit, maxLimit) : maxLimit : limit,
+          joins: newJoins
         };
       });
-      return this;
     };
 
     this.value = () => this._parsed;
@@ -62,12 +82,18 @@ class AnalyticsQuery {
     }, {});
 
     this.execute = async ({
-      useMaster
-    } = {}) => this.options.model.findAll({
-      raw: true,
       useMaster,
-      logging: this.options.debug,
-      ...this.value()
+      debug
+    } = {}) => this.options.model.sequelize.query((0, _toString.select)({
+      value: this.value(),
+      model: this.options.model,
+      analytics: true
+    }), {
+      useMaster,
+      raw: true,
+      type: _sequelize.QueryTypes.SELECT,
+      logging: debug,
+      model: this.options.model
     });
 
     this.executeStream = async ({
@@ -75,7 +101,8 @@ class AnalyticsQuery {
       format,
       tupleFraction,
       transform,
-      useMaster
+      useMaster,
+      debug
     } = {}) => (0, _export.default)({
       analytics: true,
       useMaster,
@@ -83,17 +110,18 @@ class AnalyticsQuery {
       format,
       transform,
       onError,
-      debug: this.options.debug,
+      debug: debug,
       model: this.options.model,
       value: this.value()
     });
 
     if (!obj) throw new Error('Missing value!');
-    if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
     if (!obj.aggregations && !obj.groupings) return new _Query.default(obj, { ...options,
       count: false
     }); // skip the advanced stuff and kick it down a level
 
+    if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
+    if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!');
     this.input = obj;
     this.options = options;
     this._parsed = (0, _parse.default)(obj, options);

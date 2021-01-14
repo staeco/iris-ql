@@ -4,6 +4,10 @@ import Filter from '../Filter'
 import { ValidationError } from '../errors'
 import aggregateWithFilter from '../util/aggregateWithFilter'
 
+const MAX_LENGTH = 64
+const MAX_NOTES_LENGTH = 1024
+const alphanum = /[^0-9a-z]/i
+
 export default (a, opt) => {
   const { model, context = [], instanceQuery } = opt
   let agg, parsedFilters
@@ -30,6 +34,34 @@ export default (a, opt) => {
       message: 'Must be a string.'
     })
   }
+
+  if (a.name && typeof a.name !== 'string') {
+    error.add({
+      path: [ ...context, 'name' ],
+      value: a.name,
+      message: 'Must be a string.'
+    })
+  }
+
+  if (a.notes && typeof a.notes !== 'string') {
+    error.add({
+      path: [ ...context, 'notes' ],
+      value: a.notes,
+      message: 'Must be a string.'
+    })
+  }
+
+  if (typeof a.alias === 'string') {
+    if (a.alias.length > MAX_LENGTH) error.add({ value: a.alias, path: [ ...context, 'alias' ], message: `Must be less than ${MAX_LENGTH} characters` })
+    if (a.alias.match(alphanum)) error.add({ value: a.alias, path: [ ...context, 'alias' ], message: 'Must be alphanumeric' })
+  }
+  if (typeof a.name === 'string') {
+    if (a.name.length > MAX_LENGTH) error.add({ value: a.name, path: [ ...context, 'name' ], message: `Must be less than ${MAX_LENGTH} characters` })
+  }
+  if (typeof a.notes === 'string') {
+    if (a.notes.length > MAX_NOTES_LENGTH) error.add({ value: a.notes, path: [ ...context, 'notes' ], message: `Must be less than ${MAX_LENGTH} characters` })
+  }
+
   if (!a.value) {
     error.add({
       path: [ ...context, 'value' ],

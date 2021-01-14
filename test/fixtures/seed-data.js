@@ -37,12 +37,12 @@ const calls = [
       description: 'Assault, Victim Fled',
       location: {
         type: 'Point',
-        coordinates: [ 1, 2 ]
+        coordinates: [ 2, 2 ]
       }
     },
     geometry: {
       type: 'Point',
-      coordinates: [ 1, 2 ]
+      coordinates: [ 2, 2 ]
     }
   }
 ]
@@ -107,7 +107,7 @@ const bikeTrips = [
 
 const transitPassengers = [
   {
-    sourceId: 'transit-passenger',
+    sourceId: 'transit-passengers',
     data: {
       id: 'SRC-1-A',
       route: 'A',
@@ -116,16 +116,16 @@ const transitPassengers = [
     }
   },
   {
-    sourceId: 'transit-passenger',
+    sourceId: 'transit-passengers',
     data: {
       id: 'SRC-1-B',
       route: 'B',
       year: 2018,
-      passengers: 6563
+      passengers: 6566
     }
   },
   {
-    sourceId: 'transit-passenger',
+    sourceId: 'transit-passengers',
     data: {
       id: 'SRC-2-A',
       route: 'A',
@@ -134,19 +134,19 @@ const transitPassengers = [
     }
   },
   {
-    sourceId: 'transit-passenger',
+    sourceId: 'transit-passengers',
     data: {
       id: 'SRC-2-B',
       route: 'B',
       year: 2019,
-      passengers: 7621
+      passengers: 7622
     }
   }
 ]
 
 const transitTrips = [
   {
-    sourceId: 'transit-trip',
+    sourceId: 'transit-trips',
     data: {
       id: 'SRC-1-A',
       route: 'A',
@@ -155,30 +155,30 @@ const transitTrips = [
     }
   },
   {
-    sourceId: 'transit-trip',
+    sourceId: 'transit-trips',
     data: {
       id: 'SRC-1-B',
       route: 'B',
       year: 2018,
-      miles: 89321
+      miles: 89322
     }
   },
   {
-    sourceId: 'transit-trip',
+    sourceId: 'transit-trips',
     data: {
       id: 'SRC-2-A',
       route: 'A',
       year: 2019,
-      passengers: 703201
+      miles: 703202
     }
   },
   {
-    sourceId: 'transit-trip',
+    sourceId: 'transit-trips',
     data: {
       id: 'SRC-2-B',
       route: 'B',
       year: 2019,
-      passengers: 85102
+      miles: 85102
     }
   }
 ]

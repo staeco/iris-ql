@@ -29,13 +29,13 @@ const getValueTypes = v => (0, _lodash.sortBy)(Object.entries(schemaTypes).reduc
 
 const getJSONTypes = (fieldPath, {
   model,
-  subSchemas = {}
+  subSchemas
 }) => {
   const path = fieldPath.split('.');
   const col = path.shift();
   const colInfo = model.rawAttributes[col];
   if (!colInfo) return [];
-  const schema = subSchemas[col] || colInfo.subSchema;
+  const schema = subSchemas?.[col] || colInfo.subSchema;
   if (!schema) return [];
   const field = path[0];
   const attrDef = schema[field];
@@ -50,18 +50,27 @@ const getJSONTypes = (fieldPath, {
   })];
 };
 
+const getJoinTypes = (fieldPath, {
+  joins
+}) => {
+  const [join, ...rest] = fieldPath.split('.');
+  return getPlainFieldTypes(rest.join('.'), joins?.[join.replace('~', '')]);
+};
+
 const getFieldTypes = (fieldPath, {
   model,
-  subSchemas = {}
+  subSchemas
 }) => {
   const desc = model.rawAttributes[fieldPath];
   if (!desc) return [];
-  const schemaType = (0, _lodash.pickBy)({ ...(0, _toSchemaType.default)(desc.type, subSchemas[fieldPath]),
+  const schemaType = (0, _lodash.pickBy)({ ...(0, _toSchemaType.default)(desc.type, subSchemas?.[fieldPath]),
     name: desc.name,
     notes: desc.notes
   });
   return schemaType ? [schemaType] : [];
-}; // return empty on any invalid condition, `parse` will handle main validation before this function is called
+};
+
+const getPlainFieldTypes = (fieldPath, opt) => fieldPath.includes('.') ? getJSONTypes(fieldPath, opt) : getFieldTypes(fieldPath, opt); // return empty on any invalid condition, `parse` will handle main validation before this function is called
 
 
 const getTypes = (v, opt = {}) => {
@@ -93,8 +102,7 @@ const getTypes = (v, opt = {}) => {
 
   if (v.field) {
     if (typeof v.field !== 'string') return [];
-    if (v.field.includes('.')) return getJSONTypes(v.field, opt);
-    return getFieldTypes(v.field, opt);
+    return v.field.startsWith('~') ? getJoinTypes(v.field, opt) : getPlainFieldTypes(v.field, opt);
   }
 
   return [];

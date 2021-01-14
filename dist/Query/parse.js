@@ -41,8 +41,11 @@ var _default = (query, opt = {}) => {
     model,
     context = []
   } = opt;
-  const attrs = (0, _getScopedAttributes.default)(model);
-  const initialFieldLimit = opt.fieldLimit || (0, _getModelFieldLimit.default)(model); // options we pass on, default in fieldLimit
+  const attrs = (0, _getScopedAttributes.default)(model); // options becomes our initial state - then we are going to mutate from here in each phase
+
+  let state = { ...opt,
+    fieldLimit: opt.fieldLimit || (0, _getModelFieldLimit.default)(model)
+  }; // options we pass on, default in fieldLimit
 
   const out = {
     where: [{} // very dumb fix for https://github.com/sequelize/sequelize/issues/10142
@@ -51,8 +54,8 @@ var _default = (query, opt = {}) => {
   }; // if user specified time settins, tack them onto options from the query so downstream knows about it
 
   try {
-    opt = { ...opt,
-      ...(0, _parseTimeOptions.default)(query, opt)
+    state = { ...state,
+      ...(0, _parseTimeOptions.default)(query, state)
     };
   } catch (err) {
     error.add(err);
@@ -64,7 +67,7 @@ var _default = (query, opt = {}) => {
   }
 
   if (query.search) {
-    const searchable = initialFieldLimit.filter(_ref);
+    const searchable = state.fieldLimit.filter(_ref);
     const isSearchable = searchable.length !== 0;
     const isValid = typeof query.search === 'string';
 
@@ -250,7 +253,7 @@ var _default = (query, opt = {}) => {
   function _ref2(k, idx) {
     const [first] = k.split('.');
 
-    if (!first || !initialFieldLimit.find(f => f.field === first)) {
+    if (!first || !state.fieldLimit.find(f => f.field === first)) {
       error.add({
         path: [...context, 'exclusions', idx],
         value: k,
@@ -305,8 +308,7 @@ var _default = (query, opt = {}) => {
       });
     } else {
       try {
-        out.where.push(new _Filter.default(query.filters, { ...opt,
-          fieldLimit: initialFieldLimit,
+        out.where.push(new _Filter.default(query.filters, { ...state,
           context: [...context, 'filters']
         }).value());
       } catch (err) {
@@ -318,8 +320,7 @@ var _default = (query, opt = {}) => {
 
   function _ref3(v, idx) {
     try {
-      out.order.push(new _Ordering.default(v, { ...opt,
-        fieldLimit: initialFieldLimit,
+      out.order.push(new _Ordering.default(v, { ...state,
         context: [...context, 'orderings', idx]
       }).value());
     } catch (err) {

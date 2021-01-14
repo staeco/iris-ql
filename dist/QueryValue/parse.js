@@ -15,6 +15,8 @@ var funcs = _interopRequireWildcard(require("../types/functions"));
 
 var _getJSONField = _interopRequireDefault(require("../util/getJSONField"));
 
+var _getJoinField = _interopRequireDefault(require("../util/getJoinField"));
+
 var _toString = require("../util/toString");
 
 var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
@@ -134,7 +136,6 @@ const parse = (v, opt) => {
   const {
     model,
     fieldLimit = (0, _getModelFieldLimit.default)(opt.model),
-    hydrateJSON = true,
     context = []
   } = opt;
   if (v == null) return null;
@@ -147,7 +148,7 @@ const parse = (v, opt) => {
     throw new _errors.ValidationError({
       path: context,
       value: v,
-      message: 'Must be a function, field, string, number, or object.'
+      message: 'Must be a string, number, boolean, or object.'
     });
   }
 
@@ -179,9 +180,8 @@ const parse = (v, opt) => {
       });
     }
 
-    if (resolvedField.includes('.')) return (0, _getJSONField.default)(resolvedField, { ...opt,
-      hydrate: hydrateJSON
-    });
+    if (resolvedField.startsWith('~')) return (0, _getJoinField.default)(resolvedField, opt);
+    if (resolvedField.includes('.')) return (0, _getJSONField.default)(resolvedField, opt);
 
     if (!fieldLimit.find(i => i.field === resolvedField)) {
       throw new _errors.ValidationError({

@@ -27,6 +27,7 @@ export const column = ({ column, model, from, instanceQuery = true }) => {
 }
 
 export const select = ({ value, model, from, analytics }) => {
+  const qg = getQueryGenerator(model)
   const nv = { ...value }
 
   // prep work findAll usually does
@@ -44,15 +45,24 @@ export const select = ({ value, model, from, analytics }) => {
     }
   }
 
-  return getQueryGenerator(model).selectQuery(from || model.getTableName(), nv, model)
+  const basic = qg.selectQuery(from || model.getTableName(), nv, model)
+  if (!value.joins) return basic
+
+  // inject joins into the query, sequelize has no way of doing this
+  const injectPoint = `FROM ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(model.name)}`
+  const joinStr = value.joins
+    .filter((j) => basic.includes(qg.quoteIdentifier(j.alias)))
+    .map(join)
+    .join(' ')
+  const out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`)
+  return out
 }
 
-export const join = ({ value, model, alias }) => {
+export const join = ({ where, model, alias }) => {
   const qg = getQueryGenerator(model)
-  // types.literal('LEFT JOIN x AS "" ON y')
-  const where = qg.whereItemsQuery(value, {
+  const whereStr = qg.whereItemsQuery(where, {
     prefix: qg.sequelize.literal(qg.quoteIdentifier(alias)),
     model
   })
-  return `LEFT JOIN ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(alias)} ON ${where}`
+  return `LEFT JOIN ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(alias)} ON ${whereStr}`
 }

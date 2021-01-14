@@ -8,6 +8,7 @@ export default class Query {
   constructor(obj, options = {}) {
     if (!obj) throw new Error('Missing query!')
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
+    if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!')
     this.input = obj
     this.options = options
     this._parsed = parse(obj, options)

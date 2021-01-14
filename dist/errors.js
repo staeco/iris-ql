@@ -36,14 +36,25 @@ class ValidationError extends BadRequestError {
     super('Validation Error');
 
     this.add = err => {
+      if (!err) return this; // nothing to do
+
       if (err.fields) {
         this.fields.push(...err.fields);
-        return this;
+      } else if (err instanceof Error) {
+        throw err;
+      } else if (Array.isArray(err)) {
+        this.fields.push(...err);
+      } else {
+        this.fields.push(err);
       }
 
-      if (err instanceof Error) throw err;
-      this.fields.push(err);
       this.message = this.toString(); // update msg
+
+      if (err.stack) {
+        this.stack = err.stack;
+      } else {
+        Error.captureStackTrace(this, this.add);
+      }
 
       return this;
     };
@@ -57,8 +68,8 @@ class ValidationError extends BadRequestError {
       return `${original}\nIssues:${serializeIssues(this.fields)}`;
     };
 
-    this.fields = Array.isArray(fields) ? fields : [fields];
-    this.message = this.toString();
+    this.fields = [];
+    if (fields) this.add(fields);
     Error.captureStackTrace(this, ValidationError);
   }
 

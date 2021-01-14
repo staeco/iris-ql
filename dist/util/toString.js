@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.select = exports.column = exports.jsonPath = exports.value = exports.where = void 0;
+exports.join = exports.select = exports.column = exports.identifier = exports.jsonPath = exports.value = exports.where = void 0;
 
 // sequelize < 6 uses QueryGenerator, > 6 uses queryGenerator
 const getQueryGenerator = model => model.sequelize.dialect.queryGenerator || model.sequelize.dialect.QueryGenerator;
@@ -14,8 +14,9 @@ const table = ({
 const where = ({
   value,
   model,
+  from,
   instanceQuery = true
-}) => getQueryGenerator(model).getWhereConditions(value, table({
+}) => getQueryGenerator(model).getWhereConditions(value, from || table({
   model,
   instanceQuery
 }), model);
@@ -25,8 +26,9 @@ exports.where = where;
 const value = ({
   value,
   model,
+  from,
   instanceQuery = true
-}) => getQueryGenerator(model).handleSequelizeMethod(value, table({
+}) => getQueryGenerator(model).handleSequelizeMethod(value, from || table({
   model,
   instanceQuery
 }), model);
@@ -37,35 +39,94 @@ const jsonPath = ({
   column,
   model,
   path,
+  from,
   instanceQuery = true
 }) => {
   const ncol = getQueryGenerator(model).jsonPathExtractionQuery(column, path) // remove parens it puts on for literally no reason
   .replace(/^\(/, '').replace(/\)$/, '');
-  return `"${table({
+  const tbl = getQueryGenerator(model).quoteIdentifier(from || table({
     model,
     instanceQuery
-  })}".${ncol}`;
+  }));
+  return `${tbl}.${ncol}`;
 };
 
 exports.jsonPath = jsonPath;
 
+const identifier = ({
+  value,
+  model
+}) => getQueryGenerator(model).quoteIdentifier(value);
+
+exports.identifier = identifier;
+
 const column = ({
   column,
   model,
+  from,
   instanceQuery = true
 }) => {
   const ncol = getQueryGenerator(model).quoteIdentifier(column);
-  return `"${table({
+  const tbl = getQueryGenerator(model).quoteIdentifier(from || table({
     model,
     instanceQuery
-  })}".${ncol}`;
+  }));
+  return `${tbl}.${ncol}`;
 };
 
 exports.column = column;
 
 const select = ({
   value,
-  model
-}) => getQueryGenerator(model).selectQuery(model.getTableName(), value, model);
+  model,
+  from,
+  analytics
+}) => {
+  const qg = getQueryGenerator(model);
+  const nv = { ...value
+  }; // prep work findAll usually does
+
+  if (!analytics) {
+    // sequelize < 5.10
+    if (model._conformOptions) {
+      model._injectScope(nv);
+
+      model._conformOptions(nv, model);
+
+      model._expandIncludeAll(nv);
+    } else {
+      model._injectScope(nv);
+
+      model._conformIncludes(nv, model);
+
+      model._expandAttributes(nv);
+
+      model._expandIncludeAll(nv);
+    }
+  }
+
+  const basic = qg.selectQuery(from || model.getTableName(), nv, model);
+  if (!value.joins) return basic; // inject joins into the query, sequelize has no way of doing this
+
+  const injectPoint = `FROM ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(model.name)}`;
+  const joinStr = value.joins.filter(j => basic.includes(qg.quoteIdentifier(j.alias))).map(join).join(' ');
+  const out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`);
+  return out;
+};
 
 exports.select = select;
+
+const join = ({
+  where,
+  model,
+  alias
+}) => {
+  const qg = getQueryGenerator(model);
+  const whereStr = qg.whereItemsQuery(where, {
+    prefix: qg.sequelize.literal(qg.quoteIdentifier(alias)),
+    model
+  });
+  return `LEFT JOIN ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(alias)} ON ${whereStr}`;
+};
+
+exports.join = join;
