@@ -9,6 +9,8 @@ var _QueryValue = _interopRequireDefault(require("../QueryValue"));
 
 var _Aggregation = _interopRequireDefault(require("../Aggregation"));
 
+var _Join = _interopRequireDefault(require("../Join"));
+
 var _errors = require("../errors");
 
 var functions = _interopRequireWildcard(require("../types/functions"));
@@ -30,7 +32,7 @@ const aggregateFunctions = Object.entries(functions).reduce((acc, [k, v]) => {
   return acc;
 }, []); // this is an extension of parseQuery that allows for aggregations and groupings
 
-function _ref2(i) {
+function _ref3(i) {
   return {
     type: 'aggregation',
     field: i.alias,
@@ -38,7 +40,7 @@ function _ref2(i) {
   };
 }
 
-function _ref4(k, v) {
+function _ref5(k, v) {
   return typeof v?.function === 'string' && aggregateFunctions.includes(v.function);
 }
 
@@ -48,21 +50,49 @@ var _default = (query = {}, opt) => {
     context = []
   } = opt;
   const error = new _errors.ValidationError();
-  let attrs = [];
-  const initialFieldLimit = opt.fieldLimit || (0, _getModelFieldLimit.default)(model); // if user specified time settins, tack them onto options from the query so downstream knows about it
+  let attrs = [],
+      joins; // options becomes our initial state - then we are going to mutate from here in each phase
+
+  let state = { ...opt,
+    fieldLimit: opt.fieldLimit || (0, _getModelFieldLimit.default)(model)
+  }; // if user specified time settings, tack them onto options from the query so downstream knows about it
 
   try {
-    opt = { ...opt,
-      ...(0, _parseTimeOptions.default)(query, opt)
+    state = { ...state,
+      ...(0, _parseTimeOptions.default)(query, state)
     };
   } catch (err) {
     error.add(err);
+  } // check joins before we dive in
+
+
+  function _ref(i, idx) {
+    try {
+      return new _Join.default(i, { ...state,
+        context: [...context, 'joins', idx]
+      }).value();
+    } catch (err) {
+      error.add(err);
+      return null;
+    }
   }
 
-  function _ref(a, idx) {
+  if (query.joins) {
+    if (!Array.isArray(query.joins)) {
+      error.add({
+        path: [...context, 'joins'],
+        value: query.joins,
+        message: 'Must be an array.'
+      });
+    } else {
+      joins = query.joins.map(_ref);
+    }
+  } // basic checks
+
+
+  function _ref2(a, idx) {
     try {
-      return new _Aggregation.default(a, { ...opt,
-        fieldLimit: initialFieldLimit,
+      return new _Aggregation.default(a, { ...state,
         context: [...context, 'aggregations', idx]
       }).value();
     } catch (err) {
@@ -86,26 +116,25 @@ var _default = (query = {}, opt) => {
       });
     }
 
-    attrs = query.aggregations.map(_ref);
+    attrs = query.aggregations.map(_ref2);
   }
 
-  if (!error.isEmpty()) throw error;
-  const aggFieldLimit = query.aggregations.map(_ref2);
-  const fieldLimit = initialFieldLimit.concat(aggFieldLimit);
-  const nopt = { ...opt,
-    fieldLimit
-  };
+  if (!error.isEmpty()) throw error; // primary query check phase
+
+  const aggFieldLimit = query.aggregations.map(_ref3);
+  state.fieldLimit = [...state.fieldLimit, ...aggFieldLimit];
   let out = {};
 
   try {
-    out = new _Query.default(query, nopt).value();
+    out = new _Query.default(query, state).value();
   } catch (err) {
     error.add(err);
-  }
+  } // groupings, last phase
 
-  function _ref3(i, idx) {
+
+  function _ref4(i, idx) {
     try {
-      return new _QueryValue.default(i, { ...nopt,
+      return new _QueryValue.default(i, { ...state,
         context: [...context, 'groupings', idx]
       }).value();
     } catch (err) {
@@ -122,14 +151,15 @@ var _default = (query = {}, opt) => {
         message: 'Must be an array.'
       });
     } else {
-      out.group = query.groupings.map(_ref3);
+      out.group = query.groupings.map(_ref4);
     }
   }
 
-  if (!error.isEmpty()) throw error; // validate each aggregation and ensure it is either used in groupings, or contains an aggregate function
+  if (!error.isEmpty()) throw error; // post-parse checks
+  // validate each aggregation and ensure it is either used in groupings, or contains an aggregate function
 
   query.aggregations.forEach((agg, idx) => {
-    const hasAggregateFunction = (0, _search.default)(agg.value, _ref4);
+    const hasAggregateFunction = (0, _search.default)(agg.value, _ref5);
     if (hasAggregateFunction) return; // valid
 
     const matchedGrouping = (0, _search.default)(query.groupings, (k, v) => typeof v?.field === 'string' && v.field === agg.alias);
@@ -157,6 +187,7 @@ var _default = (query = {}, opt) => {
   }, []);
   if (!error.isEmpty()) throw error;
   out.attributes = attrs;
+  out.joins = joins;
   return out;
 };
 

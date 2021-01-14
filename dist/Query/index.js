@@ -41,7 +41,7 @@ class Query {
     } = {}) => {
       if (where && !Array.isArray(where)) throw new Error('Invalid where array!');
       if (attributes && !Array.isArray(attributes)) throw new Error('Invalid attributes array!');
-      this.update(v => {
+      return this.update(v => {
         const limit = v.limit || defaultLimit;
         return { ...v,
           attributes: attributes || v.attributes,
@@ -49,7 +49,6 @@ class Query {
           limit: maxLimit ? limit ? Math.min(limit, maxLimit) : maxLimit : limit
         };
       });
-      return this;
     };
 
     this.value = ({
@@ -75,13 +74,14 @@ class Query {
 
     this.execute = async ({
       raw = false,
-      useMaster
+      useMaster,
+      debug
     } = {}) => {
       const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll';
       return this.options.model[fn]({
         raw,
         useMaster,
-        logging: this.options.debug,
+        logging: debug,
         ...this.value()
       });
     };
@@ -91,28 +91,32 @@ class Query {
       format,
       tupleFraction,
       transform,
-      useMaster
+      useMaster,
+      debug
     } = {}) => (0, _export.default)({
       useMaster,
       tupleFraction,
       format,
       transform,
       onError,
-      debug: this.options.debug,
+      debug,
       model: this.options.model,
       value: this.value()
     });
 
     this.count = async ({
-      useMaster
+      useMaster,
+      debug
     } = {}) => this.options.model.count({
       useMaster,
-      logging: this.options.debug,
+      logging: debug,
       ...this.value()
     });
 
-    this.destroy = async () => this.options.model.destroy({
-      logging: this.options.debug,
+    this.destroy = async ({
+      debug
+    } = {}) => this.options.model.destroy({
+      logging: debug,
       ...this.value({
         instanceQuery: false
       })
@@ -120,6 +124,7 @@ class Query {
 
     if (!obj) throw new Error('Missing query!');
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
+    if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!');
     this.input = obj;
     this.options = options;
     this._parsed = (0, _parse.default)(obj, options);

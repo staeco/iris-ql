@@ -91,30 +91,11 @@ var _default = async ({
   analytics = false
 }) => {
   const nv = { ...value
-  }; // prep work findAll usually does
-
-  if (!analytics) {
-    // sequelize < 5.10
-    if (model._conformOptions) {
-      model._injectScope(nv);
-
-      model._conformOptions(nv, model);
-
-      model._expandIncludeAll(nv);
-    } else {
-      model._injectScope(nv);
-
-      model._conformIncludes(nv, model);
-
-      model._expandAttributes(nv);
-
-      model._expandIncludeAll(nv);
-    }
-  }
-
+  };
   const sql = (0, _toString.select)({
     value: nv,
-    model
+    model,
+    analytics
   });
   if (debug) debug(sql);
   const src = await streamable({

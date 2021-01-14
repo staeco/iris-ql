@@ -1,14 +1,17 @@
+import { QueryTypes } from 'sequelize'
 import isObject from 'is-plain-obj'
 import parse from './parse'
 import exportStream from '../util/export'
+import { select } from '../util/toString'
 import getAggregationMeta from '../Aggregation/getMeta'
 import Query from '../Query'
 
 export default class AnalyticsQuery {
   constructor(obj, options = {}) {
     if (!obj) throw new Error('Missing value!')
-    if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
     if (!obj.aggregations && !obj.groupings) return new Query(obj, { ...options, count: false }) // skip the advanced stuff and kick it down a level
+    if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
+    if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!')
     this.input = obj
     this.options = options
     this._parsed = parse(obj, options)
@@ -21,11 +24,26 @@ export default class AnalyticsQuery {
     this._parsed = newValue
     return this
   }
-  constrain = ({ defaultLimit, maxLimit, attributes, where } = {}) => {
+  constrain = ({ defaultLimit, maxLimit, attributes, where, joins } = {}) => {
     if (where && !Array.isArray(where)) throw new Error('Invalid where array!')
     if (attributes && !Array.isArray(attributes)) throw new Error('Invalid attributes array!')
-    this.update((v) => {
+    return this.update((v) => {
       const limit = v.limit || defaultLimit
+      const newJoins = joins
+        ? Object.entries(joins).reduce((acc, [ k, mod ]) => {
+          const idx = acc.findIndex((j) => j.alias === k)
+          if (idx === -1) throw new Error(`Join not found: ${k}`)
+          if (mod.where && !Array.isArray(mod.where)) throw new Error(`Invalid where array on join update for ${k}!`)
+          if (mod.where) {
+            acc[idx] = {
+              ...acc[idx],
+              where: [ ...acc[idx].where, ...mod.where ]
+            }
+          }
+          return acc
+        }, Array.from(v.joins))
+        : v.joins
+
       return {
         ...v,
         attributes: attributes || v.attributes,
@@ -36,10 +54,10 @@ export default class AnalyticsQuery {
           ? limit
             ? Math.min(limit, maxLimit)
             : maxLimit
-          : limit
+          : limit,
+        joins: newJoins
       }
     })
-    return this
   }
   value = () => this._parsed
   toJSON = () => this.input
@@ -54,15 +72,20 @@ export default class AnalyticsQuery {
       return prev
     }, {})
 
-  execute = async ({ useMaster } = {}) =>
-    this.options.model.findAll({
-      raw: true,
+  execute = async ({ useMaster, debug } = {}) =>
+    this.options.model.sequelize.query(select({
+      value: this.value(),
+      model: this.options.model,
+      analytics: true
+    }), {
       useMaster,
-      logging: this.options.debug,
-      ...this.value()
+      raw: true,
+      type: QueryTypes.SELECT,
+      logging: debug,
+      model: this.options.model
     })
 
-  executeStream = async ({ onError, format, tupleFraction, transform, useMaster } = {}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, debug } = {}) =>
     exportStream({
       analytics: true,
       useMaster,
@@ -70,7 +93,7 @@ export default class AnalyticsQuery {
       format,
       transform,
       onError,
-      debug: this.options.debug,
+      debug: debug,
       model: this.options.model,
       value: this.value()
     })

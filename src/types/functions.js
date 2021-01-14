@@ -1,4 +1,4 @@
-import types from 'sequelize'
+import sql from 'sequelize'
 import capitalize from 'capitalize'
 import decamelize from 'decamelize'
 import moment from 'moment-timezone'
@@ -28,9 +28,9 @@ const numeric = (info) => {
   const flatTypes = info.types.map((i) => i.type)
   //if (flatTypes.includes('number')) return info.value // already a number
   if (flatTypes.includes('date')) {
-    return types.fn('time_to_ms', info.value)
+    return sql.fn('time_to_ms', info.value)
   }
-  return types.cast(info.value, 'numeric')
+  return sql.cast(info.value, 'numeric')
 }
 
 const getGeoReturnType = (raw) => {
@@ -66,13 +66,13 @@ const getGeometryValue = (raw) => {
   if (typeof o.type !== 'string') throw new Error('Not a valid GeoJSON object!')
 
   // FeatureCollection
-  if (Array.isArray(o.features)) return types.fn('from_geojson_collection', raw)
+  if (Array.isArray(o.features)) return sql.fn('from_geojson_collection', raw)
 
   // Feature
   if (o.geometry) return getGeometryValue(JSON.stringify(o.geometry))
 
   // Anything else
-  return types.fn('from_geojson', raw)
+  return sql.fn('from_geojson', raw)
 }
 
 const partsToDB = {
@@ -127,7 +127,7 @@ export const expand = {
     static: { type: 'any' },
     dynamic: ([ listInfo ]) => listInfo.types.find((i) => i.type === 'array').items
   },
-  execute: ([ listInfo ]) => types.fn('unnest', listInfo.value)
+  execute: ([ listInfo ]) => sql.fn('unnest', listInfo.value)
 }
 
 // Aggregations
@@ -146,7 +146,7 @@ export const min = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
-  execute: ([ f ]) => types.fn('min', numeric(f))
+  execute: ([ f ]) => sql.fn('min', numeric(f))
 }
 export const max = {
   name: 'Maximum',
@@ -163,7 +163,7 @@ export const max = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
-  execute: ([ f ]) => types.fn('max', numeric(f))
+  execute: ([ f ]) => sql.fn('max', numeric(f))
 }
 export const sum = {
   name: 'Sum',
@@ -180,7 +180,7 @@ export const sum = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
-  execute: ([ f ]) => types.fn('sum', numeric(f))
+  execute: ([ f ]) => sql.fn('sum', numeric(f))
 }
 export const average = {
   name: 'Average',
@@ -197,7 +197,7 @@ export const average = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
-  execute: ([ f ]) => types.fn('avg', numeric(f))
+  execute: ([ f ]) => sql.fn('avg', numeric(f))
 }
 export const median = {
   name: 'Median',
@@ -214,7 +214,7 @@ export const median = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
-  execute: ([ f ]) => types.fn('median', numeric(f))
+  execute: ([ f ]) => sql.fn('median', numeric(f))
 }
 export const count = {
   name: 'Total Count',
@@ -224,7 +224,7 @@ export const count = {
   },
   aggregate: true,
   execute: () =>
-    types.fn('count', types.literal('*'))
+    sql.fn('count', sql.literal('*'))
 }
 
 export const distinctCount = {
@@ -242,7 +242,7 @@ export const distinctCount = {
   },
   aggregate: true,
   execute: ([ f ]) =>
-    types.fn('count', types.fn('distinct', f.value))
+    sql.fn('count', sql.fn('distinct', f.value))
 }
 
 // Math
@@ -266,7 +266,7 @@ export const add = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   execute: ([ a, b ]) =>
-    types.fn('add', numeric(a), numeric(b))
+    sql.fn('add', numeric(a), numeric(b))
 }
 export const subtract = {
   name: 'Subtract',
@@ -288,7 +288,7 @@ export const subtract = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   execute: ([ a, b ]) =>
-    types.fn('subtract', numeric(a), numeric(b))
+    sql.fn('subtract', numeric(a), numeric(b))
 }
 export const multiply = {
   name: 'Multiply',
@@ -310,7 +310,7 @@ export const multiply = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
   execute: ([ a, b ]) =>
-    types.fn('multiply', numeric(a), numeric(b))
+    sql.fn('multiply', numeric(a), numeric(b))
 }
 export const divide = {
   name: 'Divide',
@@ -332,7 +332,7 @@ export const divide = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
   execute: ([ a, b ]) =>
-    types.fn('divide', numeric(a), numeric(b))
+    sql.fn('divide', numeric(a), numeric(b))
 }
 export const percentage = {
   name: 'Percentage',
@@ -358,7 +358,7 @@ export const percentage = {
     }
   },
   execute: ([ a, b ]) =>
-    types.fn('divide', numeric(a), numeric(b))
+    sql.fn('divide', numeric(a), numeric(b))
 }
 export const remainder = {
   name: 'Remainder',
@@ -380,7 +380,7 @@ export const remainder = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
   execute: ([ a, b ]) =>
-    types.fn('modulus', numeric(a), numeric(b))
+    sql.fn('modulus', numeric(a), numeric(b))
 }
 
 // Comparisons
@@ -403,7 +403,7 @@ export const gt = {
     static: { type: 'boolean' }
   },
   execute: ([ a, b ]) =>
-    types.fn('gt', numeric(a), numeric(b))
+    sql.fn('gt', numeric(a), numeric(b))
 }
 export const lt = {
   name: 'Less Than',
@@ -424,7 +424,7 @@ export const lt = {
     static: { type: 'boolean' }
   },
   execute: ([ a, b ]) =>
-    types.fn('lt', numeric(a), numeric(b))
+    sql.fn('lt', numeric(a), numeric(b))
 }
 export const gte = {
   name: 'Greater Than or Equal',
@@ -445,7 +445,7 @@ export const gte = {
     static: { type: 'boolean' }
   },
   execute: ([ a, b ]) =>
-    types.fn('gte', numeric(a), numeric(b))
+    sql.fn('gte', numeric(a), numeric(b))
 }
 export const lte = {
   name: 'Less Than or Equal',
@@ -466,7 +466,7 @@ export const lte = {
     static: { type: 'boolean' }
   },
   execute: ([ a, b ]) =>
-    types.fn('lte', numeric(a), numeric(b))
+    sql.fn('lte', numeric(a), numeric(b))
 }
 export const eq = {
   name: 'Equal',
@@ -487,7 +487,7 @@ export const eq = {
     static: { type: 'boolean' }
   },
   execute: ([ a, b ]) =>
-    types.fn('eq', numeric(a), numeric(b))
+    sql.fn('eq', numeric(a), numeric(b))
 }
 
 // Time
@@ -497,7 +497,7 @@ export const now = {
   returns: {
     static: { type: 'date' }
   },
-  execute: () => types.fn('now')
+  execute: () => sql.fn('now')
 }
 export const last = {
   name: 'Last',
@@ -516,7 +516,7 @@ export const last = {
     const { raw } = a
     const milli = moment.duration(raw).asMilliseconds()
     if (milli === 0) throw new Error('Invalid duration!')
-    return types.literal(`CURRENT_DATE - INTERVAL ${opt.model.sequelize.escape(ms(milli, { verbose: true }))}`)
+    return sql.literal(`CURRENT_DATE - INTERVAL ${opt.model.sequelize.escape(ms(milli, { verbose: true }))}`)
   }
 }
 export const interval = {
@@ -544,7 +544,7 @@ export const interval = {
     }
   },
   execute: ([ start, end ]) =>
-    types.fn('subtract', types.fn('time_to_ms', end.value), types.fn('time_to_ms', start.value))
+    sql.fn('subtract', sql.fn('time_to_ms', end.value), sql.fn('time_to_ms', start.value))
 }
 export const bucket = {
   name: 'Bucket Date',
@@ -575,9 +575,9 @@ export const bucket = {
   execute: ([ p, f ], { customYearStart = 1, timezone = 'Etc/UTC' } = {}) => {
     const trunc = truncatesToDB[p.raw]
     if (trunc.startsWith('custom')) {
-      return types.fn('date_trunc_with_custom', trunc, f.value, timezone, customYearStart)
+      return sql.fn('date_trunc_with_custom', trunc, f.value, timezone, customYearStart)
     }
-    return types.fn('date_trunc', trunc, f.value, timezone)
+    return sql.fn('date_trunc', trunc, f.value, timezone)
   }
 }
 export const extract = {
@@ -610,9 +610,9 @@ export const extract = {
     const part = partsToDB[p.raw]
     const d = forceTZ(f.value, timezone)
     if (part.startsWith('custom')) {
-      return types.fn('date_part_with_custom', part, d, customYearStart)
+      return sql.fn('date_part_with_custom', part, d, customYearStart)
     }
-    return types.fn('date_part', part, d)
+    return sql.fn('date_part', part, d)
   }
 }
 
@@ -637,7 +637,7 @@ export const area = {
     }
   },
   execute: ([ f ]) =>
-    types.fn('ST_Area', types.cast(f.value, 'geography'))
+    sql.fn('ST_Area', sql.cast(f.value, 'geography'))
 }
 export const length = {
   name: 'Length',
@@ -659,7 +659,7 @@ export const length = {
     }
   },
   execute: ([ f ]) =>
-    types.fn('ST_Length', types.cast(f.value, 'geography'))
+    sql.fn('ST_Length', sql.cast(f.value, 'geography'))
 }
 export const intersects = {
   name: 'Intersects',
@@ -680,7 +680,7 @@ export const intersects = {
     static: { type: 'boolean' }
   },
   execute: ([ a, b ]) =>
-    types.fn('ST_Intersects', types.cast(a.value, 'geometry'), types.cast(b.value, 'geometry'))
+    sql.fn('ST_Intersects', sql.cast(a.value, 'geometry'), sql.cast(b.value, 'geometry'))
 }
 export const distance = {
   name: 'Distance',
@@ -707,7 +707,7 @@ export const distance = {
     }
   },
   execute: ([ a, b ]) =>
-    types.fn('ST_Distance', types.cast(a.value, 'geography'), types.cast(b.value, 'geography'))
+    sql.fn('ST_Distance', sql.cast(a.value, 'geography'), sql.cast(b.value, 'geography'))
 }
 export const geojson = {
   name: 'Create Geometry',
@@ -756,5 +756,5 @@ export const boundingBox = {
     static: { type: 'polygon' }
   },
   execute: ([ xmin, ymin, xmax, ymax ]) =>
-    types.fn('ST_SetSRID', types.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value), wgs84)
+    sql.fn('ST_SetSRID', sql.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value), wgs84)
 }

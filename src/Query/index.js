@@ -8,6 +8,7 @@ export default class Query {
   constructor(obj, options = {}) {
     if (!obj) throw new Error('Missing query!')
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
+    if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!')
     this.input = obj
     this.options = options
     this._parsed = parse(obj, options)
@@ -31,7 +32,7 @@ export default class Query {
   constrain = ({ defaultLimit, maxLimit, attributes, where } = {}) => {
     if (where && !Array.isArray(where)) throw new Error('Invalid where array!')
     if (attributes && !Array.isArray(attributes)) throw new Error('Invalid attributes array!')
-    this.update((v) => {
+    return this.update((v) => {
       const limit = v.limit || defaultLimit
       return {
         ...v,
@@ -46,7 +47,6 @@ export default class Query {
           : limit
       }
     })
-    return this
   }
   value = ({ instanceQuery = true } = {}) => instanceQuery ? this._parsed : this._parsedCollection
   toJSON = () => this.input
@@ -61,37 +61,37 @@ export default class Query {
     }, {})
   }
 
-  execute = async ({ raw = false, useMaster } = {}) => {
+  execute = async ({ raw = false, useMaster, debug } = {}) => {
     const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll'
     return this.options.model[fn]({
       raw,
       useMaster,
-      logging: this.options.debug,
+      logging: debug,
       ...this.value()
     })
   }
-  executeStream = async ({ onError, format, tupleFraction, transform, useMaster } = {}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, debug } = {}) =>
     exportStream({
       useMaster,
       tupleFraction,
       format,
       transform,
       onError,
-      debug: this.options.debug,
+      debug,
       model: this.options.model,
       value: this.value()
     })
 
-  count = async ({ useMaster } = {}) =>
+  count = async ({ useMaster, debug } = {}) =>
     this.options.model.count({
       useMaster,
-      logging: this.options.debug,
+      logging: debug,
       ...this.value()
     })
 
-  destroy = async () =>
+  destroy = async ({ debug } = {}) =>
     this.options.model.destroy({
-      logging: this.options.debug,
+      logging: debug,
       ...this.value({ instanceQuery: false })
     })
 }

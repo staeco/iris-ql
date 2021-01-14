@@ -19,7 +19,12 @@ export default (query, opt = {}) => {
   const error = new ValidationError()
   const { model, context = [] } = opt
   const attrs = getScopedAttributes(model)
-  const initialFieldLimit = opt.fieldLimit || getModelFieldLimit(model)
+
+  // options becomes our initial state - then we are going to mutate from here in each phase
+  let state = {
+    ...opt,
+    fieldLimit: opt.fieldLimit || getModelFieldLimit(model)
+  }
 
   // options we pass on, default in fieldLimit
   const out = {
@@ -31,9 +36,9 @@ export default (query, opt = {}) => {
 
   // if user specified time settins, tack them onto options from the query so downstream knows about it
   try {
-    opt = {
-      ...opt,
-      ...parseTimeOptions(query, opt)
+    state = {
+      ...state,
+      ...parseTimeOptions(query, state)
     }
   } catch (err) {
     error.add(err)
@@ -41,7 +46,7 @@ export default (query, opt = {}) => {
 
   // searching
   if (query.search) {
-    const searchable = initialFieldLimit.filter((f) => attrs[f.field].searchable)
+    const searchable = state.fieldLimit.filter((f) => attrs[f.field].searchable)
     const isSearchable = searchable.length !== 0
     const isValid = typeof query.search === 'string'
     if (!isValid) {
@@ -189,7 +194,7 @@ export default (query, opt = {}) => {
   if (query.exclusions) {
     const parsed = parseIffyStringArray(query.exclusions).map((k, idx) => {
       const [ first ] = k.split('.')
-      if (!first || !initialFieldLimit.find((f) => f.field === first)) {
+      if (!first || !state.fieldLimit.find((f) => f.field === first)) {
         error.add({
           path: [ ...context, 'exclusions', idx ],
           value: k,
@@ -239,8 +244,7 @@ export default (query, opt = {}) => {
     } else {
       try {
         out.where.push(new Filter(query.filters, {
-          ...opt,
-          fieldLimit: initialFieldLimit,
+          ...state,
           context: [ ...context, 'filters' ]
         }).value())
       } catch (err) {
@@ -261,8 +265,7 @@ export default (query, opt = {}) => {
       query.orderings.forEach((v, idx) => {
         try {
           out.order.push(new Ordering(v, {
-            ...opt,
-            fieldLimit: initialFieldLimit,
+            ...state,
             context: [ ...context, 'orderings', idx ]
           }).value())
         } catch (err) {

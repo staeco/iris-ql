@@ -26,7 +26,8 @@ var _default = (v, opt) => {
     model,
     fieldLimit = (0, _getModelFieldLimit.default)(model),
     instanceQuery,
-    hydrate = true
+    from,
+    hydrateJSON = true
   } = opt;
   const path = v.split('.');
   const col = path.shift();
@@ -52,6 +53,7 @@ var _default = (v, opt) => {
     column: col,
     model,
     path,
+    from,
     instanceQuery
   }));
 
@@ -66,7 +68,7 @@ var _default = (v, opt) => {
     });
   }
 
-  if (!hydrate) return lit; // asked to keep it raw
+  if (!hydrateJSON) return lit; // asked to keep it raw
   // if a schema is specified, check the type of the field to see if it needs hydrating
   // this is because pg treats all json values as text, so we need to explicitly hydrate types for things
   // to work the way we expect

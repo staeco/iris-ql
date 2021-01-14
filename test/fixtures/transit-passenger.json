@@ -1,0 +1,37 @@
+{
+  "schema": {
+    "id": {
+      "name": "ID",
+      "type": "text",
+      "validation": {
+        "required": true,
+        "notEmpty": true
+      }
+    },
+    "route": {
+      "name": "Route",
+      "type": "text",
+      "validation": {
+        "required": true
+      }
+    },
+    "year": {
+      "name": "Received",
+      "type": "number",
+      "measurement": {
+        "type": "datePart",
+        "value": "year"
+      },
+      "validation": {
+        "required": true
+      }
+    },
+    "passengers": {
+      "name": "Passengers",
+      "type": "number",
+      "validation": {
+        "min": 0
+      }
+    }
+  }
+}
