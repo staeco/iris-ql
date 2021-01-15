@@ -6,7 +6,7 @@ import aggregateWithFilter from '../util/aggregateWithFilter'
 
 const MAX_LENGTH = 64
 const MAX_NOTES_LENGTH = 1024
-const alphanum = /[^0-9a-z]/i
+const alphanumPlus = /[^0-9a-z_-]/i
 
 export default (a, opt) => {
   const { model, context = [], instanceQuery } = opt
@@ -53,7 +53,7 @@ export default (a, opt) => {
 
   if (typeof a.alias === 'string') {
     if (a.alias.length > MAX_LENGTH) error.add({ value: a.alias, path: [ ...context, 'alias' ], message: `Must be less than ${MAX_LENGTH} characters` })
-    if (a.alias.match(alphanum)) error.add({ value: a.alias, path: [ ...context, 'alias' ], message: 'Must be alphanumeric' })
+    if (a.alias.match(alphanumPlus)) error.add({ value: a.alias, path: [ ...context, 'alias' ], message: 'Must be alphanumeric, _, or -' })
   }
   if (typeof a.name === 'string') {
     if (a.name.length > MAX_LENGTH) error.add({ value: a.name, path: [ ...context, 'name' ], message: `Must be less than ${MAX_LENGTH} characters` })

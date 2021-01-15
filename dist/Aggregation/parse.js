@@ -17,7 +17,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 const MAX_LENGTH = 64;
 const MAX_NOTES_LENGTH = 1024;
-const alphanum = /[^0-9a-z]/i;
+const alphanumPlus = /[^0-9a-z_-]/i;
 
 var _default = (a, opt) => {
   const {
@@ -73,10 +73,10 @@ var _default = (a, opt) => {
       path: [...context, 'alias'],
       message: `Must be less than ${MAX_LENGTH} characters`
     });
-    if (a.alias.match(alphanum)) error.add({
+    if (a.alias.match(alphanumPlus)) error.add({
       value: a.alias,
       path: [...context, 'alias'],
-      message: 'Must be alphanumeric'
+      message: 'Must be alphanumeric, _, or -'
     });
   }
 
