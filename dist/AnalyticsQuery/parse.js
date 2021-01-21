@@ -87,8 +87,9 @@ var _default = (query = {}, opt) => {
     } else {
       joins = query.joins.map(_ref);
     }
-  } // basic checks
+  }
 
+  if (!error.isEmpty()) throw error; // basic checks
 
   function _ref2(a, idx) {
     try {

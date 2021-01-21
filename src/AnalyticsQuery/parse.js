@@ -58,6 +58,8 @@ export default (query = {}, opt) => {
     }
   }
 
+  if (!error.isEmpty()) throw error
+
   // basic checks
   if (!Array.isArray(query.aggregations)) {
     error.add({
