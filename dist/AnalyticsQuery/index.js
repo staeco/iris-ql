@@ -116,7 +116,7 @@ class AnalyticsQuery {
     });
 
     if (!obj) throw new Error('Missing value!');
-    if (!obj.aggregations && !obj.groupings) return new _Query.default(obj, { ...options,
+    if (!obj.aggregations && !obj.groupings && !obj.joins) return new _Query.default(obj, { ...options,
       count: false
     }); // skip the advanced stuff and kick it down a level
 

@@ -9,7 +9,7 @@ import Query from '../Query'
 export default class AnalyticsQuery {
   constructor(obj, options = {}) {
     if (!obj) throw new Error('Missing value!')
-    if (!obj.aggregations && !obj.groupings) return new Query(obj, { ...options, count: false }) // skip the advanced stuff and kick it down a level
+    if (!obj.aggregations && !obj.groupings && !obj.joins) return new Query(obj, { ...options, count: false }) // skip the advanced stuff and kick it down a level
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
     if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!')
     this.input = obj
