@@ -46,4 +46,23 @@ Issues:
       `.trim())
     }
   })
+
+  it('should allow removing specific field paths', () => {
+    try {
+      getJSONField('noExist.id', { context: [ 'test', 'path' ], model: user, subSchemas: { data: dataType.schema } })
+    } catch (err) {
+      should(err.fields).eql([
+        {
+          path: [ 'test', 'path' ],
+          value: 'noExist.id',
+          message: 'Field does not exist: noExist'
+        }
+      ])
+
+      err.removePath([ 'test' ])
+
+      should(err.isEmpty()).equal(true)
+      should(err.fields).eql([])
+    }
+  })
 })

@@ -46,6 +46,12 @@ export class ValidationError extends BadRequestError {
     }
     return this
   }
+  removePath = (path) => {
+    this.fields = this.fields.filter((f) =>
+      !f.path || !path.every((p, idx) => f.path[idx] === p)
+    )
+    this.message = this.toString() // update msg
+  }
   isEmpty = () =>
     this.fields.length === 0
 
