@@ -13,7 +13,9 @@ var _getTypes = _interopRequireDefault(require("../types/getTypes"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const fmt = v => _capitalize.default.words((0, _decamelize.default)(v, ' '));
+const fmt = v => _capitalize.default.words((0, _decamelize.default)(v, {
+  separator: ' '
+}));
 
 const getFieldSchema = (field, opt) => {
   if (field.includes('.')) {

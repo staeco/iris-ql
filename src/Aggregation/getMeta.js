@@ -3,7 +3,7 @@ import capitalize from 'capitalize'
 import decamelize from 'decamelize'
 import getTypes from '../types/getTypes'
 
-const fmt = (v) => capitalize.words(decamelize(v, ' '))
+const fmt = (v) => capitalize.words(decamelize(v, { separator: ' ' }))
 
 const getFieldSchema = (field, opt) => {
   if (field.includes('.')) {

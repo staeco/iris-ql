@@ -114,7 +114,9 @@ const partsToDB = {
 };
 const parts = Object.keys(partsToDB).map(k => ({
   value: k,
-  label: _capitalize.default.words((0, _decamelize.default)(k, ' '))
+  label: _capitalize.default.words((0, _decamelize.default)(k, {
+    separator: ' '
+  }))
 }));
 const truncatesToDB = {
   second: 'second',
@@ -131,7 +133,9 @@ const truncatesToDB = {
 };
 const truncates = Object.keys(truncatesToDB).map(k => ({
   value: k,
-  label: _capitalize.default.words((0, _decamelize.default)(k, ' '))
+  label: _capitalize.default.words((0, _decamelize.default)(k, {
+    separator: ' '
+  }))
 })); // Arrays
 
 function _ref2(i) {

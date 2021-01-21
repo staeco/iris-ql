@@ -91,7 +91,7 @@ const partsToDB = {
 }
 const parts = Object.keys(partsToDB).map((k) => ({
   value: k,
-  label: capitalize.words(decamelize(k, ' '))
+  label: capitalize.words(decamelize(k, { separator: ' ' }))
 }))
 
 const truncatesToDB = {
@@ -109,7 +109,7 @@ const truncatesToDB = {
 }
 const truncates = Object.keys(truncatesToDB).map((k) => ({
   value: k,
-  label: capitalize.words(decamelize(k, ' '))
+  label: capitalize.words(decamelize(k, { separator: ' ' }))
 }))
 
 // Arrays
