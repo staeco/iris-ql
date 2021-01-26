@@ -15,7 +15,6 @@ const resolveField = (field, opt) => {
 }
 
 const validateArgumentTypes = (func, sig, arg, opt) => {
-  if (sig.types === 'any') return true // allows anything
   if (!sig.required && arg == null) return true // not present, so has a default
   if (sig.required && arg == null) {
     throw new ValidationError({
@@ -24,6 +23,7 @@ const validateArgumentTypes = (func, sig, arg, opt) => {
       message: `Argument "${sig.name}" for "${func.name}" is required`
     })
   }
+  if (sig.types === 'any') return true // allows anything
   const enumm = sig.options?.map((i) => i.value)
   if (enumm && !enumm.includes(arg)) {
     throw new ValidationError({
@@ -78,9 +78,9 @@ const getFunction = (v, opt) => {
       context: [ ...context, 'arguments', idx ]
     }
     const argValue = args[idx]
-    if (argValue == null) return null
     const parsed = parse(argValue, nopt)
     validateArgumentTypes(func, sig, argValue, nopt)
+    if (argValue == null) return null
     return {
       types: getTypes(argValue, nopt),
       raw: argValue,

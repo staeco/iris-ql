@@ -47,6 +47,35 @@ describe('types#functions#distinctCount', () => {
     const res = await query.execute()
     should(res).eql(expectedResponse)
   })
+  it('should fail when missing argument', async () => {
+    const funcVal = {
+      function: 'distinctCount',
+      arguments: []
+    }
+    const fullQuery = {
+      filters: { sourceId: 'bike-trips' },
+      aggregations: [
+        { value: { function: 'count' }, alias: 'total' },
+        { value: { field: 'data.type' }, alias: 'type' },
+        { value: funcVal, alias: 'count' }
+      ],
+      groupings: [
+        { field: 'type' }
+      ]
+    }
+    try {
+      new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
+    } catch (err) {
+      should.exist(err)
+      should(err.fields).eql([ {
+        path: [ 'aggregations', 2, 'value', 'arguments', 0 ],
+        value: undefined,
+        message: 'Argument "Field" for "Unique Count" is required'
+      } ])
+      return
+    }
+    throw new Error('Did not throw!')
+  })
   it('should bubble up schema correctly', async () => {
     const funcVal = { function: 'distinctCount', arguments: [ { field: 'data.path' } ] }
     const fullQuery = {
