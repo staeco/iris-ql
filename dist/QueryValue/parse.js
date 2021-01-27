@@ -27,8 +27,9 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const resolveField = (field, subs) => {
-  if (!subs) return field;
+const resolveField = (field, opt) => {
+  if (!opt?.substitutions) return field;
+  const subs = typeof opt.substitutions === 'function' ? opt.substitutions(opt) : opt.substitutions;
   return subs?.[field] || field;
 };
 
@@ -169,9 +170,17 @@ const parse = (v, opt) => {
   }
 
   if (v.field) {
-    const resolvedField = resolveField(v.field, opt.substitutions);
-
     if (typeof v.field !== 'string') {
+      throw new _errors.ValidationError({
+        path: [...context, 'field'],
+        value: v.field,
+        message: 'Must be a string.'
+      });
+    }
+
+    const resolvedField = resolveField(v.field, opt);
+
+    if (typeof resolvedField !== 'string') {
       throw new _errors.ValidationError({
         path: [...context, 'field'],
         value: resolvedField,
