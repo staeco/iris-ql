@@ -152,6 +152,14 @@ const parse = (v, opt) => {
     });
   }
 
+  if (v.val) {
+    throw new _errors.ValidationError({
+      path: [...context, 'val'],
+      value: v.val,
+      message: 'Must not contain a reserved key "val".'
+    });
+  }
+
   if (v.function) {
     const {
       fn,
@@ -217,14 +225,6 @@ const parse = (v, opt) => {
       column: resolvedField
     }));
     throw new Error(`Unknown field type for: ${resolvedField}`);
-  }
-
-  if (v.val) {
-    throw new _errors.ValidationError({
-      path: [...context, 'val'],
-      value: v.val,
-      message: 'Must not contain a reserved key "val".'
-    });
   }
 
   return v;
