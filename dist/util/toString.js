@@ -119,14 +119,16 @@ exports.select = select;
 const join = ({
   where,
   model,
-  alias
+  alias,
+  required
 }) => {
   const qg = getQueryGenerator(model);
   const whereStr = qg.whereItemsQuery(where, {
     prefix: qg.sequelize.literal(qg.quoteIdentifier(alias)),
     model
   });
-  return `LEFT JOIN ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(alias)} ON ${whereStr}`;
+  const joinType = required ? 'INNER JOIN' : 'LEFT JOIN';
+  return `${joinType} ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(alias)} ON ${whereStr}`;
 };
 
 exports.join = join;

@@ -152,6 +152,76 @@ describe('AnalyticsQuery#joins', () => {
       { totalTrips: 2, totalCalls: 0, year: 2017 }
     ])
   })
+  it('should handle a join where required is false', async () => {
+    const query = new AnalyticsQuery({
+      joins: [ {
+        name: 'Nearby Calls',
+        alias: 'nearbyCalls',
+        required: true,
+        filters: [
+          {
+            function: 'intersects',
+            arguments: [
+              { field: 'data.location' },
+              { field: '~parent.data.path' }
+            ]
+          }
+        ]
+      } ],
+      aggregations: [
+        {
+          value: {
+            function: 'distinctCount',
+            arguments: [ { field: 'id' } ]
+          },
+          alias: 'totalTrips'
+        },
+        {
+          value: {
+            function: 'distinctCount',
+            arguments: [ { field: '~nearbyCalls.id' } ]
+          },
+          alias: 'totalCalls'
+        },
+        {
+          value: {
+            function: 'extract',
+            arguments: [ 'year', { field: 'data.startedAt' } ]
+          },
+          alias: 'year'
+        }
+      ],
+      groupings: [
+        { field: 'year' }
+      ]
+    }, {
+      model: datum,
+      subSchemas: { data: bikeTrip.schema },
+      joins: {
+        nearbyCalls: {
+          model: datum,
+          subSchemas: { data: call.schema }
+        }
+      }
+    })
+
+    query.constrain({
+      where: [
+        { sourceId: 'bike-trips' }
+      ],
+      joins: {
+        nearbyCalls: {
+          where: [
+            { sourceId: 'ldfgldkfgjldfkjg' }
+          ]
+        }
+      }
+    })
+
+    const res = await query.execute()
+    should.exist(res)
+    should(res).eql([])
+  })
 
   // miles per passenger, from two sources that share a join key
   it('should handle a non-geospatial join', async () => {

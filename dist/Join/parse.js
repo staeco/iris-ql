@@ -120,6 +120,7 @@ var _default = (a, opt) => {
 
   if (!error.isEmpty()) throw error;
   return { ...joinConfig,
+    required: a.required,
     alias: a.alias,
     where: query.value().where
   };

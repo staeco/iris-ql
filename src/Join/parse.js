@@ -92,6 +92,7 @@ export default (a, opt) => {
 
   return {
     ...joinConfig,
+    required: a.required,
     alias: a.alias,
     where: query.value().where
   }
