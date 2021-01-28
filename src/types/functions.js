@@ -680,7 +680,7 @@ export const intersects = {
     static: { type: 'boolean' }
   },
   execute: ([ a, b ]) =>
-    sql.fn('ST_Intersects', sql.cast(a.value, 'geometry'), sql.cast(b.value, 'geometry'))
+    sql.fn('ST_Intersects', a.value, b.value)
 }
 export const distance = {
   name: 'Distance',

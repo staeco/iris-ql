@@ -729,7 +729,7 @@ const intersects = {
       type: 'boolean'
     }
   },
-  execute: ([a, b]) => _sequelize.default.fn('ST_Intersects', _sequelize.default.cast(a.value, 'geometry'), _sequelize.default.cast(b.value, 'geometry'))
+  execute: ([a, b]) => _sequelize.default.fn('ST_Intersects', a.value, b.value)
 };
 exports.intersects = intersects;
 const distance = {
