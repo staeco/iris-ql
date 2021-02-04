@@ -117,7 +117,7 @@ const parse = (v, opt) => {
   if (v.function) {
     const { fn, args = [] } = getFunction(v, opt)
     try {
-      return fn.execute(args, opt)
+      return fn.execute(args, opt, (v) => parse(v, opt))
     } catch (err) {
       throw new ValidationError({
         path: context,

@@ -160,6 +160,10 @@ const parse = (v, opt) => {
     });
   }
 
+  function _ref3(v) {
+    return parse(v, opt);
+  }
+
   if (v.function) {
     const {
       fn,
@@ -167,7 +171,7 @@ const parse = (v, opt) => {
     } = getFunction(v, opt);
 
     try {
-      return fn.execute(args, opt);
+      return fn.execute(args, opt, _ref3);
     } catch (err) {
       throw new _errors.ValidationError({
         path: context,

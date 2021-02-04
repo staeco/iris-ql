@@ -217,7 +217,16 @@ const sum = {
     })
   },
   aggregate: true,
-  execute: ([f]) => _sequelize.default.fn('sum', numeric(f))
+  execute: ([f], opt, qv) => {
+    const base = _sequelize.default.fn('sum', numeric(f));
+
+    if (!opt.joins) return base; // remove the cartesian product from the sum
+    // TODO: look through fieldLimit + schema and find the right PK!
+
+    return Object.keys(opt.joins).reduce((acc, k) => _sequelize.default.fn('divide', acc, _sequelize.default.fn('count', _sequelize.default.fn('distinct', qv({
+      field: `~${k}.id`
+    })))), base);
+  }
 };
 exports.sum = sum;
 const average = {

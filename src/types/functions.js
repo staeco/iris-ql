@@ -180,7 +180,16 @@ export const sum = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
-  execute: ([ f ]) => sql.fn('sum', numeric(f))
+  execute: ([ f ], opt, qv) => {
+    const base = sql.fn('sum', numeric(f))
+    if (!opt.joins) return base
+
+    // remove the cartesian product from the sum
+    // TODO: look through fieldLimit + schema and find the right PK!
+    return Object.keys(opt.joins).reduce((acc, k) =>
+      sql.fn('divide', acc, sql.fn('count', sql.fn('distinct', qv({ field: `~${k}.id` }))))
+    , base)
+  }
 }
 export const average = {
   name: 'Average',

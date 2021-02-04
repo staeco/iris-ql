@@ -141,6 +141,24 @@ const transitPassengers = [
       year: 2019,
       passengers: 7622
     }
+  },
+  {
+    sourceId: 'transit-passengers',
+    data: {
+      id: 'SRC-3-A',
+      route: 'A',
+      year: 2019,
+      passengers: 10
+    }
+  },
+  {
+    sourceId: 'transit-passengers',
+    data: {
+      id: 'SRC-3-B',
+      route: 'B',
+      year: 2019,
+      passengers: 10
+    }
   }
 ]
 
@@ -179,6 +197,24 @@ const transitTrips = [
       route: 'B',
       year: 2019,
       miles: 85102
+    }
+  },
+  {
+    sourceId: 'transit-trips',
+    data: {
+      id: 'SRC-3-A',
+      route: 'A',
+      year: 2019,
+      miles: 100
+    }
+  },
+  {
+    sourceId: 'transit-trips',
+    data: {
+      id: 'SRC-3-B',
+      route: 'B',
+      year: 2019,
+      miles: 100
     }
   }
 ]

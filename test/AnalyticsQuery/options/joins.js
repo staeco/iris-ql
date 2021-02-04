@@ -231,10 +231,7 @@ describe('AnalyticsQuery#joins', () => {
         alias: 'trips',
         filters: [
           {
-            'data.route': { field: '~parent.data.route' }
-          },
-          {
-            'data.year': 2019
+            'data.year': { field: '~parent.data.year' }
           }
         ]
       } ],
@@ -256,6 +253,24 @@ describe('AnalyticsQuery#joins', () => {
             ]
           },
           alias: 'totalMiles'
+        },
+        {
+          value: {
+            function: 'divide',
+            arguments: [
+              {
+                function: 'sum',
+                arguments: [
+                  { field: 'data.passengers' }
+                ]
+              },
+              {
+                function: 'distinctCount',
+                arguments: [ { field: '~trips.id' } ]
+              }
+            ]
+          },
+          alias: 'passengersPerRecord'
         },
         {
           value: {
@@ -311,9 +326,133 @@ describe('AnalyticsQuery#joins', () => {
     should.exist(res)
     should(res).eql([
       {
-        totalPassengers: 10840,
-        totalMiles: 788304,
-        milesPerPassenger: 72.72177121771217
+        totalPassengers: 10860,
+        passengersPerRecord: 2715,
+        totalMiles: 788504,
+        milesPerPassenger: 72.60626151012892
+      }
+    ])
+  })
+  it('should handle a non-geospatial join with required = true and groupings', async () => {
+    const query = new AnalyticsQuery({
+      joins: [ {
+        name: 'Trips',
+        alias: 'trips',
+        required: true,
+        filters: [
+          {
+            'data.route': { field: '~parent.data.route' },
+            'data.year': { field: '~parent.data.year' }
+          }
+        ]
+      } ],
+      aggregations: [
+        { alias: 'route', value: { field: 'data.route' } },
+        {
+          value: {
+            function: 'sum',
+            arguments: [
+              { field: 'data.passengers' }
+            ]
+          },
+          alias: 'totalPassengers'
+        },
+        {
+          value: {
+            function: 'sum',
+            arguments: [
+              { field: '~trips.data.miles' }
+            ]
+          },
+          alias: 'totalMiles'
+        },
+        {
+          value: {
+            function: 'divide',
+            arguments: [
+              {
+                function: 'sum',
+                arguments: [
+                  { field: 'data.passengers' }
+                ]
+              },
+              {
+                function: 'distinctCount',
+                arguments: [ { field: '~trips.id' } ]
+              }
+            ]
+          },
+          alias: 'passengersPerRecord'
+        },
+        {
+          value: {
+            function: 'divide',
+            arguments: [
+              {
+                function: 'sum',
+                arguments: [
+                  { field: '~trips.data.miles' }
+                ]
+              },
+              {
+                function: 'sum',
+                arguments: [
+                  { field: 'data.passengers' }
+                ]
+              }
+            ]
+          },
+          alias: 'milesPerPassenger'
+        }
+      ],
+      groupings: [
+        { field: 'route' }
+      ],
+      filters: [
+        {
+          'data.year': 2019
+        }
+      ]
+    }, {
+      model: datum,
+      subSchemas: { data: transitPassenger.schema },
+      joins: {
+        trips: {
+          model: datum,
+          subSchemas: { data: transitTrip.schema }
+        }
+      }
+    })
+
+    query.constrain({
+      where: [
+        { sourceId: 'transit-passengers' }
+      ],
+      joins: {
+        trips: {
+          where: [
+            { sourceId: 'transit-trips' }
+          ]
+        }
+      }
+    })
+
+    const res = await query.execute()
+    should.exist(res)
+    should(res).eql([
+      {
+        route: 'A',
+        totalPassengers: 3228,
+        passengersPerRecord: 1614,
+        totalMiles: 703302,
+        milesPerPassenger: 217.87546468401487
+      },
+      {
+        route: 'B',
+        totalPassengers: 7632,
+        passengersPerRecord: 3816,
+        totalMiles: 85202,
+        milesPerPassenger: 11.163784067085954
       }
     ])
   })
