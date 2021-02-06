@@ -407,7 +407,8 @@ const percentage = {
     static: {
       type: 'number',
       measurement: {
-        type: 'percentage'
+        type: 'percentage',
+        value: 'decimal'
       }
     }
   },
