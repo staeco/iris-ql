@@ -90,16 +90,6 @@ export default (a, opt) => {
 
   if (!error.isEmpty()) throw error
 
-  // check that they reference the primary somewhere in the query
-  // this was originally recursing through the object to find it but it was more expensive than this basic text search
-  const joinConstraint = a.filters?.find((i) =>
-    JSON.stringify(i).includes(`{"field":"~parent`)
-  )
-  if (!joinConstraint) {
-    error.add({ value: a.filters, path: [ ...context, 'filters' ], message: `Must have at least 1 filter referencing the primary data` })
-  }
-  if (!error.isEmpty()) throw error
-
   return {
     ...joinConfig,
     required: a.required,

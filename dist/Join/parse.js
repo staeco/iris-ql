@@ -15,10 +15,6 @@ const MAX_LENGTH = 64;
 const MAX_NOTES_LENGTH = 1024;
 const alphanumPlus = /[^0-9a-z_-]/i;
 
-function _ref(i) {
-  return JSON.stringify(i).includes(`{"field":"~parent`);
-}
-
 var _default = (a, opt) => {
   const {
     joins,
@@ -120,19 +116,6 @@ var _default = (a, opt) => {
     });
   } catch (err) {
     error.add(err);
-  }
-
-  if (!error.isEmpty()) throw error; // check that they reference the primary somewhere in the query
-  // this was originally recursing through the object to find it but it was more expensive than this basic text search
-
-  const joinConstraint = a.filters?.find(_ref);
-
-  if (!joinConstraint) {
-    error.add({
-      value: a.filters,
-      path: [...context, 'filters'],
-      message: `Must have at least 1 filter referencing the primary data`
-    });
   }
 
   if (!error.isEmpty()) throw error;

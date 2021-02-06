@@ -456,4 +456,114 @@ describe('AnalyticsQuery#joins', () => {
       }
     ])
   })
+
+  it('should handle a join with no reference filter', async () => {
+    const query = new AnalyticsQuery({
+      joins: [ {
+        name: 'Trips',
+        alias: 'trips',
+        filters: [
+          {
+            'data.year': 2019
+          }
+        ]
+      } ],
+      aggregations: [
+        {
+          value: {
+            function: 'sum',
+            arguments: [
+              { field: 'data.passengers' }
+            ]
+          },
+          alias: 'totalPassengers'
+        },
+        {
+          value: {
+            function: 'sum',
+            arguments: [
+              { field: '~trips.data.miles' }
+            ]
+          },
+          alias: 'totalMiles'
+        },
+        {
+          value: {
+            function: 'divide',
+            arguments: [
+              {
+                function: 'sum',
+                arguments: [
+                  { field: 'data.passengers' }
+                ]
+              },
+              {
+                function: 'distinctCount',
+                arguments: [ { field: '~trips.id' } ]
+              }
+            ]
+          },
+          alias: 'passengersPerRecord'
+        },
+        {
+          value: {
+            function: 'divide',
+            arguments: [
+              {
+                function: 'sum',
+                arguments: [
+                  { field: '~trips.data.miles' }
+                ]
+              },
+              {
+                function: 'sum',
+                arguments: [
+                  { field: 'data.passengers' }
+                ]
+              }
+            ]
+          },
+          alias: 'milesPerPassenger'
+        }
+      ],
+      filters: [
+        {
+          'data.year': 2019
+        }
+      ]
+    }, {
+      model: datum,
+      subSchemas: { data: transitPassenger.schema },
+      joins: {
+        trips: {
+          model: datum,
+          subSchemas: { data: transitTrip.schema }
+        }
+      }
+    })
+
+    query.constrain({
+      where: [
+        { sourceId: 'transit-passengers' }
+      ],
+      joins: {
+        trips: {
+          where: [
+            { sourceId: 'transit-trips' }
+          ]
+        }
+      }
+    })
+
+    const res = await query.execute()
+    should.exist(res)
+    should(res).eql([
+      {
+        totalPassengers: 10860,
+        passengersPerRecord: 2715,
+        totalMiles: 788504,
+        milesPerPassenger: 72.60626151012892
+      }
+    ])
+  })
 })
