@@ -82,4 +82,31 @@ describe('AnalyticsQuery#execute', () => {
       }
     ])
   })
+  it('should work with a timeout', async () => {
+    const query = new AnalyticsQuery(crimeTimeSeries, { timezone: 'America/Los_Angeles', model: datum, subSchemas: { data: dataType.schema } })
+    const res = await query.execute({ timeout: 20000 })
+    should(res).eql([
+      {
+        total: 1,
+        day: new Date('2017-05-16T07:00:00.000Z')
+      },
+      {
+        total: 1,
+        day: new Date('2017-05-15T07:00:00.000Z')
+      }
+    ])
+  })
+  it.skip('should handle timeout errors', async () => {
+    // currently skipped because its really difficult to make this query run slower than 1ms!
+    const query = new AnalyticsQuery(crimeTimeSeries, { timezone: 'America/Los_Angeles', model: datum, subSchemas: { data: dataType.schema } })
+    let res
+    try {
+      res = await query.execute({ timeout: 1, debug: console.log })
+    } catch (err) {
+      should(err.message).eql('canceling statement due to statement timeout')
+      return
+    }
+    should.not.exist(res)
+    throw new Error('Did not throw!')
+  })
 })

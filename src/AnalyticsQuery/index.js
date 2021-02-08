@@ -72,8 +72,9 @@ export default class AnalyticsQuery {
       return prev
     }, {})
 
-  execute = async ({ useMaster, debug } = {}) =>
+  execute = async ({ useMaster, debug, timeout } = {}) =>
     this.options.model.sequelize.query(select({
+      timeout,
       value: this.value(),
       model: this.options.model,
       analytics: true

@@ -76,11 +76,19 @@ const column = ({
 
 exports.column = column;
 
+const addTimeout = (timeout, query) => timeout ? `
+BEGIN;
+SET LOCAL statement_timeout = ${parseInt(timeout)};
+${query.endsWith(';') ? query.slice(0, -1) : query};
+COMMIT;
+`.trim() : query;
+
 const select = ({
   value,
   model,
   from,
-  analytics
+  analytics,
+  timeout
 }) => {
   const qg = getQueryGenerator(model);
   const nv = { ...value
@@ -106,12 +114,12 @@ const select = ({
   }
 
   const basic = qg.selectQuery(from || model.getTableName(), nv, model);
-  if (!value.joins) return basic; // inject joins into the query, sequelize has no way of doing this
+  if (!value.joins) return addTimeout(timeout, basic); // inject joins into the query, sequelize has no way of doing this
 
   const injectPoint = `FROM ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(model.name)}`;
   const joinStr = value.joins.filter(j => basic.includes(qg.quoteIdentifier(j.alias))).map(join).join(' ');
   const out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`);
-  return out;
+  return addTimeout(timeout, out);
 };
 
 exports.select = select;

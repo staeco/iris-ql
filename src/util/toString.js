@@ -26,7 +26,14 @@ export const column = ({ column, model, from, instanceQuery = true }) => {
   return `${tbl}.${ncol}`
 }
 
-export const select = ({ value, model, from, analytics }) => {
+const addTimeout = (timeout, query) => timeout ? `
+BEGIN;
+SET LOCAL statement_timeout = ${parseInt(timeout)};
+${query.endsWith(';') ? query.slice(0, -1) : query};
+COMMIT;
+`.trim() : query
+
+export const select = ({ value, model, from, analytics, timeout }) => {
   const qg = getQueryGenerator(model)
   const nv = { ...value }
 
@@ -46,7 +53,7 @@ export const select = ({ value, model, from, analytics }) => {
   }
 
   const basic = qg.selectQuery(from || model.getTableName(), nv, model)
-  if (!value.joins) return basic
+  if (!value.joins) return addTimeout(timeout, basic)
 
   // inject joins into the query, sequelize has no way of doing this
   const injectPoint = `FROM ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(model.name)}`
@@ -55,7 +62,7 @@ export const select = ({ value, model, from, analytics }) => {
     .map(join)
     .join(' ')
   const out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`)
-  return out
+  return addTimeout(timeout, out)
 }
 
 export const join = ({ where, model, alias, required }) => {

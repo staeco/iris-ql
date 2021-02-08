@@ -83,8 +83,10 @@ class AnalyticsQuery {
 
     this.execute = async ({
       useMaster,
-      debug
+      debug,
+      timeout
     } = {}) => this.options.model.sequelize.query((0, _toString.select)({
+      timeout,
       value: this.value(),
       model: this.options.model,
       analytics: true
