@@ -111,11 +111,20 @@ const truncates = Object.keys(truncatesToDB).map((k) => ({
   value: k,
   label: capitalize.words(decamelize(k, { separator: ' ' }))
 }))
+const categories = {
+  arrays: 'Array',
+  aggregations: 'Aggregation',
+  math: 'Math',
+  comparisons: 'Comparison',
+  time: 'Date/Time',
+  geospatial: 'Geospatial'
+}
 
 // Arrays
 export const expand = {
   name: 'Expand List',
   notes: 'Expands a list to a set of rows',
+  category: categories.arrays,
   signature: [
     {
       name: 'List',
@@ -134,6 +143,7 @@ export const expand = {
 export const min = {
   name: 'Minimum',
   notes: 'Aggregates the minimum value of a number',
+  category: categories.aggregations,
   signature: [
     {
       name: 'Value',
@@ -151,6 +161,7 @@ export const min = {
 export const max = {
   name: 'Maximum',
   notes: 'Aggregates the maximum value of a number',
+  category: categories.aggregations,
   signature: [
     {
       name: 'Value',
@@ -168,6 +179,7 @@ export const max = {
 export const sum = {
   name: 'Sum',
   notes: 'Aggregates the sum total of a number',
+  category: categories.aggregations,
   signature: [
     {
       name: 'Value',
@@ -194,6 +206,7 @@ export const sum = {
 export const average = {
   name: 'Average',
   notes: 'Aggregates the average of a number',
+  category: categories.aggregations,
   signature: [
     {
       name: 'Value',
@@ -211,6 +224,7 @@ export const average = {
 export const median = {
   name: 'Median',
   notes: 'Aggregates the median of a number',
+  category: categories.aggregations,
   signature: [
     {
       name: 'Value',
@@ -228,6 +242,7 @@ export const median = {
 export const count = {
   name: 'Total Count',
   notes: 'Aggregates the total number of rows',
+  category: categories.aggregations,
   returns: {
     static: { type: 'number' }
   },
@@ -235,10 +250,10 @@ export const count = {
   execute: () =>
     sql.fn('count', sql.literal('*'))
 }
-
 export const distinctCount = {
   name: 'Unique Count',
   notes: 'Aggregates the total number of unique values',
+  category: categories.aggregations,
   signature: [
     {
       name: 'Field',
@@ -258,6 +273,7 @@ export const distinctCount = {
 export const add = {
   name: 'Add',
   notes: 'Applies addition to multiple numbers',
+  category: categories.math,
   signature: [
     {
       name: 'Value A',
@@ -280,6 +296,7 @@ export const add = {
 export const subtract = {
   name: 'Subtract',
   notes: 'Applies subtraction to multiple numbers',
+  category: categories.math,
   signature: [
     {
       name: 'Value A',
@@ -302,6 +319,7 @@ export const subtract = {
 export const multiply = {
   name: 'Multiply',
   notes: 'Applies multiplication to multiple numbers',
+  category: categories.math,
   signature: [
     {
       name: 'Value A',
@@ -324,6 +342,7 @@ export const multiply = {
 export const divide = {
   name: 'Divide',
   notes: 'Applies division to multiple numbers',
+  category: categories.math,
   signature: [
     {
       name: 'Value A',
@@ -346,6 +365,7 @@ export const divide = {
 export const percentage = {
   name: 'Percentage',
   notes: 'Returns the percentage of Value A in Value B',
+  category: categories.math,
   signature: [
     {
       name: 'Value A',
@@ -373,6 +393,7 @@ export const percentage = {
 export const remainder = {
   name: 'Remainder',
   notes: 'Applies division to multiple numbers and returns the remainder/modulus',
+  category: categories.math,
   signature: [
     {
       name: 'Value A',
@@ -397,6 +418,7 @@ export const remainder = {
 export const gt = {
   name: 'Greater Than',
   notes: 'Returns true/false if Value A is greater than Value B',
+  category: categories.comparisons,
   signature: [
     {
       name: 'Value A',
@@ -418,6 +440,7 @@ export const gt = {
 export const lt = {
   name: 'Less Than',
   notes: 'Returns true/false if Value A is less than Value B',
+  category: categories.comparisons,
   signature: [
     {
       name: 'Value A',
@@ -439,6 +462,7 @@ export const lt = {
 export const gte = {
   name: 'Greater Than or Equal',
   notes: 'Returns true/false if Value A is greater than Value B or equal',
+  category: categories.comparisons,
   signature: [
     {
       name: 'Value A',
@@ -460,6 +484,7 @@ export const gte = {
 export const lte = {
   name: 'Less Than or Equal',
   notes: 'Returns true/false if Value A is less than Value B or equal',
+  category: categories.comparisons,
   signature: [
     {
       name: 'Value A',
@@ -481,6 +506,7 @@ export const lte = {
 export const eq = {
   name: 'Equal',
   notes: 'Returns true/false if Value A is equal to Value B',
+  category: categories.comparisons,
   signature: [
     {
       name: 'Value A',
@@ -504,6 +530,7 @@ export const eq = {
 export const now = {
   name: 'Now',
   notes: 'Returns the current date and time',
+  category: categories.time,
   returns: {
     static: { type: 'date' }
   },
@@ -512,6 +539,7 @@ export const now = {
 export const last = {
   name: 'Last',
   notes: 'Returns the date and time for any duration into the past',
+  category: categories.time,
   signature: [
     {
       name: 'Duration',
@@ -532,6 +560,7 @@ export const last = {
 export const interval = {
   name: 'Interval',
   notes: 'Returns the difference in milliseconds between Start and End dates',
+  category: categories.time,
   signature: [
     {
       name: 'Start',
@@ -559,6 +588,7 @@ export const interval = {
 export const bucket = {
   name: 'Bucket Date',
   notes: 'Returns a date truncated to a unit of time',
+  category: categories.time,
   signature: [
     {
       name: 'Unit',
@@ -593,6 +623,7 @@ export const bucket = {
 export const extract = {
   name: 'Part of Date',
   notes: 'Converts a date to a unit of time',
+  category: categories.time,
   signature: [
     {
       name: 'Unit',
@@ -630,6 +661,7 @@ export const extract = {
 export const area = {
   name: 'Area',
   notes: 'Returns the area of a polygon in meters',
+  category: categories.geospatial,
   signature: [
     {
       name: 'Geometry',
@@ -652,6 +684,7 @@ export const area = {
 export const length = {
   name: 'Length',
   notes: 'Returns the length of a line in meters',
+  category: categories.geospatial,
   signature: [
     {
       name: 'Geometry',
@@ -674,6 +707,7 @@ export const length = {
 export const intersects = {
   name: 'Intersects',
   notes: 'Returns true/false if two geometries intersect',
+  category: categories.geospatial,
   signature: [
     {
       name: 'Geometry A',
@@ -695,6 +729,7 @@ export const intersects = {
 export const distance = {
   name: 'Distance',
   notes: 'Returns the distance between two geometries in meters',
+  category: categories.geospatial,
   signature: [
     {
       name: 'Geometry A',
@@ -722,6 +757,7 @@ export const distance = {
 export const geojson = {
   name: 'Create Geometry',
   notes: 'Returns a geometry from a GeoJSON string',
+  category: categories.geospatial,
   signature: [
     {
       name: 'GeoJSON Text',
@@ -740,6 +776,7 @@ export const geojson = {
 export const boundingBox = {
   name: 'Create Bounding Box',
   notes: 'Returns a bounding box polygon for the given coordinates',
+  category: categories.geospatial,
   signature: [
     {
       name: 'X Min',

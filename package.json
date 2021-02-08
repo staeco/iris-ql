@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "preversion": "npm run clean && npm run build",
-    "build": "NODE_ENV=production babel src --copy-files --out-dir dist",
+    "build": "npm run-script clean && NODE_ENV=production babel src --copy-files --out-dir dist",
     "clean": "rimraf dist",
     "lint": "eslint src test --fix",
     "test-make-user": "createuser postgres -lsd",
