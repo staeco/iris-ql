@@ -136,7 +136,15 @@ const truncates = Object.keys(truncatesToDB).map(k => ({
   label: _capitalize.default.words((0, _decamelize.default)(k, {
     separator: ' '
   }))
-})); // Arrays
+}));
+const categories = {
+  arrays: 'Array',
+  aggregations: 'Aggregation',
+  math: 'Math',
+  comparisons: 'Comparison',
+  time: 'Date/Time',
+  geospatial: 'Geospatial'
+}; // Arrays
 
 function _ref2(i) {
   return i.type === 'array';
@@ -145,6 +153,7 @@ function _ref2(i) {
 const expand = {
   name: 'Expand List',
   notes: 'Expands a list to a set of rows',
+  category: categories.arrays,
   signature: [{
     name: 'List',
     types: ['array'],
@@ -163,6 +172,7 @@ exports.expand = expand;
 const min = {
   name: 'Minimum',
   notes: 'Aggregates the minimum value of a number',
+  category: categories.aggregations,
   signature: [{
     name: 'Value',
     types: ['number', 'date'],
@@ -183,6 +193,7 @@ exports.min = min;
 const max = {
   name: 'Maximum',
   notes: 'Aggregates the maximum value of a number',
+  category: categories.aggregations,
   signature: [{
     name: 'Value',
     types: ['number', 'date'],
@@ -203,6 +214,7 @@ exports.max = max;
 const sum = {
   name: 'Sum',
   notes: 'Aggregates the sum total of a number',
+  category: categories.aggregations,
   signature: [{
     name: 'Value',
     types: ['number'],
@@ -232,6 +244,7 @@ exports.sum = sum;
 const average = {
   name: 'Average',
   notes: 'Aggregates the average of a number',
+  category: categories.aggregations,
   signature: [{
     name: 'Value',
     types: ['number'],
@@ -252,6 +265,7 @@ exports.average = average;
 const median = {
   name: 'Median',
   notes: 'Aggregates the median of a number',
+  category: categories.aggregations,
   signature: [{
     name: 'Value',
     types: ['number'],
@@ -272,6 +286,7 @@ exports.median = median;
 const count = {
   name: 'Total Count',
   notes: 'Aggregates the total number of rows',
+  category: categories.aggregations,
   returns: {
     static: {
       type: 'number'
@@ -284,6 +299,7 @@ exports.count = count;
 const distinctCount = {
   name: 'Unique Count',
   notes: 'Aggregates the total number of unique values',
+  category: categories.aggregations,
   signature: [{
     name: 'Field',
     types: 'any',
@@ -302,6 +318,7 @@ exports.distinctCount = distinctCount;
 const add = {
   name: 'Add',
   notes: 'Applies addition to multiple numbers',
+  category: categories.math,
   signature: [{
     name: 'Value A',
     types: ['number'],
@@ -325,6 +342,7 @@ exports.add = add;
 const subtract = {
   name: 'Subtract',
   notes: 'Applies subtraction to multiple numbers',
+  category: categories.math,
   signature: [{
     name: 'Value A',
     types: ['number'],
@@ -348,6 +366,7 @@ exports.subtract = subtract;
 const multiply = {
   name: 'Multiply',
   notes: 'Applies multiplication to multiple numbers',
+  category: categories.math,
   signature: [{
     name: 'Value A',
     types: ['number'],
@@ -371,6 +390,7 @@ exports.multiply = multiply;
 const divide = {
   name: 'Divide',
   notes: 'Applies division to multiple numbers',
+  category: categories.math,
   signature: [{
     name: 'Value A',
     types: ['number'],
@@ -394,6 +414,7 @@ exports.divide = divide;
 const percentage = {
   name: 'Percentage',
   notes: 'Returns the percentage of Value A in Value B',
+  category: categories.math,
   signature: [{
     name: 'Value A',
     types: ['number'],
@@ -418,6 +439,7 @@ exports.percentage = percentage;
 const remainder = {
   name: 'Remainder',
   notes: 'Applies division to multiple numbers and returns the remainder/modulus',
+  category: categories.math,
   signature: [{
     name: 'Value A',
     types: ['number'],
@@ -442,6 +464,7 @@ exports.remainder = remainder;
 const gt = {
   name: 'Greater Than',
   notes: 'Returns true/false if Value A is greater than Value B',
+  category: categories.comparisons,
   signature: [{
     name: 'Value A',
     types: ['number', 'date'],
@@ -462,6 +485,7 @@ exports.gt = gt;
 const lt = {
   name: 'Less Than',
   notes: 'Returns true/false if Value A is less than Value B',
+  category: categories.comparisons,
   signature: [{
     name: 'Value A',
     types: ['number', 'date'],
@@ -482,6 +506,7 @@ exports.lt = lt;
 const gte = {
   name: 'Greater Than or Equal',
   notes: 'Returns true/false if Value A is greater than Value B or equal',
+  category: categories.comparisons,
   signature: [{
     name: 'Value A',
     types: ['number', 'date'],
@@ -502,6 +527,7 @@ exports.gte = gte;
 const lte = {
   name: 'Less Than or Equal',
   notes: 'Returns true/false if Value A is less than Value B or equal',
+  category: categories.comparisons,
   signature: [{
     name: 'Value A',
     types: ['number', 'date'],
@@ -522,6 +548,7 @@ exports.lte = lte;
 const eq = {
   name: 'Equal',
   notes: 'Returns true/false if Value A is equal to Value B',
+  category: categories.comparisons,
   signature: [{
     name: 'Value A',
     types: ['number', 'date'],
@@ -543,6 +570,7 @@ exports.eq = eq;
 const now = {
   name: 'Now',
   notes: 'Returns the current date and time',
+  category: categories.time,
   returns: {
     static: {
       type: 'date'
@@ -554,6 +582,7 @@ exports.now = now;
 const last = {
   name: 'Last',
   notes: 'Returns the date and time for any duration into the past',
+  category: categories.time,
   signature: [{
     name: 'Duration',
     types: ['text'],
@@ -581,6 +610,7 @@ exports.last = last;
 const interval = {
   name: 'Interval',
   notes: 'Returns the difference in milliseconds between Start and End dates',
+  category: categories.time,
   signature: [{
     name: 'Start',
     types: ['date'],
@@ -605,6 +635,7 @@ exports.interval = interval;
 const bucket = {
   name: 'Bucket Date',
   notes: 'Returns a date truncated to a unit of time',
+  category: categories.time,
   signature: [{
     name: 'Unit',
     types: ['text'],
@@ -644,6 +675,7 @@ exports.bucket = bucket;
 const extract = {
   name: 'Part of Date',
   notes: 'Converts a date to a unit of time',
+  category: categories.time,
   signature: [{
     name: 'Unit',
     types: ['text'],
@@ -685,6 +717,7 @@ exports.extract = extract;
 const area = {
   name: 'Area',
   notes: 'Returns the area of a polygon in meters',
+  category: categories.geospatial,
   signature: [{
     name: 'Geometry',
     types: ['polygon', 'multipolygon'],
@@ -705,6 +738,7 @@ exports.area = area;
 const length = {
   name: 'Length',
   notes: 'Returns the length of a line in meters',
+  category: categories.geospatial,
   signature: [{
     name: 'Geometry',
     types: ['line', 'multiline'],
@@ -725,6 +759,7 @@ exports.length = length;
 const intersects = {
   name: 'Intersects',
   notes: 'Returns true/false if two geometries intersect',
+  category: categories.geospatial,
   signature: [{
     name: 'Geometry A',
     types: ['point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry'],
@@ -745,6 +780,7 @@ exports.intersects = intersects;
 const distance = {
   name: 'Distance',
   notes: 'Returns the distance between two geometries in meters',
+  category: categories.geospatial,
   signature: [{
     name: 'Geometry A',
     types: ['point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry'],
@@ -769,6 +805,7 @@ exports.distance = distance;
 const geojson = {
   name: 'Create Geometry',
   notes: 'Returns a geometry from a GeoJSON string',
+  category: categories.geospatial,
   signature: [{
     name: 'GeoJSON Text',
     types: ['text'],
@@ -788,6 +825,7 @@ exports.geojson = geojson;
 const boundingBox = {
   name: 'Create Bounding Box',
   notes: 'Returns a bounding box polygon for the given coordinates',
+  category: categories.geospatial,
   signature: [{
     name: 'X Min',
     types: ['number'],
