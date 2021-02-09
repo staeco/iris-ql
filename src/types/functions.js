@@ -203,7 +203,7 @@ export const sum = {
     const correct = (v, field) =>
       sql.fn('divide', v, sql.fn('count', sql.fn('distinct', qv({ field }))))
 
-    const containedJoins = search(f.raw, (k, v) => v.field?.startsWith('~'))?.map((i) => parse(i.value.field).alias)
+    const containedJoins = search(f.raw, (k, v) => v?.field?.startsWith('~'))?.map((i) => parse(i.value.field).alias)
     const joins = Object.keys(containedJoins ? omit(opt.joins, containedJoins) : opt.joins)
     const out = joins.reduce((acc, k) => correct(acc, `~${k}.id`), base)
     return containedJoins ? correct(out, 'id') : out

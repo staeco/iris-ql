@@ -219,7 +219,7 @@ const max = {
 exports.max = max;
 
 function _ref3(k, v) {
-  return v.field?.startsWith('~');
+  return v?.field?.startsWith('~');
 }
 
 function _ref4(i) {
