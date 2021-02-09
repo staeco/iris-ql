@@ -13,6 +13,8 @@ var _getTypes = _interopRequireDefault(require("../types/getTypes"));
 
 var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
 
+var _runWithTimeout = _interopRequireDefault(require("../util/runWithTimeout"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class Query {
@@ -75,14 +77,23 @@ class Query {
     this.execute = async ({
       raw = false,
       useMaster,
-      debug
+      debug,
+      timeout
     } = {}) => {
       const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll';
-      return this.options.model[fn]({
+
+      const exec = transaction => this.options.model[fn]({
         raw,
         useMaster,
         logging: debug,
+        transaction,
         ...this.value()
+      });
+
+      if (!timeout) return exec();
+      return (0, _runWithTimeout.default)(exec, {
+        sequelize: this.options.model.sequelize,
+        timeout
       });
     };
 
@@ -106,21 +117,41 @@ class Query {
 
     this.count = async ({
       useMaster,
+      timeout,
       debug
-    } = {}) => this.options.model.count({
-      useMaster,
-      logging: debug,
-      ...this.value()
-    });
+    } = {}) => {
+      const exec = transaction => this.options.model.count({
+        useMaster,
+        transaction,
+        logging: debug,
+        ...this.value()
+      });
+
+      if (!timeout) return exec();
+      return (0, _runWithTimeout.default)(exec, {
+        sequelize: this.options.model.sequelize,
+        timeout
+      });
+    };
 
     this.destroy = async ({
-      debug
-    } = {}) => this.options.model.destroy({
-      logging: debug,
-      ...this.value({
-        instanceQuery: false
-      })
-    });
+      debug,
+      timeout
+    } = {}) => {
+      const exec = transaction => this.options.model.destroy({
+        logging: debug,
+        transaction,
+        ...this.value({
+          instanceQuery: false
+        })
+      });
+
+      if (!timeout) return exec();
+      return (0, _runWithTimeout.default)(exec, {
+        sequelize: this.options.model.sequelize,
+        timeout
+      });
+    };
 
     if (!obj) throw new Error('Missing query!');
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');

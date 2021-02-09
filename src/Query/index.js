@@ -3,6 +3,7 @@ import parse from './parse'
 import exportStream from '../util/export'
 import getTypes from '../types/getTypes'
 import getModelFieldLimit from '../util/getModelFieldLimit'
+import runWithTimeout from '../util/runWithTimeout'
 
 export default class Query {
   constructor(obj, options = {}) {
@@ -61,13 +62,21 @@ export default class Query {
     }, {})
   }
 
-  execute = async ({ raw = false, useMaster, debug } = {}) => {
+  execute = async ({ raw = false, useMaster, debug, timeout } = {}) => {
     const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll'
-    return this.options.model[fn]({
-      raw,
-      useMaster,
-      logging: debug,
-      ...this.value()
+    const exec = (transaction) =>
+      this.options.model[fn]({
+        raw,
+        useMaster,
+        logging: debug,
+        transaction,
+        ...this.value()
+      })
+
+    if (!timeout) return exec()
+    return runWithTimeout(exec, {
+      sequelize: this.options.model.sequelize,
+      timeout
     })
   }
   executeStream = async ({ onError, format, tupleFraction, transform, useMaster, debug } = {}) =>
@@ -82,16 +91,32 @@ export default class Query {
       value: this.value()
     })
 
-  count = async ({ useMaster, debug } = {}) =>
-    this.options.model.count({
-      useMaster,
-      logging: debug,
-      ...this.value()
+  count = async ({ useMaster, timeout, debug } = {}) => {
+    const exec = (transaction) =>
+      this.options.model.count({
+        useMaster,
+        transaction,
+        logging: debug,
+        ...this.value()
+      })
+    if (!timeout) return exec()
+    return runWithTimeout(exec, {
+      sequelize: this.options.model.sequelize,
+      timeout
     })
+  }
 
-  destroy = async ({ debug } = {}) =>
-    this.options.model.destroy({
-      logging: debug,
-      ...this.value({ instanceQuery: false })
+  destroy = async ({ debug, timeout } = {}) => {
+    const exec = (transaction) =>
+      this.options.model.destroy({
+        logging: debug,
+        transaction,
+        ...this.value({ instanceQuery: false })
+      })
+    if (!timeout) return exec()
+    return runWithTimeout(exec, {
+      sequelize: this.options.model.sequelize,
+      timeout
     })
+  }
 }
