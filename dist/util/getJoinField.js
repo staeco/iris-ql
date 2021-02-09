@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.default = void 0;
+exports.default = exports.parse = void 0;
 
 var _errors = require("../errors");
 
@@ -9,13 +9,27 @@ var _QueryValue = _interopRequireDefault(require("../QueryValue"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+const parse = v => {
+  const [alias, ...rest] = v.split('.');
+  const joinKey = alias.replace('~', '');
+  return {
+    alias: joinKey,
+    field: rest.join('.')
+  };
+};
+
+exports.parse = parse;
+
 var _default = (v, opt) => {
   const {
     joins,
     hydrateJSON,
     context = []
   } = opt;
-  const [alias, ...rest] = v.split('.');
+  const {
+    alias,
+    field
+  } = parse(v);
   const joinKey = alias.replace('~', '');
   const joinConfig = joins?.[joinKey];
 
@@ -28,7 +42,7 @@ var _default = (v, opt) => {
   }
 
   return new _QueryValue.default({
-    field: rest.join('.')
+    field
   }, { ...joinConfig,
     hydrateJSON,
     context,
@@ -38,4 +52,3 @@ var _default = (v, opt) => {
 };
 
 exports.default = _default;
-module.exports = exports.default;

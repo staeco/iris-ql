@@ -9,15 +9,21 @@ var _capitalize = _interopRequireDefault(require("capitalize"));
 
 var _decamelize = _interopRequireDefault(require("decamelize"));
 
-var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
-
-var _ = require("./");
-
-var _tz = require("../util/tz");
-
 var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
 
 var _prettyMs = _interopRequireDefault(require("pretty-ms"));
+
+var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
+
+var _lodash = _interopRequireDefault(require("lodash.omit"));
+
+var _tz = require("../util/tz");
+
+var _getJoinField = require("../util/getJoinField");
+
+var _search = _interopRequireDefault(require("../util/search"));
+
+var _ = require("./");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -211,6 +217,15 @@ const max = {
   execute: ([f]) => _sequelize.default.fn('max', numeric(f))
 };
 exports.max = max;
+
+function _ref3(k, v) {
+  return v.field?.startsWith('~');
+}
+
+function _ref4(i) {
+  return (0, _getJoinField.parse)(i.value.field).alias;
+}
+
 const sum = {
   name: 'Sum',
   notes: 'Aggregates the sum total of a number',
@@ -233,11 +248,15 @@ const sum = {
     const base = _sequelize.default.fn('sum', numeric(f));
 
     if (!opt.joins) return base; // remove the cartesian product from the sum
-    // TODO: look through fieldLimit + schema and find the right PK!
 
-    return Object.keys(opt.joins).reduce((acc, k) => _sequelize.default.fn('divide', acc, _sequelize.default.fn('count', _sequelize.default.fn('distinct', qv({
-      field: `~${k}.id`
-    })))), base);
+    const correct = (v, field) => _sequelize.default.fn('divide', v, _sequelize.default.fn('count', _sequelize.default.fn('distinct', qv({
+      field
+    }))));
+
+    const containedJoins = (0, _search.default)(f.raw, _ref3)?.map(_ref4);
+    const joins = Object.keys(containedJoins ? (0, _lodash.default)(opt.joins, containedJoins) : opt.joins);
+    const out = joins.reduce((acc, k) => correct(acc, `~${k}.id`), base);
+    return containedJoins ? correct(out, 'id') : out;
   }
 };
 exports.sum = sum;

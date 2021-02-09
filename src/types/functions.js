@@ -1,11 +1,14 @@
 import sql from 'sequelize'
 import capitalize from 'capitalize'
 import decamelize from 'decamelize'
-import moment from 'moment-timezone'
-import { multiline, line, point, polygon, multipolygon } from './'
-import { force as forceTZ } from '../util/tz'
 import isObject from 'is-plain-obj'
 import ms from 'pretty-ms'
+import moment from 'moment-timezone'
+import omit from 'lodash.omit'
+import { force as forceTZ } from '../util/tz'
+import { parse } from '../util/getJoinField'
+import search from '../util/search'
+import { multiline, line, point, polygon, multipolygon } from './'
 
 const wgs84 = 4326
 
@@ -197,10 +200,13 @@ export const sum = {
     if (!opt.joins) return base
 
     // remove the cartesian product from the sum
-    // TODO: look through fieldLimit + schema and find the right PK!
-    return Object.keys(opt.joins).reduce((acc, k) =>
-      sql.fn('divide', acc, sql.fn('count', sql.fn('distinct', qv({ field: `~${k}.id` }))))
-    , base)
+    const correct = (v, field) =>
+      sql.fn('divide', v, sql.fn('count', sql.fn('distinct', qv({ field }))))
+
+    const containedJoins = search(f.raw, (k, v) => v.field?.startsWith('~'))?.map((i) => parse(i.value.field).alias)
+    const joins = Object.keys(containedJoins ? omit(opt.joins, containedJoins) : opt.joins)
+    const out = joins.reduce((acc, k) => correct(acc, `~${k}.id`), base)
+    return containedJoins ? correct(out, 'id') : out
   }
 }
 export const average = {

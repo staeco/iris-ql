@@ -1,9 +1,15 @@
 import { ValidationError } from '../errors'
 import QueryValue from '../QueryValue'
 
+export const parse = (v) => {
+  const [ alias, ...rest ] = v.split('.')
+  const joinKey = alias.replace('~', '')
+  return { alias: joinKey, field: rest.join('.') }
+}
+
 export default (v, opt) => {
   const { joins, hydrateJSON, context = [] } = opt
-  const [ alias, ...rest ] = v.split('.')
+  const { alias, field } = parse(v)
   const joinKey = alias.replace('~', '')
   const joinConfig = joins?.[joinKey]
   if (!joinConfig) {
@@ -14,9 +20,7 @@ export default (v, opt) => {
     })
   }
 
-  return new QueryValue({
-    field: rest.join('.')
-  }, {
+  return new QueryValue({ field }, {
     ...joinConfig,
     hydrateJSON,
     context,
