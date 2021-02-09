@@ -3,6 +3,7 @@ import isObject from 'is-plain-obj'
 import parse from './parse'
 import exportStream from '../util/export'
 import { select } from '../util/toString'
+import runWithTimeout from '../util/runWithTimeout'
 import getAggregationMeta from '../Aggregation/getMeta'
 import Query from '../Query'
 
@@ -72,19 +73,27 @@ export default class AnalyticsQuery {
       return prev
     }, {})
 
-  execute = async ({ useMaster, debug, timeout } = {}) =>
-    this.options.model.sequelize.query(select({
-      timeout,
-      value: this.value(),
-      model: this.options.model,
-      analytics: true
-    }), {
-      useMaster,
-      raw: true,
-      type: QueryTypes.SELECT,
-      logging: debug,
-      model: this.options.model
+  execute = async ({ useMaster, debug, timeout } = {}) => {
+    const exec = (transaction) =>
+      this.options.model.sequelize.query(select({
+        value: this.value(),
+        model: this.options.model,
+        analytics: true
+      }), {
+        useMaster,
+        raw: true,
+        type: QueryTypes.SELECT,
+        logging: debug,
+        model: this.options.model,
+        transaction
+      })
+
+    if (!timeout) return exec()
+    return runWithTimeout(exec, {
+      sequelize: this.options.model.sequelize,
+      timeout
     })
+  }
 
   executeStream = async ({ onError, format, tupleFraction, transform, useMaster, debug } = {}) =>
     exportStream({

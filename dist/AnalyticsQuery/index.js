@@ -13,6 +13,8 @@ var _export = _interopRequireDefault(require("../util/export"));
 
 var _toString = require("../util/toString");
 
+var _runWithTimeout = _interopRequireDefault(require("../util/runWithTimeout"));
+
 var _getMeta = _interopRequireDefault(require("../Aggregation/getMeta"));
 
 var _Query = _interopRequireDefault(require("../Query"));
@@ -85,18 +87,26 @@ class AnalyticsQuery {
       useMaster,
       debug,
       timeout
-    } = {}) => this.options.model.sequelize.query((0, _toString.select)({
-      timeout,
-      value: this.value(),
-      model: this.options.model,
-      analytics: true
-    }), {
-      useMaster,
-      raw: true,
-      type: _sequelize.QueryTypes.SELECT,
-      logging: debug,
-      model: this.options.model
-    });
+    } = {}) => {
+      const exec = transaction => this.options.model.sequelize.query((0, _toString.select)({
+        value: this.value(),
+        model: this.options.model,
+        analytics: true
+      }), {
+        useMaster,
+        raw: true,
+        type: _sequelize.QueryTypes.SELECT,
+        logging: debug,
+        model: this.options.model,
+        transaction
+      });
+
+      if (!timeout) return exec();
+      return (0, _runWithTimeout.default)(exec, {
+        sequelize: this.options.model.sequelize,
+        timeout
+      });
+    };
 
     this.executeStream = async ({
       onError,
