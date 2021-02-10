@@ -15,8 +15,6 @@ var _prettyMs = _interopRequireDefault(require("pretty-ms"));
 
 var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
 
-var _lodash = _interopRequireDefault(require("lodash.omit"));
-
 var _tz = require("../util/tz");
 
 var _getJoinField = require("../util/getJoinField");
@@ -219,11 +217,11 @@ const max = {
 exports.max = max;
 
 function _ref3(k, v) {
-  return v?.field?.startsWith('~');
+  return v?.field && !v.field.startsWith('~');
 }
 
-function _ref4(i) {
-  return (0, _getJoinField.parse)(i.value.field).alias;
+function _ref4(k, v) {
+  return v?.field?.startsWith('~');
 }
 
 const sum = {
@@ -245,18 +243,17 @@ const sum = {
   },
   aggregate: true,
   execute: ([f], opt, qv) => {
-    const base = _sequelize.default.fn('sum', numeric(f));
-
-    if (!opt.joins) return base; // remove the cartesian product from the sum
-
-    const correct = (v, field) => _sequelize.default.fn('divide', v, _sequelize.default.fn('count', _sequelize.default.fn('distinct', qv({
-      field
-    }))));
-
-    const containedJoins = (0, _search.default)(f.raw, _ref3)?.map(_ref4);
-    const joins = Object.keys(containedJoins ? (0, _lodash.default)(opt.joins, containedJoins) : opt.joins);
-    const out = joins.reduce((acc, k) => correct(acc, `~${k}.id`), base);
-    return containedJoins ? correct(out, 'id') : out;
+    if (!opt.joins) return _sequelize.default.fn('sum', numeric(f));
+    const distincts = [];
+    const primaryDistinct = (0, _search.default)(f.raw, _ref3);
+    const joinDistincts = (0, _search.default)(f.raw, _ref4)?.map(i => qv({
+      field: `~${(0, _getJoinField.parse)(i.value.field).alias}.id`
+    }));
+    if (primaryDistinct) distincts.push(qv({
+      field: 'id'
+    }));
+    if (joinDistincts) distincts.push(...joinDistincts);
+    return _sequelize.default.fn('dist_sum', _sequelize.default.fn('distinct', ...distincts), numeric(f));
   }
 };
 exports.sum = sum;

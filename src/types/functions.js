@@ -4,7 +4,6 @@ import decamelize from 'decamelize'
 import isObject from 'is-plain-obj'
 import ms from 'pretty-ms'
 import moment from 'moment-timezone'
-import omit from 'lodash.omit'
 import { force as forceTZ } from '../util/tz'
 import { parse } from '../util/getJoinField'
 import search from '../util/search'
@@ -196,17 +195,19 @@ export const sum = {
   },
   aggregate: true,
   execute: ([ f ], opt, qv) => {
-    const base = sql.fn('sum', numeric(f))
-    if (!opt.joins) return base
+    if (!opt.joins) return sql.fn('sum', numeric(f))
 
-    // remove the cartesian product from the sum
-    const correct = (v, field) =>
-      sql.fn('divide', v, sql.fn('count', sql.fn('distinct', qv({ field }))))
+    const distincts = []
 
-    const containedJoins = search(f.raw, (k, v) => v?.field?.startsWith('~'))?.map((i) => parse(i.value.field).alias)
-    const joins = Object.keys(containedJoins ? omit(opt.joins, containedJoins) : opt.joins)
-    const out = joins.reduce((acc, k) => correct(acc, `~${k}.id`), base)
-    return containedJoins ? correct(out, 'id') : out
+    const primaryDistinct = search(f.raw, (k, v) => v?.field && !v.field.startsWith('~'))
+    const joinDistincts = search(f.raw, (k, v) => v?.field?.startsWith('~'))?.map((i) =>
+      qv({ field: `~${parse(i.value.field).alias}.id` })
+    )
+
+    if (primaryDistinct) distincts.push(qv({ field: 'id' }))
+    if (joinDistincts) distincts.push(...joinDistincts)
+
+    return sql.fn('dist_sum', sql.fn('distinct', ...distincts), numeric(f))
   }
 }
 export const average = {
