@@ -97,9 +97,10 @@ export default class AnalyticsQuery {
     })
   }
 
-  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, debug } = {}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, timeout, debug } = {}) =>
     exportStream({
       analytics: true,
+      timeout,
       useMaster,
       tupleFraction,
       format,

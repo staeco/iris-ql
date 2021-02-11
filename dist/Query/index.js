@@ -103,8 +103,10 @@ class Query {
       tupleFraction,
       transform,
       useMaster,
-      debug
+      debug,
+      timeout
     } = {}) => (0, _export.default)({
+      timeout,
       useMaster,
       tupleFraction,
       format,

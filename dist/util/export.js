@@ -3,13 +3,15 @@
 exports.__esModule = true;
 exports.default = void 0;
 
-var _toString = require("./toString");
-
 var _pgQueryStream = _interopRequireDefault(require("pg-query-stream"));
 
 var _readableStream = require("readable-stream");
 
 var _through = _interopRequireDefault(require("through2"));
+
+var _toString = require("./toString");
+
+var _runWithTimeout = require("./runWithTimeout");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -27,16 +29,23 @@ const streamable = async ({
   model,
   sql,
   transform,
+  timeout,
+  debug,
   tupleFraction,
   onError
 }) => {
   const conn = await model.sequelize.connectionManager.getConnection({
     useMaster,
+    logging: debug,
     type: 'SELECT'
   });
 
   if (typeof tupleFraction === 'number') {
-    await conn.query(`set cursor_tuple_fraction=${tupleFraction}`);
+    await conn.query(`SET cursor_tuple_fraction=${tupleFraction};`);
+  }
+
+  if (timeout) {
+    await (0, _runWithTimeout.setSession)(timeout, conn);
   } // a not so fun hack to tie our sequelize types into this raw cursor
 
 
@@ -87,6 +96,7 @@ var _default = async ({
   transform,
   tupleFraction,
   debug,
+  timeout,
   onError,
   analytics = false
 }) => {
@@ -97,11 +107,12 @@ var _default = async ({
     model,
     analytics
   });
-  if (debug) debug(sql);
   const src = await streamable({
     useMaster,
     model,
     tupleFraction,
+    timeout,
+    debug,
     sql,
     transform,
     onError

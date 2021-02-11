@@ -84,4 +84,32 @@ describe('AnalyticsQuery#executeStream', () => {
     parsed.length.should.equal(3)
     should.exist(parsed[0].name)
   })
+  it('should work with timeout', async () => {
+    const query = new AnalyticsQuery({
+      aggregations: [
+        {
+          value: { function: 'count' },
+          alias: 'count'
+        },
+        {
+          value: { field: 'name' },
+          alias: 'name'
+        }
+      ],
+      groupings: [
+        { field: 'name' }
+      ]
+    }, { model: user.scope('public') })
+    const stream = await query.executeStream({
+      debug: console.log,
+      timeout: 1000,
+      format: json
+    })
+    should(stream.contentType).eql(json.contentType)
+    const res = await collect(stream)
+    should(typeof res).eql('string')
+    const parsed = JSON.parse(res)
+    parsed.length.should.equal(3)
+    should.exist(parsed[0].name)
+  })
 })

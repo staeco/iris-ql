@@ -79,8 +79,9 @@ export default class Query {
       timeout
     })
   }
-  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, debug } = {}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, debug, timeout } = {}) =>
     exportStream({
+      timeout,
       useMaster,
       tupleFraction,
       format,

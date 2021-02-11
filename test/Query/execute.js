@@ -229,4 +229,13 @@ describe('Query#execute', () => {
     should(filteredRes.count).equal(1)
     should(filteredRes.rows[0].data.arrivedAt).eql('2017-05-17T00:24:09.649Z')
   })
+  it('should work with timeout', async () => {
+    const query = new Query({ limit: 1 }, { model: user.scope('public') })
+    const res = await query.execute({ timeout: 10000 })
+    should.exist(res.count)
+    should.exist(res.rows)
+    res.count.should.equal(3)
+    res.rows.length.should.equal(1)
+    should.not.exist(res.rows[0].authToken)
+  })
 })
