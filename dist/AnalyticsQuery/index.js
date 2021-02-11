@@ -21,6 +21,8 @@ var _Query = _interopRequireDefault(require("../Query"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+const isEmpty = s => !s || s.length === 0;
+
 function _ref(acc, [k, mod]) {
   const idx = acc.findIndex(j => j.alias === k);
   if (idx === -1) throw new Error(`Join not found: ${k}`);
@@ -128,7 +130,7 @@ class AnalyticsQuery {
     });
 
     if (!obj) throw new Error('Missing value!');
-    if (!obj.aggregations && !obj.groupings && !obj.joins) return new _Query.default(obj, { ...options,
+    if (isEmpty(obj.aggregations) && isEmpty(obj.groupings) && isEmpty(obj.joins)) return new _Query.default(obj, { ...options,
       count: false
     }); // skip the advanced stuff and kick it down a level
 
