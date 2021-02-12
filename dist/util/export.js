@@ -11,8 +11,6 @@ var _through = _interopRequireDefault(require("through2"));
 
 var _toString = require("./toString");
 
-var _runWithTimeout = require("./runWithTimeout");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // this wraps a sql query in a stream via a cursor so as each row is found
@@ -40,12 +38,12 @@ const streamable = async ({
     type: 'SELECT'
   });
 
-  if (typeof tupleFraction === 'number') {
-    await conn.query(`SET cursor_tuple_fraction=${tupleFraction};`);
+  if (timeout) {
+    await conn.query(`SET idle_in_transaction_session_timeout = ${parseInt(timeout)};`);
   }
 
-  if (timeout) {
-    await (0, _runWithTimeout.setSession)(timeout, conn);
+  if (typeof tupleFraction === 'number') {
+    await conn.query(`SET cursor_tuple_fraction=${tupleFraction};`);
   } // a not so fun hack to tie our sequelize types into this raw cursor
 
 

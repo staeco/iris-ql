@@ -2,7 +2,6 @@ import QueryStream from 'pg-query-stream'
 import { pipeline, finished } from 'readable-stream'
 import through2 from 'through2'
 import { select } from './toString'
-import { setSession } from './runWithTimeout'
 
 // this wraps a sql query in a stream via a cursor so as each row is found
 // it gets transformed and emitted from the stream
@@ -14,11 +13,11 @@ const streamable = async ({ useMaster, model, sql, transform, timeout, debug, tu
     logging: debug,
     type: 'SELECT'
   })
+  if (timeout) {
+    await conn.query(`SET idle_in_transaction_session_timeout = ${parseInt(timeout)};`)
+  }
   if (typeof tupleFraction === 'number') {
     await conn.query(`SET cursor_tuple_fraction=${tupleFraction};`)
-  }
-  if (timeout) {
-    await setSession(timeout, conn)
   }
 
   // a not so fun hack to tie our sequelize types into this raw cursor
