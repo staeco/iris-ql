@@ -34,7 +34,6 @@ const streamable = async ({
 }) => {
   const conn = await model.sequelize.connectionManager.getConnection({
     useMaster,
-    logging: debug,
     type: 'SELECT'
   });
 
@@ -48,6 +47,7 @@ const streamable = async ({
 
 
   let out;
+  if (debug) debug(sql);
   const query = conn.query(new _pgQueryStream.default(sql, undefined, {
     batchSize,
     types: {

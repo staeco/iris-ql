@@ -10,7 +10,6 @@ const batchSize = 16
 const streamable = async ({ useMaster, model, sql, transform, timeout, debug, tupleFraction, onError }) => {
   const conn = await model.sequelize.connectionManager.getConnection({
     useMaster,
-    logging: debug,
     type: 'SELECT'
   })
   if (timeout) {
@@ -22,6 +21,7 @@ const streamable = async ({ useMaster, model, sql, transform, timeout, debug, tu
 
   // a not so fun hack to tie our sequelize types into this raw cursor
   let out
+  if (debug) debug(sql)
   const query = conn.query(new QueryStream(sql, undefined, {
     batchSize,
     types: {
