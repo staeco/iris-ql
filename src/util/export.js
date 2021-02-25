@@ -7,18 +7,19 @@ import { select } from './toString'
 // it gets transformed and emitted from the stream
 // this is how you want to return millions of rows with low memory overhead
 const batchSize = 16
-const streamable = async ({ useMaster, model, sql, transform, timeout, debug, tupleFraction, onError }) => {
+const streamable = async ({ useMaster, model, sql, transform, timeout, finishTimeout, debug, tupleFraction, onError }) => {
   const conn = await model.sequelize.connectionManager.getConnection({
     useMaster,
     type: 'SELECT'
   })
-  if (timeout) {
-    await conn.query(`SET idle_in_transaction_session_timeout = ${parseInt(timeout)};`)
-  }
-  if (typeof tupleFraction === 'number') {
-    await conn.query(`SET cursor_tuple_fraction=${tupleFraction};`)
-  }
+  const warm = []
+  if (timeout) warm.push(`SET idle_in_transaction_session_timeout = ${parseInt(timeout)};`)
+  if (finishTimeout) warm.push(`SET statement_timeout = ${parseInt(finishTimeout)};`)
+  if (typeof tupleFraction === 'number') warm.push(`SET cursor_tuple_fraction=${tupleFraction};`)
 
+  if (warm.length !== 0) {
+    await conn.query(warm.join('\n'))
+  }
   // a not so fun hack to tie our sequelize types into this raw cursor
   let out
   if (debug) debug(sql)
