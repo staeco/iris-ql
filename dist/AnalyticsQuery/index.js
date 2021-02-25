@@ -117,10 +117,12 @@ class AnalyticsQuery {
       transform,
       useMaster,
       timeout,
+      finishTimeout,
       debug
     } = {}) => (0, _export.default)({
       analytics: true,
       timeout,
+      finishTimeout,
       useMaster,
       tupleFraction,
       format,
