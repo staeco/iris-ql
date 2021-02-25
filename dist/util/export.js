@@ -5,9 +5,7 @@ exports.default = void 0;
 
 var _pgQueryStream = _interopRequireDefault(require("pg-query-stream"));
 
-var _readableStream = require("readable-stream");
-
-var _through = _interopRequireDefault(require("through2"));
+var _stream = require("stream");
 
 var _toString = require("./toString");
 
@@ -73,15 +71,18 @@ const streamable = async ({
     query.destroy(null, _ref3);
   };
 
-  function _ref4(obj, _, cb) {
-    return cb(null, transform(obj));
-  }
-
   if (transform) {
-    out = (0, _readableStream.pipeline)(query, _through.default.obj(_ref4), end);
+    out = (0, _stream.pipeline)(query, new _stream.Transform({
+      objectMode: true,
+
+      transform(obj, _, cb) {
+        cb(null, transform(obj));
+      }
+
+    }), end);
   } else {
     out = query;
-    (0, _readableStream.finished)(query, end);
+    (0, _stream.finished)(query, end);
   }
 
   return out;
@@ -96,6 +97,7 @@ var _default = async ({
   tupleFraction,
   debug,
   timeout,
+  finishTimeout,
   onError,
   analytics = false
 }) => {
@@ -111,13 +113,14 @@ var _default = async ({
     model,
     tupleFraction,
     timeout,
+    finishTimeout,
     debug,
     sql,
     transform,
     onError
   });
   if (!format) return src;
-  const out = (0, _readableStream.pipeline)(src, format(), err => {
+  const out = (0, _stream.pipeline)(src, format(), err => {
     if (err) out.emit('error', err);
   });
   out.contentType = format.contentType;

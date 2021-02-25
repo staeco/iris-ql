@@ -4,7 +4,7 @@ import { Query } from '../../src'
 import db from '../fixtures/db'
 import collect from 'get-stream'
 import pumpify from 'pumpify'
-import through2 from 'through2'
+import { PassThrough } from 'stream'
 import JSONStream from 'jsonstream-next'
 
 const json = () => JSONStream.stringify('[', ',', ']')
@@ -111,7 +111,7 @@ describe('Query#executeStream', () => {
     should(stream.contentType).eql(json.contentType)
     const res = await collect(pumpify.obj(
       stream,
-      through2()
+      new PassThrough()
     ))
     should(typeof res).eql('string')
     const parsed = JSON.parse(res)

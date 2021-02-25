@@ -1,6 +1,5 @@
 import QueryStream from 'pg-query-stream'
-import { pipeline, finished } from 'readable-stream'
-import through2 from 'through2'
+import { pipeline, Transform, finished } from 'stream'
 import { select } from './toString'
 
 // this wraps a sql query in a stream via a cursor so as each row is found
@@ -48,7 +47,12 @@ const streamable = async ({ useMaster, model, sql, transform, timeout, finishTim
   if (transform) {
     out = pipeline(
       query,
-      through2.obj((obj, _, cb) => cb(null, transform(obj))),
+      new Transform({
+        objectMode: true,
+        transform(obj, _, cb) {
+          cb(null, transform(obj))
+        }
+      }),
       end
     )
   } else {
@@ -59,10 +63,20 @@ const streamable = async ({ useMaster, model, sql, transform, timeout, finishTim
 }
 
 
-export default async ({ useMaster, model, value, format, transform, tupleFraction, debug, timeout, onError, analytics = false }) => {
+export default async ({ useMaster, model, value, format, transform, tupleFraction, debug, timeout, finishTimeout, onError, analytics = false }) => {
   const nv = { ...value }
   const sql = select({ value: nv, model, analytics })
-  const src = await streamable({ useMaster, model, tupleFraction, timeout, debug, sql, transform, onError })
+  const src = await streamable({
+    useMaster,
+    model,
+    tupleFraction,
+    timeout,
+    finishTimeout,
+    debug,
+    sql,
+    transform,
+    onError
+  })
   if (!format) return src
   const out = pipeline(src, format(), (err) => {
     if (err) out.emit('error', err)
