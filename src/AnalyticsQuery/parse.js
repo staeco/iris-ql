@@ -130,6 +130,8 @@ export default (query = {}, opt) => {
   // post-parse checks
   // validate each aggregation and ensure it is either used in groupings, or contains an aggregate function
   query.aggregations.forEach((agg, idx) => {
+    const hasField = search(agg.value, (k, v) => typeof v?.field === 'string')
+    if (!hasField) return // no field, doesnt need an aggregate fn
     const hasAggregateFunction = search(agg.value, (k, v) => typeof v?.function === 'string' && aggregateFunctions.includes(v.function))
     if (hasAggregateFunction) return // valid
     const matchedGrouping = search(query.groupings, (k, v) => typeof v?.field === 'string' && v.field === agg.alias)
