@@ -72,3 +72,9 @@ CREATE OR REPLACE FUNCTION jsonb_merge(a jsonb, b jsonb) RETURNS JSONB AS $$
   from jsonb_each(a) e1(ka, va)
   full join jsonb_each(b) e2(kb, vb) on ka = kb
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE;
+
+
+CREATE OR REPLACE FUNCTION get_label_from_json(p_input jsonb) RETURNS text AS $$
+  SELECT coalesce(p_input->>'name', p_input->>'type', p_input->>'id', NULL);
+$$
+LANGUAGE sql IMMUTABLE PARALLEL SAFE STRICT;
