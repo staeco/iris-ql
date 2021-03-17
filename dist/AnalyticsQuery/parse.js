@@ -174,9 +174,7 @@ var _default = (query = {}, opt) => {
 
     const matchedGrouping = query.groupings?.find(v => {
       if (!v) return false;
-      if (v.field) return v.field === agg.alias; // grouping by the alias
-
-      return (0, _fastDeepEqual.default)(v, agg.value); // grouping by the same value
+      return (0, _fastDeepEqual.default)(v, agg.value) || v.field === agg.alias;
     });
     if (matchedGrouping) return; // valid
 

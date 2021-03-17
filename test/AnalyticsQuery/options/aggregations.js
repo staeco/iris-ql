@@ -173,7 +173,7 @@ describe('AnalyticsQuery#options#aggregations', () => {
           },
           {
             value: { field: 'name' },
-            alias: 'name'
+            alias: 'name-test'
           }
         ]
       }, { model: user })
@@ -188,6 +188,26 @@ describe('AnalyticsQuery#options#aggregations', () => {
       return
     }
     throw new Error('Did not throw!')
+  })
+  it('should not return errors when a field aggregation is a deep grouping', async () => {
+    new AnalyticsQuery({
+      aggregations: [
+        {
+          value: { function: 'count' },
+          alias: 'count',
+          filters: {
+            createdAt: { $gte: { function: 'last', arguments: [ 'P1W' ] } }
+          }
+        },
+        {
+          value: { field: 'name' },
+          alias: 'name-test'
+        }
+      ],
+      groupings: [
+        { field: 'name' }
+      ]
+    }, { model: user })
   })
   it('should return errors for duplicate aggregation', async () => {
     try {
