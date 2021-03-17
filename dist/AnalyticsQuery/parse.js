@@ -3,6 +3,8 @@
 exports.__esModule = true;
 exports.default = void 0;
 
+var _fastDeepEqual = _interopRequireDefault(require("fast-deep-equal"));
+
 var _Query = _interopRequireDefault(require("../Query"));
 
 var _QueryValue = _interopRequireDefault(require("../QueryValue"));
@@ -170,7 +172,12 @@ var _default = (query = {}, opt) => {
     const hasAggregateFunction = (0, _search.default)(agg.value, _ref6);
     if (hasAggregateFunction) return; // valid
 
-    const matchedGrouping = (0, _search.default)(query.groupings, (k, v) => typeof v?.field === 'string' && v.field === agg.alias);
+    const matchedGrouping = query.groupings?.find(v => {
+      if (!v) return false;
+      if (v.field) return v.field === agg.alias; // grouping by the alias
+
+      return (0, _fastDeepEqual.default)(v, agg.value); // grouping by the same value
+    });
     if (matchedGrouping) return; // valid
 
     error.add({

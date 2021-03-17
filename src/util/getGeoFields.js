@@ -7,5 +7,5 @@ export default (model) => {
     return type instanceof sql.GEOGRAPHY || type instanceof sql.GEOMETRY
   })
 
-  return ret.length !== 0 ? ret : null
+  return ret.length > 0 ? ret : null
 }

@@ -101,7 +101,7 @@ describe('AnalyticsQuery#execute', () => {
     const query = new AnalyticsQuery(crimeTimeSeries, { timezone: 'America/Los_Angeles', model: datum, subSchemas: { data: dataType.schema } })
     let res
     try {
-      res = await query.execute({ timeout: 1, debug: console.log })
+      res = await query.execute({ timeout: 1 })
     } catch (err) {
       should(err.message).eql('canceling statement due to statement timeout')
       return

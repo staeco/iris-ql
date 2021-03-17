@@ -19,10 +19,10 @@ const serializeIssues = fields => fields.map(_ref);
 class BadRequestError extends Error {
   constructor(message = 'Bad Request', status = 400) {
     super(message);
+    this.name = 'BadRequestError';
 
     this.toString = () => `${super.toString()} (HTTP ${this.status})`;
 
-    this.message = message;
     this.status = status;
     Error.captureStackTrace(this, BadRequestError);
   }
@@ -34,6 +34,7 @@ exports.BadRequestError = BadRequestError;
 class ValidationError extends BadRequestError {
   constructor(fields = []) {
     super('Validation Error');
+    this.name = 'ValidationError';
 
     this.add = err => {
       if (!err) return this; // nothing to do

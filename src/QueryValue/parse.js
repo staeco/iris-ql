@@ -144,7 +144,7 @@ const parse = (v, opt) => {
     }
     if (resolvedField.startsWith('~')) return getJoinField(resolvedField, opt)
     if (resolvedField.includes('.')) return getJSONField(resolvedField, opt)
-    if (!fieldLimit.find((i) => i.field === resolvedField)) {
+    if (!fieldLimit.some((i) => i.field === resolvedField)) {
       throw new ValidationError({
         path: [ ...context, 'field' ],
         value: resolvedField,

@@ -1,3 +1,4 @@
+import deepEqual from 'fast-deep-equal'
 import Query from '../Query'
 import QueryValue from '../QueryValue'
 import Aggregation from '../Aggregation'
@@ -134,7 +135,11 @@ export default (query = {}, opt) => {
     if (!hasField) return // no field, doesnt need an aggregate fn
     const hasAggregateFunction = search(agg.value, (k, v) => typeof v?.function === 'string' && aggregateFunctions.includes(v.function))
     if (hasAggregateFunction) return // valid
-    const matchedGrouping = search(query.groupings, (k, v) => typeof v?.field === 'string' && v.field === agg.alias)
+    const matchedGrouping = query.groupings?.find((v) => {
+      if (!v) return false
+      if (v.field) return v.field === agg.alias // grouping by the alias
+      return deepEqual(v, agg.value) // grouping by the same value
+    })
     if (matchedGrouping) return // valid
     error.add({
       path: [ ...context, 'aggregations', idx, 'value' ],

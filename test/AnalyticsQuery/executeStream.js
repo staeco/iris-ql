@@ -101,7 +101,6 @@ describe('AnalyticsQuery#executeStream', () => {
       ]
     }, { model: user.scope('public') })
     const stream = await query.executeStream({
-      debug: console.log,
       timeout: 1000,
       format: json
     })

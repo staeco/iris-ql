@@ -4,7 +4,7 @@ import { ValidationError } from '../errors'
 
 const MAX_LENGTH = 64
 const MAX_NOTES_LENGTH = 1024
-const alphanumPlus = /[^0-9a-z_-]/i
+const alphanumPlus = /[^\w-]/i
 
 export default (a, opt) => {
   const { joins, context = [] } = opt
@@ -56,14 +56,10 @@ export default (a, opt) => {
 
   if (typeof a.alias === 'string') {
     if (a.alias.length > MAX_LENGTH) error.add({ value: a.alias, path: [ ...context, 'alias' ], message: `Must be less than ${MAX_LENGTH} characters` })
-    if (a.alias.match(alphanumPlus)) error.add({ value: a.alias, path: [ ...context, 'alias' ], message: 'Must be alphanumeric, _, or -' })
+    if (alphanumPlus.test(a.alias)) error.add({ value: a.alias, path: [ ...context, 'alias' ], message: 'Must be alphanumeric, _, or -' })
   }
-  if (typeof a.name === 'string') {
-    if (a.name.length > MAX_LENGTH) error.add({ value: a.name, path: [ ...context, 'name' ], message: `Must be less than ${MAX_LENGTH} characters` })
-  }
-  if (typeof a.notes === 'string') {
-    if (a.notes.length > MAX_NOTES_LENGTH) error.add({ value: a.notes, path: [ ...context, 'notes' ], message: `Must be less than ${MAX_LENGTH} characters` })
-  }
+  if (typeof a.name === 'string' && a.name.length > MAX_LENGTH) error.add({ value: a.name, path: [ ...context, 'name' ], message: `Must be less than ${MAX_LENGTH} characters` })
+  if (typeof a.notes === 'string' && a.notes.length > MAX_NOTES_LENGTH) error.add({ value: a.notes, path: [ ...context, 'notes' ], message: `Must be less than ${MAX_LENGTH} characters` })
 
   if (!error.isEmpty()) throw error
 

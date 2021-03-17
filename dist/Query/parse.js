@@ -68,7 +68,7 @@ var _default = (query, opt = {}) => {
 
   if (query.search) {
     const searchable = state.fieldLimit.filter(_ref);
-    const isSearchable = searchable.length !== 0;
+    const isSearchable = searchable.length > 0;
     const isValid = typeof query.search === 'string';
 
     if (!isValid) {
@@ -253,7 +253,7 @@ var _default = (query, opt = {}) => {
   function _ref2(k, idx) {
     const [first] = k.split('.');
 
-    if (!first || !state.fieldLimit.find(f => f.field === first)) {
+    if (!first || !state.fieldLimit.some(f => f.field === first)) {
       error.add({
         path: [...context, 'exclusions', idx],
         value: k,
@@ -267,7 +267,7 @@ var _default = (query, opt = {}) => {
 
   if (query.exclusions) {
     const parsed = (0, _stringArray.default)(query.exclusions).map(_ref2);
-    if (parsed.length !== 0) out.attributes = {
+    if (parsed.length > 0) out.attributes = {
       exclude: parsed
     };
   } // limit

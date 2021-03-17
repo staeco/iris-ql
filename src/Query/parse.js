@@ -47,7 +47,7 @@ export default (query, opt = {}) => {
   // searching
   if (query.search) {
     const searchable = state.fieldLimit.filter((f) => attrs[f.field].searchable)
-    const isSearchable = searchable.length !== 0
+    const isSearchable = searchable.length > 0
     const isValid = typeof query.search === 'string'
     if (!isValid) {
       error.add({
@@ -194,7 +194,7 @@ export default (query, opt = {}) => {
   if (query.exclusions) {
     const parsed = parseIffyStringArray(query.exclusions).map((k, idx) => {
       const [ first ] = k.split('.')
-      if (!first || !state.fieldLimit.find((f) => f.field === first)) {
+      if (!first || !state.fieldLimit.some((f) => f.field === first)) {
         error.add({
           path: [ ...context, 'exclusions', idx ],
           value: k,
@@ -204,7 +204,7 @@ export default (query, opt = {}) => {
       }
       return k
     })
-    if (parsed.length !== 0) out.attributes = { exclude: parsed }
+    if (parsed.length > 0) out.attributes = { exclude: parsed }
   }
 
   // limit

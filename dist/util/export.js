@@ -40,7 +40,7 @@ const streamable = async ({
   if (finishTimeout) warm.push(`SET statement_timeout = ${parseInt(finishTimeout)};`);
   if (typeof tupleFraction === 'number') warm.push(`SET cursor_tuple_fraction=${tupleFraction};`);
 
-  if (warm.length !== 0) {
+  if (warm.length > 0) {
     await conn.query(warm.join('\n'));
   } // a not so fun hack to tie our sequelize types into this raw cursor
 

@@ -33,7 +33,7 @@ var _default = (v, opt) => {
   const col = path.shift();
   const colInfo = model.rawAttributes[col];
 
-  if (!colInfo || !fieldLimit.find(i => i.field === col)) {
+  if (!colInfo || !fieldLimit.some(i => i.field === col)) {
     throw new _errors.ValidationError({
       path: context,
       value: v,

@@ -15,7 +15,7 @@ var _default = model => {
     } = attrs[k];
     return type instanceof _sequelize.default.GEOGRAPHY || type instanceof _sequelize.default.GEOMETRY;
   });
-  return ret.length !== 0 ? ret : null;
+  return ret.length > 0 ? ret : null;
 };
 
 exports.default = _default;
