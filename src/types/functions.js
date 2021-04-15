@@ -277,6 +277,24 @@ export const distinctCount = {
 }
 
 // Math
+export const round = {
+  name: 'Round',
+  notes: 'Rounds a number',
+  category: categories.math,
+  signature: [
+    {
+      name: 'Value A',
+      types: [ 'number' ],
+      required: true
+    }
+  ],
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric.bind(null, { retainPercentage: true })
+  },
+  execute: ([ a ]) =>
+    sql.fn('round', numeric(a))
+}
 export const add = {
   name: 'Add',
   notes: 'Applies addition to multiple numbers',
