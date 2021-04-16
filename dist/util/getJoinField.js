@@ -31,7 +31,7 @@ var _default = (v, opt) => {
     field
   } = parse(v);
   const joinKey = alias.replace('~', '');
-  const joinConfig = joins?.[joinKey];
+  const joinConfig = joins == null ? void 0 : joins[joinKey];
 
   if (!joinConfig) {
     throw new _errors.ValidationError({

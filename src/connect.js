@@ -23,7 +23,7 @@ const defaultOptions = {
   operatorsAliases: operators,
   timezone: 'UTC'
 }
-export default (url, opt = {}) => {
+export default (url, opt = {}, Instance = Sequelize) => {
   // fix issues with pg types
   pg.types.setTypeParser(20, 'text', pg.types.getTypeParser(23, 'text')) // bigint = int
   pg.types.setTypeParser(1016, 'text', pg.types.getTypeParser(1007, 'text')) // bigint[] = int[]
@@ -40,12 +40,13 @@ export default (url, opt = {}) => {
   Sequelize.Validator.notNull = function (item) {
     return !this.isNull(item)
   }
+  // you can override Instance if you use sequelize-typescript
   const conn = typeof url === 'object'
-    ? new Sequelize({
+    ? new Instance({
       ...defaultOptions,
       ...url
     })
-    : new Sequelize(url, {
+    : new Instance(url, {
       ...defaultOptions,
       ...opt
     })

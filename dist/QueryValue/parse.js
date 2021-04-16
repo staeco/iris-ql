@@ -28,9 +28,9 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const resolveField = (field, opt) => {
-  if (!opt?.substitutions) return field;
+  if (!(opt != null && opt.substitutions)) return field;
   const subs = typeof opt.substitutions === 'function' ? opt.substitutions(opt) : opt.substitutions;
-  return subs?.[field] || field;
+  return (subs == null ? void 0 : subs[field]) || field;
 };
 
 function _ref(i) {
@@ -42,6 +42,8 @@ function _ref2(t) {
 }
 
 const validateArgumentTypes = (func, sig, arg, opt) => {
+  var _sig$options;
+
   if (!sig.required && arg == null) return true; // not present, so has a default
 
   if (sig.required && arg == null) {
@@ -54,7 +56,7 @@ const validateArgumentTypes = (func, sig, arg, opt) => {
 
   if (sig.types === 'any') return true; // allows anything
 
-  const enumm = sig.options?.map(_ref);
+  const enumm = (_sig$options = sig.options) == null ? void 0 : _sig$options.map(_ref);
 
   if (enumm && !enumm.includes(arg)) {
     throw new _errors.ValidationError({
@@ -182,6 +184,8 @@ const parse = (v, opt) => {
   }
 
   if (v.field) {
+    var _resolvedAggregation$;
+
     if (typeof v.field !== 'string') {
       throw new _errors.ValidationError({
         path: [...context, 'field'],
@@ -216,7 +220,7 @@ const parse = (v, opt) => {
     // it needs to be renamed to something else, or grouping/ordering has no idea if you are referencing the column
     // or the aggregation
 
-    if (resolvedAggregation && resolvedColumn && resolvedAggregation.value?.field !== resolvedColumn.field) {
+    if (resolvedAggregation && resolvedColumn && ((_resolvedAggregation$ = resolvedAggregation.value) == null ? void 0 : _resolvedAggregation$.field) !== resolvedColumn.field) {
       throw new _errors.ValidationError({
         path: [...context, 'field'],
         value: resolvedField,

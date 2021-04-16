@@ -41,7 +41,7 @@ function _ref(item) {
   return !this.isNull(item);
 }
 
-var _default = (url, opt = {}) => {
+var _default = (url, opt = {}, Instance = _sequelize.default) => {
   // fix issues with pg types
   _pg.default.types.setTypeParser(20, 'text', _pg.default.types.getTypeParser(23, 'text')); // bigint = int
 
@@ -63,10 +63,11 @@ var _default = (url, opt = {}) => {
   }); // See https://github.com/sequelize/sequelize/issues/1500
 
 
-  _sequelize.default.Validator.notNull = _ref;
-  const conn = typeof url === 'object' ? new _sequelize.default({ ...defaultOptions,
+  _sequelize.default.Validator.notNull = _ref; // you can override Instance if you use sequelize-typescript
+
+  const conn = typeof url === 'object' ? new Instance({ ...defaultOptions,
     ...url
-  }) : new _sequelize.default(url, { ...defaultOptions,
+  }) : new Instance(url, { ...defaultOptions,
     ...opt
   }); // fix sequelize types overriding pg-types
 

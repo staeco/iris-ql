@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.boundingBox = exports.geojson = exports.distance = exports.intersects = exports.length = exports.area = exports.extract = exports.bucket = exports.interval = exports.last = exports.now = exports.eq = exports.lte = exports.gte = exports.lt = exports.gt = exports.remainder = exports.percentage = exports.divide = exports.multiply = exports.subtract = exports.add = exports.distinctCount = exports.count = exports.median = exports.average = exports.sum = exports.max = exports.min = exports.expand = void 0;
+exports.boundingBox = exports.geojson = exports.distance = exports.intersects = exports.length = exports.area = exports.extract = exports.bucket = exports.interval = exports.last = exports.now = exports.eq = exports.lte = exports.gte = exports.lt = exports.gt = exports.remainder = exports.percentage = exports.divide = exports.multiply = exports.subtract = exports.add = exports.round = exports.distinctCount = exports.count = exports.median = exports.average = exports.sum = exports.max = exports.min = exports.expand = void 0;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
@@ -19,7 +19,7 @@ var _tz = require("../util/tz");
 
 var _getJoinField = require("../util/getJoinField");
 
-var _search = _interopRequireDefault(require("../util/search"));
+var _search2 = _interopRequireDefault(require("../util/search"));
 
 var _ = require("./");
 
@@ -29,18 +29,22 @@ const wgs84 = 4326; // some operations we don't want to display a percentage aft
 // 33% * 100,000 should return 33,000 as a flat integer
 // 100,000 / 77% should return 130,000 as a flat integer
 
-const isPercentage = i => i.measurement?.type === 'percentage';
+const isPercentage = i => {
+  var _i$measurement;
+
+  return ((_i$measurement = i.measurement) == null ? void 0 : _i$measurement.type) === 'percentage';
+};
 
 const inheritNumeric = ({
   retainPercentage
 }, [infoA, infoB]) => {
   const filter = i => (i.type === 'number' || i.type === 'date') && (retainPercentage || !isPercentage(i));
 
-  const primaryTypeA = infoA?.types.find(filter);
-  const primaryTypeB = infoB?.types.find(filter);
+  const primaryTypeA = infoA == null ? void 0 : infoA.types.find(filter);
+  const primaryTypeB = infoB == null ? void 0 : infoB.types.find(filter);
   return {
-    type: primaryTypeA?.type || primaryTypeB?.type,
-    measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
+    type: (primaryTypeA == null ? void 0 : primaryTypeA.type) || (primaryTypeB == null ? void 0 : primaryTypeB.type),
+    measurement: (primaryTypeA == null ? void 0 : primaryTypeA.measurement) || (primaryTypeB == null ? void 0 : primaryTypeB.measurement)
   };
 };
 
@@ -217,11 +221,13 @@ const max = {
 exports.max = max;
 
 function _ref3(k, v) {
-  return v?.field && !v.field.startsWith('~');
+  return (v == null ? void 0 : v.field) && !v.field.startsWith('~');
 }
 
 function _ref4(k, v) {
-  return v?.field?.startsWith('~');
+  var _v$field;
+
+  return v == null ? void 0 : (_v$field = v.field) == null ? void 0 : _v$field.startsWith('~');
 }
 
 const sum = {
@@ -243,10 +249,12 @@ const sum = {
   },
   aggregate: true,
   execute: ([f], opt, qv) => {
+    var _search;
+
     if (!opt.joins) return _sequelize.default.fn('sum', numeric(f));
     const distincts = [];
-    const primaryDistinct = (0, _search.default)(f.raw, _ref3);
-    const joinDistincts = (0, _search.default)(f.raw, _ref4)?.map(i => qv({
+    const primaryDistinct = (0, _search2.default)(f.raw, _ref3);
+    const joinDistincts = (_search = (0, _search2.default)(f.raw, _ref4)) == null ? void 0 : _search.map(i => qv({
       field: `~${(0, _getJoinField.parse)(i.value.field).alias}.id`
     }));
     if (primaryDistinct) distincts.push(qv({
@@ -331,6 +339,26 @@ const distinctCount = {
 }; // Math
 
 exports.distinctCount = distinctCount;
+const round = {
+  name: 'Round',
+  notes: 'Rounds a number',
+  category: categories.math,
+  signature: [{
+    name: 'Value A',
+    types: ['number'],
+    required: true
+  }],
+  returns: {
+    static: {
+      type: 'number'
+    },
+    dynamic: inheritNumeric.bind(null, {
+      retainPercentage: true
+    })
+  },
+  execute: ([a]) => _sequelize.default.fn('round', numeric(a))
+};
+exports.round = round;
 const add = {
   name: 'Add',
   notes: 'Applies addition to multiple numbers',
