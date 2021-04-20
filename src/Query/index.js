@@ -62,7 +62,7 @@ export default class Query {
     }, {})
   }
 
-  execute = async ({ raw = false, useMaster, debug, timeout } = {}) => {
+  execute = async ({ raw = false, useMaster, debug = this.options.model.sequelize.options.logging, timeout } = {}) => {
     const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll'
     const exec = (transaction) =>
       this.options.model[fn]({
@@ -79,7 +79,7 @@ export default class Query {
       timeout
     })
   }
-  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, debug, timeout, finishTimeout } = {}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, debug = this.options.model.sequelize.options.logging, timeout, finishTimeout } = {}) =>
     exportStream({
       timeout,
       finishTimeout,
@@ -93,7 +93,7 @@ export default class Query {
       value: this.value()
     })
 
-  count = async ({ useMaster, timeout, debug } = {}) => {
+  count = async ({ useMaster, timeout, debug = this.options.model.sequelize.options.logging } = {}) => {
     const exec = (transaction) =>
       this.options.model.count({
         useMaster,
@@ -108,7 +108,7 @@ export default class Query {
     })
   }
 
-  destroy = async ({ debug, timeout } = {}) => {
+  destroy = async ({ debug = this.options.model.sequelize.options.logging, timeout } = {}) => {
     const exec = (transaction) =>
       this.options.model.destroy({
         logging: debug,

@@ -77,7 +77,7 @@ class Query {
     this.execute = async ({
       raw = false,
       useMaster,
-      debug,
+      debug = this.options.model.sequelize.options.logging,
       timeout
     } = {}) => {
       const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll';
@@ -103,7 +103,7 @@ class Query {
       tupleFraction,
       transform,
       useMaster,
-      debug,
+      debug = this.options.model.sequelize.options.logging,
       timeout,
       finishTimeout
     } = {}) => (0, _export.default)({
@@ -122,7 +122,7 @@ class Query {
     this.count = async ({
       useMaster,
       timeout,
-      debug
+      debug = this.options.model.sequelize.options.logging
     } = {}) => {
       const exec = transaction => this.options.model.count({
         useMaster,
@@ -139,7 +139,7 @@ class Query {
     };
 
     this.destroy = async ({
-      debug,
+      debug = this.options.model.sequelize.options.logging,
       timeout
     } = {}) => {
       const exec = transaction => this.options.model.destroy({

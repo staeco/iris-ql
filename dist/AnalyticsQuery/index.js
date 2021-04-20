@@ -87,7 +87,7 @@ class AnalyticsQuery {
 
     this.execute = async ({
       useMaster,
-      debug,
+      debug = this.options.model.sequelize.options.logging,
       timeout
     } = {}) => {
       const exec = transaction => this.options.model.sequelize.query((0, _toString.select)({
@@ -118,7 +118,7 @@ class AnalyticsQuery {
       useMaster,
       timeout,
       finishTimeout,
-      debug
+      debug = this.options.model.sequelize.options.logging
     } = {}) => (0, _export.default)({
       analytics: true,
       timeout,

@@ -75,7 +75,7 @@ export default class AnalyticsQuery {
       return prev
     }, {})
 
-  execute = async ({ useMaster, debug, timeout } = {}) => {
+  execute = async ({ useMaster, debug = this.options.model.sequelize.options.logging, timeout } = {}) => {
     const exec = (transaction) =>
       this.options.model.sequelize.query(select({
         value: this.value(),
@@ -97,7 +97,7 @@ export default class AnalyticsQuery {
     })
   }
 
-  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, timeout, finishTimeout, debug } = {}) =>
+  executeStream = async ({ onError, format, tupleFraction, transform, useMaster, timeout, finishTimeout, debug = this.options.model.sequelize.options.logging } = {}) =>
     exportStream({
       analytics: true,
       timeout,
