@@ -1,6 +1,6 @@
 {
   "name": "iris-ql",
-  "version": "4.3.15",
+  "version": "4.4.0",
   "description": "User friendly API query language",
   "main": "dist/index.js",
   "keywords": [],

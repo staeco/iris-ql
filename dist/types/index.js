@@ -11,9 +11,7 @@ var _humanSchema = require("human-schema");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const wgs84 = 4326;
-
-const geoCast = txt => _sequelize.default.fn('ST_SetSRID', _sequelize.default.fn('ST_GeomFromGeoJSON', txt), wgs84); // Extend human-schema types and:
+const geoCast = txt => _sequelize.default.fn('from_geojson', txt); // Extend human-schema types and:
 // - add a hydrate function to go from db text values -> properly typed values
 // - make some types more permissive, since queries are often passed in via querystring
 

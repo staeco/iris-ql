@@ -2,9 +2,8 @@ import sql from 'sequelize'
 import isNumber from 'is-number'
 import { types } from 'human-schema'
 
-const wgs84 = 4326
 const geoCast = (txt) =>
-  sql.fn('ST_SetSRID', sql.fn('ST_GeomFromGeoJSON', txt), wgs84)
+  sql.fn('from_geojson', txt)
 
 // Extend human-schema types and:
 // - add a hydrate function to go from db text values -> properly typed values
