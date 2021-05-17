@@ -7,7 +7,7 @@ describe('Query#options#exclusions', () => {
 
   it('should work for valid exclusions values', async () => {
     should.exist(new Query({ exclusions: [] }, { model: user }))
-    should.exist(new Query({ exclusions: [ 'id' ] }, { model: user }))
+    should.exist(new Query({ exclusions: ['id'] }, { model: user }))
     should.exist(new Query({ exclusions: '' }, { model: user }))
     should.exist(new Query({ exclusions: null }, { model: user }))
     should.exist(new Query({ exclusions: 'id,name' }, { model: user }))
@@ -15,10 +15,12 @@ describe('Query#options#exclusions', () => {
   it('should return 400 on bad exclusions', async () => {
     should.throws(() => new Query({ exclusions: {} }, { model: user }))
     should.throws(() => new Query({ exclusions: 'blahblah' }, { model: user }))
-    should.throws(() => new Query({ exclusions: [ 'field-does-not-exist' ] }, { model: user }))
+    should.throws(
+      () => new Query({ exclusions: ['field-does-not-exist'] }, { model: user })
+    )
   })
   it('should execute with exclusions', async () => {
-    const query = new Query({ exclusions: [ 'id' ], limit: 1 }, { model: user })
+    const query = new Query({ exclusions: ['id'], limit: 1 }, { model: user })
     const res = await query.execute()
     should.exist(res.count)
     should.exist(res.rows)
@@ -27,7 +29,10 @@ describe('Query#options#exclusions', () => {
     should.not.exist(res.rows[0].id)
   })
   it.skip('should execute with nested exclusions', async () => {
-    const query = new Query({ exclusions: [ 'settings.vegan' ], limit: 1 }, { model: user })
+    const query = new Query(
+      { exclusions: ['settings.vegan'], limit: 1 },
+      { model: user }
+    )
     const res = await query.execute()
     should.exist(res.count)
     should.exist(res.rows)

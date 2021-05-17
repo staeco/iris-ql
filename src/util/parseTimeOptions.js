@@ -12,14 +12,14 @@ export default (query, { context = [] }) => {
   if (query.timezone) {
     if (typeof query.timezone !== 'string') {
       error.add({
-        path: [ ...context, 'timezone' ],
+        path: [...context, 'timezone'],
         value: query.timezone,
         message: 'Must be a string.'
       })
     } else {
       if (!zones.has(query.timezone)) {
         error.add({
-          path: [ ...context, 'timezone' ],
+          path: [...context, 'timezone'],
           value: query.timezone,
           message: 'Not a valid timezone.'
         })
@@ -33,14 +33,14 @@ export default (query, { context = [] }) => {
   if (query.customYearStart) {
     if (typeof query.customYearStart !== 'number') {
       error.add({
-        path: [ ...context, 'customYearStart' ],
+        path: [...context, 'customYearStart'],
         value: query.customYearStart,
         message: 'Must be a number.'
       })
     } else {
       if (query.customYearStart < 1 || query.customYearStart > 12) {
         error.add({
-          path: [ ...context, 'customYearStart' ],
+          path: [...context, 'customYearStart'],
           value: query.customYearStart,
           message: 'Not a valid month.'
         })

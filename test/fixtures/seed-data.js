@@ -8,19 +8,19 @@ const calls = [
       receivedAt: '2017-05-17T00:23:49.649Z',
       dispatchedAt: '2017-05-17T00:23:59.649Z',
       arrivedAt: '2017-05-17T00:24:09.649Z',
-      units: [ 'W201', 'B691' ],
-      officers: [ 'Wyatt', 'Smith' ],
+      units: ['W201', 'B691'],
+      officers: ['Wyatt', 'Smith'],
       code: 'R-1',
       type: 'violent',
       description: 'Assault, Victim On Scene',
       location: {
         type: 'Point',
-        coordinates: [ 1, 2 ]
+        coordinates: [1, 2]
       }
     },
     geometry: {
       type: 'Point',
-      coordinates: [ 1, 2 ]
+      coordinates: [1, 2]
     }
   },
   {
@@ -30,19 +30,19 @@ const calls = [
       receivedAt: '2017-05-15T20:37:19.649Z',
       dispatchedAt: '2017-05-15T20:37:29.649Z',
       arrivedAt: '2017-05-15T20:37:39.649Z',
-      units: [ 'B691', 'W999' ],
-      officers: [ 'Smith', 'Johns' ],
+      units: ['B691', 'W999'],
+      officers: ['Smith', 'Johns'],
       code: 'R-2',
       type: 'violent',
       description: 'Assault, Victim Fled',
       location: {
         type: 'Point',
-        coordinates: [ 2, 2 ]
+        coordinates: [2, 2]
       }
     },
     geometry: {
       type: 'Point',
-      coordinates: [ 2, 2 ]
+      coordinates: [2, 2]
     }
   }
 ]
@@ -54,25 +54,25 @@ const bikeTrips = [
       id: 'SRC-1',
       startedAt: '2017-05-17T00:23:49.649Z',
       endedAt: '2017-05-17T00:24:09.649Z',
-      issues: [ 'flat tire' ],
+      issues: ['flat tire'],
       type: 'regular',
       cost: 50.14,
       tax: 10.29,
       path: {
         type: 'LineString',
         coordinates: [
-          [ 1, 2 ],
-          [ 1, 8 ],
-          [ 1, 12 ]
+          [1, 2],
+          [1, 8],
+          [1, 12]
         ]
       }
     },
     geometry: {
       type: 'LineString',
       coordinates: [
-        [ 1, 2 ],
-        [ 1, 8 ],
-        [ 1, 12 ]
+        [1, 2],
+        [1, 8],
+        [1, 12]
       ]
     }
   },
@@ -88,18 +88,18 @@ const bikeTrips = [
       path: {
         type: 'LineString',
         coordinates: [
-          [ 1, 2 ],
-          [ 1, 8 ],
-          [ 1, 12 ]
+          [1, 2],
+          [1, 8],
+          [1, 12]
         ]
       }
     },
     geometry: {
       type: 'LineString',
       coordinates: [
-        [ 1, 2 ],
-        [ 1, 8 ],
-        [ 1, 12 ]
+        [1, 2],
+        [1, 8],
+        [1, 12]
       ]
     }
   }
@@ -227,6 +227,4 @@ const data = [
 ].map((v) => db.models.datum.build(v).toJSON()) // generate the IDs
 
 export default async () =>
-  Promise.all(data.map(async (i) =>
-    db.models.datum.upsert(i)
-  ))
+  Promise.all(data.map(async (i) => db.models.datum.upsert(i)))

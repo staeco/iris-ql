@@ -13,7 +13,7 @@ describe('util#fixJSONFilters#hydrate', () => {
   })
 
   it('should accept array of fields as input', () => {
-    const t = hydrate([ { id: '' } ], { model: user })
-    should(t).eql({ $and: [ { id: '' } ] })
+    const t = hydrate([{ id: '' }], { model: user })
+    should(t).eql({ $and: [{ id: '' }] })
   })
 })

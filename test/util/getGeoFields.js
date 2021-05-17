@@ -12,6 +12,6 @@ describe('util#getGeoFields', () => {
 
   it('should return location for a geo model ', () => {
     const t = getGeoFields(store)
-    should(t).deepEqual([ 'location' ])
+    should(t).deepEqual(['location'])
   })
 })

@@ -6,15 +6,22 @@ import db from '../fixtures/db'
 describe('util#aggregateWithFilter', () => {
   const { user } = db.models
 
-  const agg = new Aggregation({
-    value: { function: 'now' },
-    alias: 'now'
-  }, { model: user })
+  const agg = new Aggregation(
+    {
+      value: { function: 'now' },
+      alias: 'now'
+    },
+    { model: user }
+  )
 
   it('should throw without opts', () => {
     should.throws(() => aggregateWithFilter({}))
-    should.throws(() => aggregateWithFilter({ filters: undefined, model: user }))
-    should.throws(() => aggregateWithFilter({ aggregation: undefined, filters: [], model: user }))
+    should.throws(() =>
+      aggregateWithFilter({ filters: undefined, model: user })
+    )
+    should.throws(() =>
+      aggregateWithFilter({ aggregation: undefined, filters: [], model: user })
+    )
     should.throws(() => aggregateWithFilter({ aggregation: agg, model: user }))
   })
 

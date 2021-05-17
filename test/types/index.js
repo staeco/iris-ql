@@ -123,7 +123,7 @@ describe('types', () => {
   })
 
   it('should hydrate point', () => {
-    const p = { type: 'Point', coordinates: [ 1, 2 ] }
+    const p = { type: 'Point', coordinates: [1, 2] }
     const top = types.point.hydrate(p)
     should(top.fn).equal('ST_SetSRID')
     should(top.args[0].args[0]).equal(p)

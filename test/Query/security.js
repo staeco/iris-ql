@@ -17,7 +17,7 @@ const searchRes = [
   `[]/*%; drop model users""`
 ]
 const searchError = [
-  '\''
+  "'"
   // { authToken: { $eq: 'test' } }
 ]
 
@@ -27,7 +27,10 @@ describe('Query#security', () => {
   filterRes.forEach((param, k) => {
     it(`should not return results for filter injections ${k}`, async () => {
       try {
-        const query = new Query({ filters: param }, { model: user.scope('public') })
+        const query = new Query(
+          { filters: param },
+          { model: user.scope('public') }
+        )
         const res = await query.execute()
         should(res.rows.length).equal(0)
       } catch (err) {
@@ -50,7 +53,9 @@ describe('Query#security', () => {
 
   searchError.forEach((param, k) => {
     it(`should return error for search injections ${k}`, async () => {
-      should.throws(() => new Query({ filters: param }, { model: user.scope('public') }))
+      should.throws(
+        () => new Query({ filters: param }, { model: user.scope('public') })
+      )
     })
   })
 })

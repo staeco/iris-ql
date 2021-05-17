@@ -17,8 +17,10 @@ const select = async (q, returnSet = false, replacements) => {
 describe('sql#time#time_to_ms', () => {
   it('should handle a basic date', async () => {
     const now = new Date()
-    should(await select('time_to_ms(:time)', false, {
-      time: now
-    })).eql(now.getTime())
+    should(
+      await select('time_to_ms(:time)', false, {
+        time: now
+      })
+    ).eql(now.getTime())
   })
 })

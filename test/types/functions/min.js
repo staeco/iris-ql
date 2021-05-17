@@ -9,9 +9,7 @@ describe('types#functions#min', () => {
   it('should work', async () => {
     const funcVal = {
       function: 'min',
-      arguments: [
-        { field: 'data.cost' }
-      ]
+      arguments: [{ field: 'data.cost' }]
     }
     const fullQuery = {
       filters: { sourceId: 'bike-trips' },
@@ -19,45 +17,48 @@ describe('types#functions#min', () => {
         { value: funcVal, alias: 'cost' },
         { value: { field: 'data.type' }, alias: 'type' }
       ],
-      groupings: [
-        { field: 'type' }
-      ]
+      groupings: [{ field: 'type' }]
     }
     const expectedResponse = [
       { cost: 5.14, type: 'electric' },
       { cost: 50.14, type: 'regular' }
     ]
-    const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
+    const query = new AnalyticsQuery(fullQuery, {
+      model: datum,
+      subSchemas: { data: dataType.schema }
+    })
     const res = await query.execute()
     should(res).eql(expectedResponse)
   })
   it('should fail when given invalid arguments', async () => {
     const funcVal = {
       function: 'min',
-      arguments: [
-        'abc'
-      ]
+      arguments: ['abc']
     }
     const fullQuery = {
       filters: { sourceId: 'bike-trips' },
       aggregations: [
         { value: { function: 'count' }, alias: 'total' },
         { value: { field: 'data.type' }, alias: 'type' },
-        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'cost' }
+        { value: { function: 'sum', arguments: [funcVal] }, alias: 'cost' }
       ],
-      groupings: [
-        { field: 'type' }
-      ]
+      groupings: [{ field: 'type' }]
     }
     try {
-      new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
+      new AnalyticsQuery(fullQuery, {
+        model: datum,
+        subSchemas: { data: dataType.schema }
+      })
     } catch (err) {
       should.exist(err)
-      should(err.fields).eql([ {
-        path: [ 'aggregations', 2, 'value', 'arguments', 0, 'arguments', 0 ],
-        value: 'abc',
-        message: 'Argument "Value" for "Minimum" must be of type: number, date - instead got text'
-      } ])
+      should(err.fields).eql([
+        {
+          path: ['aggregations', 2, 'value', 'arguments', 0, 'arguments', 0],
+          value: 'abc',
+          message:
+            'Argument "Value" for "Minimum" must be of type: number, date - instead got text'
+        }
+      ])
       return
     }
     throw new Error('Did not throw!')
@@ -65,9 +66,7 @@ describe('types#functions#min', () => {
   it('should bubble up schema correctly', async () => {
     const funcVal = {
       function: 'min',
-      arguments: [
-        { field: 'data.cost' }
-      ]
+      arguments: [{ field: 'data.cost' }]
     }
     const fullQuery = {
       filters: { sourceId: 'bike-trips' },
@@ -75,9 +74,7 @@ describe('types#functions#min', () => {
         { value: funcVal, alias: 'cost' },
         { value: { field: 'data.type' }, alias: 'type' }
       ],
-      groupings: [
-        { field: 'type' }
-      ]
+      groupings: [{ field: 'type' }]
     }
     const expectedResponse = {
       cost: {
@@ -94,7 +91,10 @@ describe('types#functions#min', () => {
         validation: { notEmpty: true, maxLength: 2048 }
       }
     }
-    const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
+    const query = new AnalyticsQuery(fullQuery, {
+      model: datum,
+      subSchemas: { data: dataType.schema }
+    })
     const res = query.getOutputSchema()
     should(res).eql(expectedResponse)
   })

@@ -24,14 +24,18 @@ export default (v, opt) => {
       message: `Field does not exist: ${col}`
     })
   }
-  if (!(colInfo.type instanceof sql.JSONB || colInfo.type instanceof sql.JSON)) {
+  if (
+    !(colInfo.type instanceof sql.JSONB || colInfo.type instanceof sql.JSON)
+  ) {
     throw new ValidationError({
       path: context,
       value: v,
       message: `Field is not JSON: ${col}`
     })
   }
-  const lit = sql.literal(jsonPath({ column: col, model, path, from, instanceQuery }))
+  const lit = sql.literal(
+    jsonPath({ column: col, model, path, from, instanceQuery })
+  )
   const schema = subSchemas[col] || colInfo.subSchema
   if (!schema) {
     // did not give sufficient info to query json objects safely!

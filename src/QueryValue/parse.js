@@ -10,7 +10,10 @@ import getModelFieldLimit from '../util/getModelFieldLimit'
 
 const resolveField = (field, opt) => {
   if (!opt?.substitutions) return field
-  const subs = typeof opt.substitutions === 'function' ? opt.substitutions(opt) : opt.substitutions
+  const subs =
+    typeof opt.substitutions === 'function'
+      ? opt.substitutions(opt)
+      : opt.substitutions
   return subs?.[field] || field
 }
 
@@ -29,7 +32,9 @@ const validateArgumentTypes = (func, sig, arg, opt) => {
     throw new ValidationError({
       path: opt.context,
       value: arg,
-      message: `Argument "${sig.name}" for "${func.name}" must be one of: ${enumm.join(', ')}`
+      message: `Argument "${sig.name}" for "${
+        func.name
+      }" must be one of: ${enumm.join(', ')}`
     })
   }
   const argTypes = getTypes(arg, opt).map((t) => t.type)
@@ -38,7 +43,11 @@ const validateArgumentTypes = (func, sig, arg, opt) => {
     throw new ValidationError({
       path: opt.context,
       value: arg,
-      message: `Argument "${sig.name}" for "${func.name}" must be of type: ${sig.types.join(', ')} - instead got ${argTypes.length === 0 ? '<none>' : argTypes.join(', ')}`
+      message: `Argument "${sig.name}" for "${
+        func.name
+      }" must be of type: ${sig.types.join(', ')} - instead got ${
+        argTypes.length === 0 ? '<none>' : argTypes.join(', ')
+      }`
     })
   }
   return true
@@ -48,7 +57,7 @@ const getFunction = (v, opt) => {
   const { context = [] } = opt
   if (typeof v.function !== 'string') {
     throw new ValidationError({
-      path: [ ...context, 'function' ],
+      path: [...context, 'function'],
       value: v.function,
       message: 'Must be a string.'
     })
@@ -57,14 +66,14 @@ const getFunction = (v, opt) => {
   const args = v.arguments || []
   if (!func) {
     throw new ValidationError({
-      path: [ ...context, 'function' ],
+      path: [...context, 'function'],
       value: v.function,
       message: 'Function does not exist'
     })
   }
   if (!Array.isArray(args)) {
     throw new ValidationError({
-      path: [ ...context, 'arguments' ],
+      path: [...context, 'arguments'],
       value: v.function,
       message: 'Must be an array.'
     })
@@ -75,7 +84,7 @@ const getFunction = (v, opt) => {
   const resolvedArgs = sigArgs.map((sig, idx) => {
     const nopt = {
       ...opt,
-      context: [ ...context, 'arguments', idx ]
+      context: [...context, 'arguments', idx]
     }
     const argValue = args[idx]
     const parsed = parse(argValue, nopt)
@@ -97,7 +106,11 @@ const parse = (v, opt) => {
     context = []
   } = opt
   if (v == null) return null
-  if (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean') {
+  if (
+    typeof v === 'string' ||
+    typeof v === 'number' ||
+    typeof v === 'boolean'
+  ) {
     return sql.literal(model.sequelize.escape(v))
   }
   if (!isObject(v)) {
@@ -109,7 +122,7 @@ const parse = (v, opt) => {
   }
   if (v.val) {
     throw new ValidationError({
-      path: [ ...context, 'val' ],
+      path: [...context, 'val'],
       value: v.val,
       message: 'Must not contain a reserved key "val".'
     })
@@ -129,7 +142,7 @@ const parse = (v, opt) => {
   if (v.field) {
     if (typeof v.field !== 'string') {
       throw new ValidationError({
-        path: [ ...context, 'field' ],
+        path: [...context, 'field'],
         value: v.field,
         message: 'Must be a string.'
       })
@@ -137,7 +150,7 @@ const parse = (v, opt) => {
     const resolvedField = resolveField(v.field, opt)
     if (typeof resolvedField !== 'string') {
       throw new ValidationError({
-        path: [ ...context, 'field' ],
+        path: [...context, 'field'],
         value: resolvedField,
         message: 'Must be a string.'
       })
@@ -146,26 +159,36 @@ const parse = (v, opt) => {
     if (resolvedField.includes('.')) return getJSONField(resolvedField, opt)
     if (!fieldLimit.some((i) => i.field === resolvedField)) {
       throw new ValidationError({
-        path: [ ...context, 'field' ],
+        path: [...context, 'field'],
         value: resolvedField,
         message: 'Field does not exist.'
       })
     }
-    const resolvedAggregation = fieldLimit.find((i) => i.field === resolvedField && i.type === 'aggregation')
-    const resolvedColumn = fieldLimit.find((i) => i.field === resolvedField && i.type === 'column')
+    const resolvedAggregation = fieldLimit.find(
+      (i) => i.field === resolvedField && i.type === 'aggregation'
+    )
+    const resolvedColumn = fieldLimit.find(
+      (i) => i.field === resolvedField && i.type === 'column'
+    )
 
     // If the aggregation has the same name as a column, and the aggregation isn't just a simple alias of the column
     // it needs to be renamed to something else, or grouping/ordering has no idea if you are referencing the column
     // or the aggregation
-    if (resolvedAggregation && resolvedColumn && resolvedAggregation.value?.field !== resolvedColumn.field) {
+    if (
+      resolvedAggregation &&
+      resolvedColumn &&
+      resolvedAggregation.value?.field !== resolvedColumn.field
+    ) {
       throw new ValidationError({
-        path: [ ...context, 'field' ],
+        path: [...context, 'field'],
         value: resolvedField,
-        message: 'Field is ambigous - exists as both a column and an aggregation.'
+        message:
+          'Field is ambigous - exists as both a column and an aggregation.'
       })
     }
     if (resolvedAggregation) return sql.col(resolvedField)
-    if (resolvedColumn) return sql.literal(column({ ...opt, column: resolvedField }))
+    if (resolvedColumn)
+      return sql.literal(column({ ...opt, column: resolvedField }))
 
     throw new Error(`Unknown field type for: ${resolvedField}`)
   }

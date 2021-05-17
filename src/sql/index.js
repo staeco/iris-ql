@@ -15,10 +15,12 @@ export const groups = [
 
 export default async (conn) => {
   //const [ [ hasPostGIS ] ] = await conn.query(`SELECT * FROM pg_extension WHERE "extname" = 'postgis'`)
-  const all = groups.reduce((p, group) =>
-    //if (group.name === 'geospatial' && !hasPostGIS) return p // skip geo stuff if they dont have postgis
-    `${p}-- ${group.name}\n${group.sql}\n`
-  , '')
+  const all = groups.reduce(
+    (p, group) =>
+      //if (group.name === 'geospatial' && !hasPostGIS) return p // skip geo stuff if they dont have postgis
+      `${p}-- ${group.name}\n${group.sql}\n`,
+    ''
+  )
 
   return conn.query(all, { useMaster: true })
 }

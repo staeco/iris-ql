@@ -11,7 +11,7 @@ describe('Query#constrain', () => {
   it('should constrain with new where clauses', async () => {
     const query = new Query({ limit: 1 }, { model: user.scope('public') })
     query.constrain({
-      where: [ { createdAt: { $eq: null } } ]
+      where: [{ createdAt: { $eq: null } }]
     })
     const res = await query.execute()
     should.exist(res.count)

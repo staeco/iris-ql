@@ -9,7 +9,7 @@ import search from '../util/search'
 import getModelFieldLimit from '../util/getModelFieldLimit'
 import parseTimeOptions from '../util/parseTimeOptions'
 
-const aggregateFunctions = Object.entries(functions).reduce((acc, [ k, v ]) => {
+const aggregateFunctions = Object.entries(functions).reduce((acc, [k, v]) => {
   if (v.aggregate) acc.push(k)
   return acc
 }, [])
@@ -18,7 +18,8 @@ const aggregateFunctions = Object.entries(functions).reduce((acc, [ k, v ]) => {
 export default (query = {}, opt) => {
   const { model, context = [] } = opt
   const error = new ValidationError()
-  let attrs = [], joins
+  let attrs = [],
+    joins
 
   // options becomes our initial state - then we are going to mutate from here in each phase
   let state = {
@@ -40,7 +41,7 @@ export default (query = {}, opt) => {
   if (query.joins) {
     if (!Array.isArray(query.joins)) {
       error.add({
-        path: [ ...context, 'joins' ],
+        path: [...context, 'joins'],
         value: query.joins,
         message: 'Must be an array.'
       })
@@ -49,7 +50,7 @@ export default (query = {}, opt) => {
         try {
           return new Join(i, {
             ...state,
-            context: [ ...context, 'joins', idx ]
+            context: [...context, 'joins', idx]
           }).value()
         } catch (err) {
           error.add(err)
@@ -64,14 +65,14 @@ export default (query = {}, opt) => {
   // basic checks
   if (!Array.isArray(query.aggregations)) {
     error.add({
-      path: [ ...context, 'aggregations' ],
+      path: [...context, 'aggregations'],
       value: query.aggregations,
       message: 'Must be an array.'
     })
   } else {
     if (query.aggregations.length === 0) {
       error.add({
-        path: [ ...context, 'aggregations' ],
+        path: [...context, 'aggregations'],
         value: query.aggregations,
         message: 'Must have at least one aggregation.'
       })
@@ -80,7 +81,7 @@ export default (query = {}, opt) => {
       try {
         return new Aggregation(a, {
           ...state,
-          context: [ ...context, 'aggregations', idx ]
+          context: [...context, 'aggregations', idx]
         }).value()
       } catch (err) {
         error.add(err)
@@ -92,10 +93,13 @@ export default (query = {}, opt) => {
   if (!error.isEmpty()) throw error
 
   // primary query check phase
-  const aggFieldLimit = query.aggregations
-    .map((i) => ({ type: 'aggregation', field: i.alias, value: i.value }))
+  const aggFieldLimit = query.aggregations.map((i) => ({
+    type: 'aggregation',
+    field: i.alias,
+    value: i.value
+  }))
 
-  state.fieldLimit = [ ...state.fieldLimit, ...aggFieldLimit ]
+  state.fieldLimit = [...state.fieldLimit, ...aggFieldLimit]
   let out = {}
   try {
     out = new Query(query, state).value()
@@ -107,7 +111,7 @@ export default (query = {}, opt) => {
   if (query.groupings) {
     if (!Array.isArray(query.groupings)) {
       error.add({
-        path: [ ...context, 'groupings' ],
+        path: [...context, 'groupings'],
         value: query.groupings,
         message: 'Must be an array.'
       })
@@ -116,7 +120,7 @@ export default (query = {}, opt) => {
         try {
           return new QueryValue(i, {
             ...state,
-            context: [ ...context, 'groupings', idx ]
+            context: [...context, 'groupings', idx]
           }).value()
         } catch (err) {
           error.add(err)
@@ -133,7 +137,12 @@ export default (query = {}, opt) => {
   query.aggregations.forEach((agg, idx) => {
     const hasField = search(agg.value, (k, v) => typeof v?.field === 'string')
     if (!hasField) return // no field, doesnt need an aggregate fn
-    const hasAggregateFunction = search(agg.value, (k, v) => typeof v?.function === 'string' && aggregateFunctions.includes(v.function))
+    const hasAggregateFunction = search(
+      agg.value,
+      (k, v) =>
+        typeof v?.function === 'string' &&
+        aggregateFunctions.includes(v.function)
+    )
     if (hasAggregateFunction) return // valid
     const matchedGrouping = query.groupings?.find((v) => {
       if (!v) return false
@@ -141,7 +150,7 @@ export default (query = {}, opt) => {
     })
     if (matchedGrouping) return // valid
     error.add({
-      path: [ ...context, 'aggregations', idx, 'value' ],
+      path: [...context, 'aggregations', idx, 'value'],
       value: agg.value,
       message: 'Must contain an aggregation.'
     })
@@ -151,7 +160,7 @@ export default (query = {}, opt) => {
   query.aggregations.reduce((seen, agg, idx) => {
     if (seen.includes(agg.alias)) {
       error.add({
-        path: [ ...context, 'aggregations', idx, 'alias' ],
+        path: [...context, 'aggregations', idx, 'alias'],
         value: agg.alias,
         message: 'Duplicate aggregation.'
       })

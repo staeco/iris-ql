@@ -19,19 +19,17 @@ npm install iris-ql --save
 import { Query } from 'iris-ql'
 
 // Find all crimes by criminal 1 or 2 after 2017
-const query = new Query({
-  limit: 100,
-  filters: {
-    createdAt: { $gt: '2017-05-13T00:00:00.000Z' },
-    $or: [
-      { name: 'Criminal 1' },
-      { name: 'Criminal 2' }
-    ]
+const query = new Query(
+  {
+    limit: 100,
+    filters: {
+      createdAt: { $gt: '2017-05-13T00:00:00.000Z' },
+      $or: [{ name: 'Criminal 1' }, { name: 'Criminal 2' }]
+    },
+    orderings: [{ value: { field: 'createdAt' }, direction: 'desc' }]
   },
-  orderings: [
-    { value: { field: 'createdAt' }, direction: 'desc' }
-  ]
-}, { model: crime })
+  { model: crime }
+)
 
 const results = await query.execute()
 ```
@@ -42,32 +40,28 @@ const results = await query.execute()
 import { AnalyticsQuery } from 'iris-ql'
 
 // get a time series of all 911 calls
-const crimeTimeSeries = new AnalyticsQuery({
-  filters: {
-    data: {
-      receivedAt: { $ne: null }
-    }
-  },
-  aggregations: [
-    { value: { function: 'count' }, alias: 'total' },
-    {
-      alias: 'day',
-      value: {
-        function: 'bucket',
-        arguments: [
-          'day',
-          { field: 'data.receivedAt' }
-        ]
+const crimeTimeSeries = new AnalyticsQuery(
+  {
+    filters: {
+      data: {
+        receivedAt: { $ne: null }
       }
-    }
-  ],
-  orderings: [
-    { value: { field: 'day' }, direction: 'desc' }
-  ],
-  groupings: [
-    { field: 'day' }
-  ]
-}, { model: emergencyCall })
+    },
+    aggregations: [
+      { value: { function: 'count' }, alias: 'total' },
+      {
+        alias: 'day',
+        value: {
+          function: 'bucket',
+          arguments: ['day', { field: 'data.receivedAt' }]
+        }
+      }
+    ],
+    orderings: [{ value: { field: 'day' }, direction: 'desc' }],
+    groupings: [{ field: 'day' }]
+  },
+  { model: emergencyCall }
+)
 
 const results = await crimeTimeSeries.execute()
 
@@ -80,7 +74,6 @@ const results = await crimeTimeSeries.execute()
 */
 ```
 
-
 ## DB Support
 
 Currently only works with Postgres 12+. Some features and specific functions may require newer versions. In the future, the database layer will be broken out into adapters and multiple stores will be supported.
@@ -88,6 +81,5 @@ Currently only works with Postgres 12+. Some features and specific functions may
 [downloads-image]: http://img.shields.io/npm/dm/iris-ql.svg
 [npm-url]: https://npmjs.org/package/iris-ql
 [npm-image]: http://img.shields.io/npm/v/iris-ql.svg
-
 [circle-url]: https://circleci.com/gh/staeco/iris-ql
 [circle-image]: https://circleci.com/gh/staeco/iris-ql.svg?style=svg

@@ -9,56 +9,57 @@ describe('types#functions#round', () => {
   it('should work with subfield', async () => {
     const funcVal = {
       function: 'round',
-      arguments: [
-        { field: 'data.cost' }
-      ]
+      arguments: [{ field: 'data.cost' }]
     }
     const fullQuery = {
       filters: { sourceId: 'bike-trips' },
       aggregations: [
         { value: { function: 'count' }, alias: 'total' },
         { value: { field: 'data.type' }, alias: 'type' },
-        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'cost' }
+        { value: { function: 'sum', arguments: [funcVal] }, alias: 'cost' }
       ],
-      groupings: [
-        { field: 'type' }
-      ]
+      groupings: [{ field: 'type' }]
     }
     const expectedResponse = [
       { total: 1, type: 'electric', cost: 5 },
       { total: 1, type: 'regular', cost: 50 }
     ]
-    const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
+    const query = new AnalyticsQuery(fullQuery, {
+      model: datum,
+      subSchemas: { data: dataType.schema }
+    })
     const res = await query.execute()
     should(res).eql(expectedResponse)
   })
   it('should fail when given invalid arguments', async () => {
     const funcVal = {
       function: 'round',
-      arguments: [
-        'abc'
-      ]
+      arguments: ['abc']
     }
     const fullQuery = {
       filters: { sourceId: 'bike-trips' },
       aggregations: [
         { value: { function: 'count' }, alias: 'total' },
         { value: { field: 'data.type' }, alias: 'type' },
-        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'cost' }
+        { value: { function: 'sum', arguments: [funcVal] }, alias: 'cost' }
       ],
-      groupings: [
-        { field: 'type' }
-      ]
+      groupings: [{ field: 'type' }]
     }
     try {
-      new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
+      new AnalyticsQuery(fullQuery, {
+        model: datum,
+        subSchemas: { data: dataType.schema }
+      })
     } catch (err) {
       should.exist(err)
-      should(err.fields).eql([ {
-        path: [ 'aggregations', 2, 'value', 'arguments', 0, 'arguments', 0 ],
-        value: 'abc',
-        message: 'Argument "Value A" for "Round" must be of type: number - instead got text'
-      } ])
+      should(err.fields).eql([
+        {
+          path: ['aggregations', 2, 'value', 'arguments', 0, 'arguments', 0],
+          value: 'abc',
+          message:
+            'Argument "Value A" for "Round" must be of type: number - instead got text'
+        }
+      ])
       return
     }
     throw new Error('Did not throw!')
@@ -69,10 +70,7 @@ describe('types#functions#round', () => {
       arguments: [
         {
           function: 'subtract',
-          arguments: [
-            { field: 'data.cost' },
-            1
-          ]
+          arguments: [{ field: 'data.cost' }, 1]
         }
       ]
     }
@@ -81,11 +79,9 @@ describe('types#functions#round', () => {
       aggregations: [
         { value: { function: 'count' }, alias: 'total' },
         { value: { field: 'data.type' }, alias: 'type' },
-        { value: { function: 'sum', arguments: [ funcVal ] }, alias: 'cost' }
+        { value: { function: 'sum', arguments: [funcVal] }, alias: 'cost' }
       ],
-      groupings: [
-        { field: 'type' }
-      ]
+      groupings: [{ field: 'type' }]
     }
     const expectedResponse = {
       total: {
@@ -106,7 +102,10 @@ describe('types#functions#round', () => {
         }
       }
     }
-    const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
+    const query = new AnalyticsQuery(fullQuery, {
+      model: datum,
+      subSchemas: { data: dataType.schema }
+    })
     const res = query.getOutputSchema()
     should(res).eql(expectedResponse)
   })

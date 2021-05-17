@@ -14,15 +14,16 @@ describe('types#functions#count', () => {
         { value: funcVal, alias: 'total' },
         { value: { field: 'data.type' }, alias: 'type' }
       ],
-      groupings: [
-        { field: 'type' }
-      ]
+      groupings: [{ field: 'type' }]
     }
     const expectedResponse = [
       { total: 1, type: 'electric' },
       { total: 1, type: 'regular' }
     ]
-    const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
+    const query = new AnalyticsQuery(fullQuery, {
+      model: datum,
+      subSchemas: { data: dataType.schema }
+    })
     const res = await query.execute()
     should(res).eql(expectedResponse)
   })
@@ -34,9 +35,7 @@ describe('types#functions#count', () => {
         { value: funcVal, alias: 'total' },
         { value: { field: 'data.type' }, alias: 'type' }
       ],
-      groupings: [
-        { field: 'type' }
-      ]
+      groupings: [{ field: 'type' }]
     }
     const expectedResponse = {
       total: {
@@ -49,7 +48,10 @@ describe('types#functions#count', () => {
         validation: { notEmpty: true, maxLength: 2048 }
       }
     }
-    const query = new AnalyticsQuery(fullQuery, { model: datum, subSchemas: { data: dataType.schema } })
+    const query = new AnalyticsQuery(fullQuery, {
+      model: datum,
+      subSchemas: { data: dataType.schema }
+    })
     const res = query.getOutputSchema()
     should(res).eql(expectedResponse)
   })

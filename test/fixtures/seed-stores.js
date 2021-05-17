@@ -6,9 +6,7 @@ const data = [
     type: 'shoes',
     location: {
       type: 'Point',
-      coordinates: [
-        5, 5
-      ]
+      coordinates: [5, 5]
     }
   },
   {
@@ -16,9 +14,7 @@ const data = [
     type: 'animals',
     location: {
       type: 'Point',
-      coordinates: [
-        10, 10
-      ]
+      coordinates: [10, 10]
     }
   },
   {
@@ -26,14 +22,10 @@ const data = [
     type: 'thrift',
     location: {
       type: 'Point',
-      coordinates: [
-        20, 20
-      ]
+      coordinates: [20, 20]
     }
   }
 ].map((v) => db.models.store.build(v).toJSON()) // generate the IDs
 
 export default async () =>
-  Promise.all(data.map(async (i) =>
-    db.models.store.upsert(i)
-  ))
+  Promise.all(data.map(async (i) => db.models.store.upsert(i)))

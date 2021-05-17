@@ -57,7 +57,10 @@ describe('Query#executeStream', () => {
     should.exist(parsed[0].name)
   })
   it('should execute with proper model name', async () => {
-    const query = new Query({ limit: 1, filters: { sourceId: '911-calls' } }, { model: datum.scope('public') })
+    const query = new Query(
+      { limit: 1, filters: { sourceId: '911-calls' } },
+      { model: datum.scope('public') }
+    )
     const stream = await query.executeStream({
       format: json
     })
@@ -72,15 +75,19 @@ describe('Query#executeStream', () => {
     should(parsed[0].geometry.type).equal('Point')
   })
   it('should report errors correctly', async () => {
-    const fauxTable = db.define('noExist', {
-      id: {
-        type: types.UUID,
-        primaryKey: true,
-        allowNull: false
+    const fauxTable = db.define(
+      'noExist',
+      {
+        id: {
+          type: types.UUID,
+          primaryKey: true,
+          allowNull: false
+        }
+      },
+      {
+        freezeTableName: true
       }
-    }, {
-      freezeTableName: true
-    })
+    )
 
     const query = new Query({ limit: 1 }, { model: fauxTable })
     const stream = await query.executeStream({
@@ -109,10 +116,7 @@ describe('Query#executeStream', () => {
       format: json
     })
     should(stream.contentType).eql(json.contentType)
-    const res = await collect(pumpify.obj(
-      stream,
-      new PassThrough()
-    ))
+    const res = await collect(pumpify.obj(stream, new PassThrough()))
     should(typeof res).eql('string')
     const parsed = JSON.parse(res)
     parsed.length.should.equal(1)

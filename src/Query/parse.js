@@ -51,14 +51,14 @@ export default (query, opt = {}) => {
     const isValid = typeof query.search === 'string'
     if (!isValid) {
       error.add({
-        path: [ ...context, 'search' ],
+        path: [...context, 'search'],
         value: query.search,
         message: 'Must be a string.'
       })
     }
     if (!isSearchable) {
       error.add({
-        path: [ ...context, 'search' ],
+        path: [...context, 'search'],
         value: query.search,
         message: 'Endpoint does not support search.'
       })
@@ -83,7 +83,7 @@ export default (query, opt = {}) => {
       })
     } catch (err) {
       error.add({
-        path: [ ...context, 'before' ],
+        path: [...context, 'before'],
         value: query.before,
         message: 'Not a valid date!'
       })
@@ -100,7 +100,7 @@ export default (query, opt = {}) => {
       })
     } catch (err) {
       error.add({
-        path: [ ...context, 'after' ],
+        path: [...context, 'after'],
         value: query.after,
         message: 'Not a valid date!'
       })
@@ -111,7 +111,7 @@ export default (query, opt = {}) => {
   if (query.within) {
     if (!isObject(query.within)) {
       error.add({
-        path: [ ...context, 'within' ],
+        path: [...context, 'within'],
         value: query.within,
         message: 'Must be an object.'
       })
@@ -127,33 +127,35 @@ export default (query, opt = {}) => {
       const ymaxIssue = lat(actualYMax)
       if (xminIssue !== true) {
         error.add({
-          path: [ ...context, 'within', 'xmin' ],
+          path: [...context, 'within', 'xmin'],
           value: xmin,
           message: xminIssue
         })
       }
       if (yminIssue !== true) {
         error.add({
-          path: [ ...context, 'within', 'ymin' ],
+          path: [...context, 'within', 'ymin'],
           value: ymin,
           message: yminIssue
         })
       }
       if (xmaxIssue !== true) {
         error.add({
-          path: [ ...context, 'within', 'xmax' ],
+          path: [...context, 'within', 'xmax'],
           value: xmax,
           message: xmaxIssue
         })
       }
       if (ymaxIssue !== true) {
         error.add({
-          path: [ ...context, 'within', 'ymax' ],
+          path: [...context, 'within', 'ymax'],
           value: ymax,
           message: ymaxIssue
         })
       }
-      const box = srid(fn('ST_MakeEnvelope', actualXMin, actualYMin, actualXMax, actualYMax))
+      const box = srid(
+        fn('ST_MakeEnvelope', actualXMin, actualYMin, actualXMax, actualYMax)
+      )
       out.where.push(intersects(box, { model }))
     }
   }
@@ -162,7 +164,7 @@ export default (query, opt = {}) => {
   if (query.intersects) {
     if (!isObject(query.intersects)) {
       error.add({
-        path: [ ...context, 'intersects' ],
+        path: [...context, 'intersects'],
         value: query.intersects,
         message: 'Must be an object.'
       })
@@ -174,29 +176,31 @@ export default (query, opt = {}) => {
       const lonIssue = lon(actualX)
       if (lonIssue !== true) {
         error.add({
-          path: [ ...context, 'intersects', 'x' ],
+          path: [...context, 'intersects', 'x'],
           value: x,
           message: lonIssue
         })
       }
       if (latIssue !== true) {
         error.add({
-          path: [ ...context, 'intersects', 'y' ],
+          path: [...context, 'intersects', 'y'],
           value: y,
           message: latIssue
         })
       }
-      out.where.push(intersects(srid(fn('ST_Point', actualX, actualY)), { model }))
+      out.where.push(
+        intersects(srid(fn('ST_Point', actualX, actualY)), { model })
+      )
     }
   }
 
   // exclusions
   if (query.exclusions) {
     const parsed = parseIffyStringArray(query.exclusions).map((k, idx) => {
-      const [ first ] = k.split('.')
+      const [first] = k.split('.')
       if (!first || !state.fieldLimit.some((f) => f.field === first)) {
         error.add({
-          path: [ ...context, 'exclusions', idx ],
+          path: [...context, 'exclusions', idx],
           value: k,
           message: 'Invalid exclusion.'
         })
@@ -213,7 +217,7 @@ export default (query, opt = {}) => {
       out.limit = parseIffyNumber(query.limit)
     } catch (err) {
       error.add({
-        path: [ ...context, 'limit' ],
+        path: [...context, 'limit'],
         value: query.limit,
         message: 'Invalid limit.'
       })
@@ -226,7 +230,7 @@ export default (query, opt = {}) => {
       out.offset = parseIffyNumber(query.offset)
     } catch (err) {
       error.add({
-        path: [ ...context, 'offset' ],
+        path: [...context, 'offset'],
         value: query.offset,
         message: 'Invalid offset.'
       })
@@ -237,16 +241,18 @@ export default (query, opt = {}) => {
   if (query.filters) {
     if (!isObject(query.filters) && !Array.isArray(query.filters)) {
       error.add({
-        path: [ ...context, 'filters' ],
+        path: [...context, 'filters'],
         value: query.filters,
         message: 'Must be an object or array.'
       })
     } else {
       try {
-        out.where.push(new Filter(query.filters, {
-          ...state,
-          context: [ ...context, 'filters' ]
-        }).value())
+        out.where.push(
+          new Filter(query.filters, {
+            ...state,
+            context: [...context, 'filters']
+          }).value()
+        )
       } catch (err) {
         error.add(err)
       }
@@ -257,17 +263,19 @@ export default (query, opt = {}) => {
   if (query.orderings) {
     if (!Array.isArray(query.orderings)) {
       error.add({
-        path: [ ...context, 'orderings' ],
+        path: [...context, 'orderings'],
         value: query.orderings,
         message: 'Must be an array.'
       })
     } else {
       query.orderings.forEach((v, idx) => {
         try {
-          out.order.push(new Ordering(v, {
-            ...state,
-            context: [ ...context, 'orderings', idx ]
-          }).value())
+          out.order.push(
+            new Ordering(v, {
+              ...state,
+              context: [...context, 'orderings', idx]
+            }).value()
+          )
         } catch (err) {
           error.add(err)
         }

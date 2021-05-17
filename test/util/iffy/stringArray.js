@@ -6,7 +6,7 @@ describe('util#iffy#stringArray', () => {
     should(stringArray).not.be.null()
   })
   it('should create string array', () => {
-    const sample = [ 'a', 'b', 'c', 'd', 'e', 'f' ]
+    const sample = ['a', 'b', 'c', 'd', 'e', 'f']
     stringArray(sample).should.eql(sample)
     stringArray(sample.join(',')).should.eql(sample)
   })

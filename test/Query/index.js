@@ -11,17 +11,22 @@ describe('Query', () => {
   })
   it('should not be able to access out of scope variables', async () => {
     try {
-      new Query({
-        filters: {
-          authToken: '123'
-        }
-      }, { model: user.scope('public') })
+      new Query(
+        {
+          filters: {
+            authToken: '123'
+          }
+        },
+        { model: user.scope('public') }
+      )
     } catch (err) {
-      err.fields.should.eql([ {
-        path: [ 'filters', 'authToken' ],
-        value: 'authToken',
-        message: 'Field does not exist.'
-      } ])
+      err.fields.should.eql([
+        {
+          path: ['filters', 'authToken'],
+          value: 'authToken',
+          message: 'Field does not exist.'
+        }
+      ])
       return
     }
     throw new Error('Did not throw!')

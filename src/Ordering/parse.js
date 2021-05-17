@@ -8,21 +8,21 @@ export default ({ value, direction } = {}, opt) => {
   const isDirectionValid = direction === 'asc' || direction === 'desc'
   if (!value) {
     error.add({
-      path: [ ...context, 'value' ],
+      path: [...context, 'value'],
       value,
       message: 'Missing ordering value.'
     })
   }
   if (!direction) {
     error.add({
-      path: [ ...context, 'direction' ],
+      path: [...context, 'direction'],
       value: direction,
       message: 'Missing ordering direction.'
     })
   }
   if (direction != null && !isDirectionValid) {
     error.add({
-      path: [ ...context, 'direction' ],
+      path: [...context, 'direction'],
       value: direction,
       message: 'Invalid ordering direction - must be asc or desc.'
     })
@@ -33,7 +33,7 @@ export default ({ value, direction } = {}, opt) => {
       out = [
         new QueryValue(value, {
           ...opt,
-          context: [ ...context, 'value' ]
+          context: [...context, 'value']
         }).value(),
         direction
       ]

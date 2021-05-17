@@ -23,13 +23,13 @@ export default (a, opt) => {
   }
   if (!a.alias) {
     error.add({
-      path: [ ...context, 'alias' ],
+      path: [...context, 'alias'],
       value: a.alias,
       message: 'Missing alias!'
     })
   } else if (typeof a.alias !== 'string') {
     error.add({
-      path: [ ...context, 'alias' ],
+      path: [...context, 'alias'],
       value: a.alias,
       message: 'Must be a string.'
     })
@@ -37,7 +37,7 @@ export default (a, opt) => {
 
   if (a.name && typeof a.name !== 'string') {
     error.add({
-      path: [ ...context, 'name' ],
+      path: [...context, 'name'],
       value: a.name,
       message: 'Must be a string.'
     })
@@ -45,22 +45,42 @@ export default (a, opt) => {
 
   if (a.notes && typeof a.notes !== 'string') {
     error.add({
-      path: [ ...context, 'notes' ],
+      path: [...context, 'notes'],
       value: a.notes,
       message: 'Must be a string.'
     })
   }
 
   if (typeof a.alias === 'string') {
-    if (a.alias.length > MAX_LENGTH) error.add({ value: a.alias, path: [ ...context, 'alias' ], message: `Must be less than ${MAX_LENGTH} characters` })
-    if (alphanumPlus.test(a.alias)) error.add({ value: a.alias, path: [ ...context, 'alias' ], message: 'Must be alphanumeric, _, or -' })
+    if (a.alias.length > MAX_LENGTH)
+      error.add({
+        value: a.alias,
+        path: [...context, 'alias'],
+        message: `Must be less than ${MAX_LENGTH} characters`
+      })
+    if (alphanumPlus.test(a.alias))
+      error.add({
+        value: a.alias,
+        path: [...context, 'alias'],
+        message: 'Must be alphanumeric, _, or -'
+      })
   }
-  if (typeof a.name === 'string' && a.name.length > MAX_LENGTH) error.add({ value: a.name, path: [ ...context, 'name' ], message: `Must be less than ${MAX_LENGTH} characters` })
-  if (typeof a.notes === 'string' && a.notes.length > MAX_NOTES_LENGTH) error.add({ value: a.notes, path: [ ...context, 'notes' ], message: `Must be less than ${MAX_LENGTH} characters` })
+  if (typeof a.name === 'string' && a.name.length > MAX_LENGTH)
+    error.add({
+      value: a.name,
+      path: [...context, 'name'],
+      message: `Must be less than ${MAX_LENGTH} characters`
+    })
+  if (typeof a.notes === 'string' && a.notes.length > MAX_NOTES_LENGTH)
+    error.add({
+      value: a.notes,
+      path: [...context, 'notes'],
+      message: `Must be less than ${MAX_LENGTH} characters`
+    })
 
   if (!a.value) {
     error.add({
-      path: [ ...context, 'value' ],
+      path: [...context, 'value'],
       value: a.value,
       message: 'Missing value!'
     })
@@ -70,7 +90,7 @@ export default (a, opt) => {
   try {
     agg = new QueryValue(a.value, {
       ...opt,
-      context: [ ...context, 'value' ]
+      context: [...context, 'value']
     }).value()
   } catch (err) {
     error.add(err)
@@ -78,16 +98,18 @@ export default (a, opt) => {
 
   if (a.filters && !isObject(a.filters) && !Array.isArray(a.filters)) {
     error.add({
-      path: [ ...context, 'filters' ],
+      path: [...context, 'filters'],
       value: a.filters,
       message: 'Must be an object or array.'
     })
   }
   try {
-    parsedFilters = a.filters && new Filter(a.filters, {
-      ...opt,
-      context: [ ...context, 'filters' ]
-    }).value()
+    parsedFilters =
+      a.filters &&
+      new Filter(a.filters, {
+        ...opt,
+        context: [...context, 'filters']
+      }).value()
   } catch (err) {
     error.add(err)
   }
@@ -95,11 +117,11 @@ export default (a, opt) => {
   return [
     parsedFilters
       ? aggregateWithFilter({
-        aggregation: agg,
-        filters: parsedFilters,
-        model,
-        instanceQuery
-      })
+          aggregation: agg,
+          filters: parsedFilters,
+          model,
+          instanceQuery
+        })
       : agg,
     a.alias
   ]

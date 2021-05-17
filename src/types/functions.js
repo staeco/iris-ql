@@ -15,8 +15,10 @@ const wgs84 = 4326
 // 33% * 100,000 should return 33,000 as a flat integer
 // 100,000 / 77% should return 130,000 as a flat integer
 const isPercentage = (i) => i.measurement?.type === 'percentage'
-const inheritNumeric = ({ retainPercentage }, [ infoA, infoB ]) => {
-  const filter = (i) => (i.type === 'number' || i.type === 'date') && (retainPercentage || !isPercentage(i))
+const inheritNumeric = ({ retainPercentage }, [infoA, infoB]) => {
+  const filter = (i) =>
+    (i.type === 'number' || i.type === 'date') &&
+    (retainPercentage || !isPercentage(i))
   const primaryTypeA = infoA?.types.find(filter)
   const primaryTypeB = infoB?.types.find(filter)
   return {
@@ -130,15 +132,16 @@ export const expand = {
   signature: [
     {
       name: 'List',
-      types: [ 'array' ],
+      types: ['array'],
       required: true
     }
   ],
   returns: {
     static: { type: 'any' },
-    dynamic: ([ listInfo ]) => listInfo.types.find((i) => i.type === 'array').items
+    dynamic: ([listInfo]) =>
+      listInfo.types.find((i) => i.type === 'array').items
   },
-  execute: ([ listInfo ]) => sql.fn('unnest', listInfo.value)
+  execute: ([listInfo]) => sql.fn('unnest', listInfo.value)
 }
 
 // Aggregations
@@ -149,7 +152,7 @@ export const min = {
   signature: [
     {
       name: 'Value',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     }
   ],
@@ -158,7 +161,7 @@ export const min = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
-  execute: ([ f ]) => sql.fn('min', numeric(f))
+  execute: ([f]) => sql.fn('min', numeric(f))
 }
 export const max = {
   name: 'Maximum',
@@ -167,7 +170,7 @@ export const max = {
   signature: [
     {
       name: 'Value',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     }
   ],
@@ -176,7 +179,7 @@ export const max = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
-  execute: ([ f ]) => sql.fn('max', numeric(f))
+  execute: ([f]) => sql.fn('max', numeric(f))
 }
 export const sum = {
   name: 'Sum',
@@ -185,7 +188,7 @@ export const sum = {
   signature: [
     {
       name: 'Value',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     }
   ],
@@ -194,15 +197,18 @@ export const sum = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
-  execute: ([ f ], opt, qv) => {
+  execute: ([f], opt, qv) => {
     if (!opt.joins) return sql.fn('sum', numeric(f))
 
     const distincts = []
 
-    const primaryDistinct = search(f.raw, (k, v) => v?.field && !v.field.startsWith('~'))
-    const joinDistincts = search(f.raw, (k, v) => v?.field?.startsWith('~'))?.map((i) =>
-      qv({ field: `~${parse(i.value.field).alias}.id` })
+    const primaryDistinct = search(
+      f.raw,
+      (k, v) => v?.field && !v.field.startsWith('~')
     )
+    const joinDistincts = search(f.raw, (k, v) =>
+      v?.field?.startsWith('~')
+    )?.map((i) => qv({ field: `~${parse(i.value.field).alias}.id` }))
 
     if (primaryDistinct) distincts.push(qv({ field: 'id' }))
     if (joinDistincts) distincts.push(...joinDistincts)
@@ -217,7 +223,7 @@ export const average = {
   signature: [
     {
       name: 'Value',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     }
   ],
@@ -226,7 +232,7 @@ export const average = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
-  execute: ([ f ]) => sql.fn('avg', numeric(f))
+  execute: ([f]) => sql.fn('avg', numeric(f))
 }
 export const median = {
   name: 'Median',
@@ -235,7 +241,7 @@ export const median = {
   signature: [
     {
       name: 'Value',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     }
   ],
@@ -244,7 +250,7 @@ export const median = {
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
   aggregate: true,
-  execute: ([ f ]) => sql.fn('median', numeric(f))
+  execute: ([f]) => sql.fn('median', numeric(f))
 }
 export const count = {
   name: 'Total Count',
@@ -254,8 +260,7 @@ export const count = {
     static: { type: 'number' }
   },
   aggregate: true,
-  execute: () =>
-    sql.fn('count', sql.literal('*'))
+  execute: () => sql.fn('count', sql.literal('*'))
 }
 export const distinctCount = {
   name: 'Unique Count',
@@ -272,8 +277,7 @@ export const distinctCount = {
     static: { type: 'number' }
   },
   aggregate: true,
-  execute: ([ f ]) =>
-    sql.fn('count', sql.fn('distinct', f.value))
+  execute: ([f]) => sql.fn('count', sql.fn('distinct', f.value))
 }
 
 // Math
@@ -284,7 +288,7 @@ export const round = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     }
   ],
@@ -292,8 +296,7 @@ export const round = {
     static: { type: 'number' },
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
-  execute: ([ a ]) =>
-    sql.fn('round', numeric(a))
+  execute: ([a]) => sql.fn('round', numeric(a))
 }
 export const add = {
   name: 'Add',
@@ -302,12 +305,12 @@ export const add = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     }
   ],
@@ -315,8 +318,7 @@ export const add = {
     static: { type: 'number' },
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
-  execute: ([ a, b ]) =>
-    sql.fn('add', numeric(a), numeric(b))
+  execute: ([a, b]) => sql.fn('add', numeric(a), numeric(b))
 }
 export const subtract = {
   name: 'Subtract',
@@ -325,12 +327,12 @@ export const subtract = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     }
   ],
@@ -338,8 +340,7 @@ export const subtract = {
     static: { type: 'number' },
     dynamic: inheritNumeric.bind(null, { retainPercentage: true })
   },
-  execute: ([ a, b ]) =>
-    sql.fn('subtract', numeric(a), numeric(b))
+  execute: ([a, b]) => sql.fn('subtract', numeric(a), numeric(b))
 }
 export const multiply = {
   name: 'Multiply',
@@ -348,12 +349,12 @@ export const multiply = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     }
   ],
@@ -361,8 +362,7 @@ export const multiply = {
     static: { type: 'number' },
     dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
-  execute: ([ a, b ]) =>
-    sql.fn('multiply', numeric(a), numeric(b))
+  execute: ([a, b]) => sql.fn('multiply', numeric(a), numeric(b))
 }
 export const divide = {
   name: 'Divide',
@@ -371,12 +371,12 @@ export const divide = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     }
   ],
@@ -384,8 +384,7 @@ export const divide = {
     static: { type: 'number' },
     dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
-  execute: ([ a, b ]) =>
-    sql.fn('divide', numeric(a), numeric(b))
+  execute: ([a, b]) => sql.fn('divide', numeric(a), numeric(b))
 }
 export const percentage = {
   name: 'Percentage',
@@ -394,12 +393,12 @@ export const percentage = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     }
   ],
@@ -412,22 +411,22 @@ export const percentage = {
       }
     }
   },
-  execute: ([ a, b ]) =>
-    sql.fn('divide', numeric(a), numeric(b))
+  execute: ([a, b]) => sql.fn('divide', numeric(a), numeric(b))
 }
 export const remainder = {
   name: 'Remainder',
-  notes: 'Applies division to multiple numbers and returns the remainder/modulus',
+  notes:
+    'Applies division to multiple numbers and returns the remainder/modulus',
   category: categories.math,
   signature: [
     {
       name: 'Value A',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     }
   ],
@@ -435,8 +434,7 @@ export const remainder = {
     static: { type: 'number' },
     dynamic: inheritNumeric.bind(null, { retainPercentage: false })
   },
-  execute: ([ a, b ]) =>
-    sql.fn('modulus', numeric(a), numeric(b))
+  execute: ([a, b]) => sql.fn('modulus', numeric(a), numeric(b))
 }
 
 // Comparisons
@@ -447,20 +445,19 @@ export const gt = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     }
   ],
   returns: {
     static: { type: 'boolean' }
   },
-  execute: ([ a, b ]) =>
-    sql.fn('gt', numeric(a), numeric(b))
+  execute: ([a, b]) => sql.fn('gt', numeric(a), numeric(b))
 }
 export const lt = {
   name: 'Less Than',
@@ -469,20 +466,19 @@ export const lt = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     }
   ],
   returns: {
     static: { type: 'boolean' }
   },
-  execute: ([ a, b ]) =>
-    sql.fn('lt', numeric(a), numeric(b))
+  execute: ([a, b]) => sql.fn('lt', numeric(a), numeric(b))
 }
 export const gte = {
   name: 'Greater Than or Equal',
@@ -491,20 +487,19 @@ export const gte = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     }
   ],
   returns: {
     static: { type: 'boolean' }
   },
-  execute: ([ a, b ]) =>
-    sql.fn('gte', numeric(a), numeric(b))
+  execute: ([a, b]) => sql.fn('gte', numeric(a), numeric(b))
 }
 export const lte = {
   name: 'Less Than or Equal',
@@ -513,20 +508,19 @@ export const lte = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     }
   ],
   returns: {
     static: { type: 'boolean' }
   },
-  execute: ([ a, b ]) =>
-    sql.fn('lte', numeric(a), numeric(b))
+  execute: ([a, b]) => sql.fn('lte', numeric(a), numeric(b))
 }
 export const eq = {
   name: 'Equal',
@@ -535,20 +529,19 @@ export const eq = {
   signature: [
     {
       name: 'Value A',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     },
     {
       name: 'Value B',
-      types: [ 'number', 'date' ],
+      types: ['number', 'date'],
       required: true
     }
   ],
   returns: {
     static: { type: 'boolean' }
   },
-  execute: ([ a, b ]) =>
-    sql.fn('eq', numeric(a), numeric(b))
+  execute: ([a, b]) => sql.fn('eq', numeric(a), numeric(b))
 }
 
 // Time
@@ -568,18 +561,22 @@ export const last = {
   signature: [
     {
       name: 'Duration',
-      types: [ 'text' ],
+      types: ['text'],
       required: true
     }
   ],
   returns: {
     static: { type: 'date' }
   },
-  execute: ([ a ], opt) => {
+  execute: ([a], opt) => {
     const { raw } = a
     const milli = moment.duration(raw).asMilliseconds()
     if (milli === 0) throw new Error('Invalid duration!')
-    return sql.literal(`CURRENT_DATE - INTERVAL ${opt.model.sequelize.escape(ms(milli, { verbose: true }))}`)
+    return sql.literal(
+      `CURRENT_DATE - INTERVAL ${opt.model.sequelize.escape(
+        ms(milli, { verbose: true })
+      )}`
+    )
   }
 }
 export const interval = {
@@ -589,12 +586,12 @@ export const interval = {
   signature: [
     {
       name: 'Start',
-      types: [ 'date' ],
+      types: ['date'],
       required: true
     },
     {
       name: 'End',
-      types: [ 'date' ],
+      types: ['date'],
       required: true
     }
   ],
@@ -607,8 +604,12 @@ export const interval = {
       }
     }
   },
-  execute: ([ start, end ]) =>
-    sql.fn('subtract', sql.fn('time_to_ms', end.value), sql.fn('time_to_ms', start.value))
+  execute: ([start, end]) =>
+    sql.fn(
+      'subtract',
+      sql.fn('time_to_ms', end.value),
+      sql.fn('time_to_ms', start.value)
+    )
 }
 export const bucket = {
   name: 'Bucket Date',
@@ -617,19 +618,19 @@ export const bucket = {
   signature: [
     {
       name: 'Unit',
-      types: [ 'text' ],
+      types: ['text'],
       options: truncates,
       required: true
     },
     {
       name: 'Date',
-      types: [ 'date' ],
+      types: ['date'],
       required: true
     }
   ],
   returns: {
     static: { type: 'date' },
-    dynamic: ([ p ]) => ({
+    dynamic: ([p]) => ({
       type: 'date',
       measurement: {
         type: 'bucket',
@@ -637,10 +638,16 @@ export const bucket = {
       }
     })
   },
-  execute: ([ p, f ], { customYearStart = 1, timezone = 'Etc/UTC' } = {}) => {
+  execute: ([p, f], { customYearStart = 1, timezone = 'Etc/UTC' } = {}) => {
     const trunc = truncatesToDB[p.raw]
     if (trunc.startsWith('custom')) {
-      return sql.fn('date_trunc_with_custom', trunc, f.value, timezone, customYearStart)
+      return sql.fn(
+        'date_trunc_with_custom',
+        trunc,
+        f.value,
+        timezone,
+        customYearStart
+      )
     }
     return sql.fn('date_trunc', trunc, f.value, timezone)
   }
@@ -652,19 +659,19 @@ export const extract = {
   signature: [
     {
       name: 'Unit',
-      types: [ 'text' ],
+      types: ['text'],
       required: true,
       options: parts
     },
     {
       name: 'Date',
-      types: [ 'date' ],
+      types: ['date'],
       required: true
     }
   ],
   returns: {
     static: { type: 'number' },
-    dynamic: ([ unitInfo ]) => ({
+    dynamic: ([unitInfo]) => ({
       type: 'number',
       measurement: {
         type: 'datePart',
@@ -672,7 +679,7 @@ export const extract = {
       }
     })
   },
-  execute: ([ p, f ], { customYearStart = 1, timezone = 'Etc/UTC' } = {}) => {
+  execute: ([p, f], { customYearStart = 1, timezone = 'Etc/UTC' } = {}) => {
     const part = partsToDB[p.raw]
     const d = forceTZ(f.value, timezone)
     if (part.startsWith('custom')) {
@@ -690,7 +697,7 @@ export const area = {
   signature: [
     {
       name: 'Geometry',
-      types: [ 'polygon', 'multipolygon' ],
+      types: ['polygon', 'multipolygon'],
       required: true
     }
   ],
@@ -703,8 +710,7 @@ export const area = {
       }
     }
   },
-  execute: ([ f ]) =>
-    sql.fn('ST_Area', sql.cast(f.value, 'geography'))
+  execute: ([f]) => sql.fn('ST_Area', sql.cast(f.value, 'geography'))
 }
 export const length = {
   name: 'Length',
@@ -713,7 +719,7 @@ export const length = {
   signature: [
     {
       name: 'Geometry',
-      types: [ 'line', 'multiline' ],
+      types: ['line', 'multiline'],
       required: true
     }
   ],
@@ -726,8 +732,7 @@ export const length = {
       }
     }
   },
-  execute: ([ f ]) =>
-    sql.fn('ST_Length', sql.cast(f.value, 'geography'))
+  execute: ([f]) => sql.fn('ST_Length', sql.cast(f.value, 'geography'))
 }
 export const intersects = {
   name: 'Intersects',
@@ -736,20 +741,33 @@ export const intersects = {
   signature: [
     {
       name: 'Geometry A',
-      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry' ],
+      types: [
+        'point',
+        'polygon',
+        'multipolygon',
+        'line',
+        'multiline',
+        'geometry'
+      ],
       required: true
     },
     {
       name: 'Geometry B',
-      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry' ],
+      types: [
+        'point',
+        'polygon',
+        'multipolygon',
+        'line',
+        'multiline',
+        'geometry'
+      ],
       required: true
     }
   ],
   returns: {
     static: { type: 'boolean' }
   },
-  execute: ([ a, b ]) =>
-    sql.fn('ST_Intersects', a.value, b.value)
+  execute: ([a, b]) => sql.fn('ST_Intersects', a.value, b.value)
 }
 export const distance = {
   name: 'Distance',
@@ -758,12 +776,26 @@ export const distance = {
   signature: [
     {
       name: 'Geometry A',
-      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry' ],
+      types: [
+        'point',
+        'polygon',
+        'multipolygon',
+        'line',
+        'multiline',
+        'geometry'
+      ],
       required: true
     },
     {
       name: 'Geometry B',
-      types: [ 'point', 'polygon', 'multipolygon', 'line', 'multiline', 'geometry' ],
+      types: [
+        'point',
+        'polygon',
+        'multipolygon',
+        'line',
+        'multiline',
+        'geometry'
+      ],
       required: true
     }
   ],
@@ -776,8 +808,12 @@ export const distance = {
       }
     }
   },
-  execute: ([ a, b ]) =>
-    sql.fn('ST_Distance', sql.cast(a.value, 'geography'), sql.cast(b.value, 'geography'))
+  execute: ([a, b]) =>
+    sql.fn(
+      'ST_Distance',
+      sql.cast(a.value, 'geography'),
+      sql.cast(b.value, 'geography')
+    )
 }
 export const geojson = {
   name: 'Create Geometry',
@@ -786,17 +822,17 @@ export const geojson = {
   signature: [
     {
       name: 'GeoJSON Text',
-      types: [ 'text' ],
+      types: ['text'],
       required: true
     }
   ],
   returns: {
     static: { type: 'geometry' },
-    dynamic: ([ a ]) => ({
+    dynamic: ([a]) => ({
       type: getGeoReturnType(a.raw)
     })
   },
-  execute: ([ a ]) => getGeometryValue(a.raw)
+  execute: ([a]) => getGeometryValue(a.raw)
 }
 export const boundingBox = {
   name: 'Create Bounding Box',
@@ -805,28 +841,32 @@ export const boundingBox = {
   signature: [
     {
       name: 'X Min',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     },
     {
       name: 'Y Min',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     },
     {
       name: 'X Max',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     },
     {
       name: 'Y Max',
-      types: [ 'number' ],
+      types: ['number'],
       required: true
     }
   ],
   returns: {
     static: { type: 'polygon' }
   },
-  execute: ([ xmin, ymin, xmax, ymax ]) =>
-    sql.fn('ST_SetSRID', sql.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value), wgs84)
+  execute: ([xmin, ymin, xmax, ymax]) =>
+    sql.fn(
+      'ST_SetSRID',
+      sql.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value),
+      wgs84
+    )
 }

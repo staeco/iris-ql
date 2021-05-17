@@ -11,7 +11,7 @@ describe('Query#options#search', () => {
   })
   it('should return 400 on bad search', async () => {
     should.throws(() => new Query({ search: {} }, { model: user }))
-    should.throws(() => new Query({ search: [ 'blah' ] }, { model: user }))
+    should.throws(() => new Query({ search: ['blah'] }, { model: user }))
   })
   it('should execute with search', async () => {
     const query = new Query({ search: 'yo', limit: 1 }, { model: user })

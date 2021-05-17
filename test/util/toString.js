@@ -25,7 +25,10 @@ describe('util#toString', () => {
   })
 
   it('should return a value string', () => {
-    const val = getJSONField('settings.id', { model: user, subSchemas: { settings: dataType.schema } })
+    const val = getJSONField('settings.id', {
+      model: user,
+      subSchemas: { settings: dataType.schema }
+    })
     const t = value({ value: val, model: user })
     should(t).equal(`"user"."settings"#>>'{id}'`)
   })

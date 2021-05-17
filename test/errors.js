@@ -15,7 +15,11 @@ describe('errors', () => {
 
   it('should return errors with status', () => {
     try {
-      getJSONField('noExist.id', { context: [ 'path' ], model: user, subSchemas: { data: dataType.schema } })
+      getJSONField('noExist.id', {
+        context: ['path'],
+        model: user,
+        subSchemas: { data: dataType.schema }
+      })
     } catch (err) {
       should(err.status).eql(400)
     }
@@ -23,11 +27,15 @@ describe('errors', () => {
 
   it('should return errors with fields', () => {
     try {
-      getJSONField('noExist.id', { context: [ 'path' ], model: user, subSchemas: { data: dataType.schema } })
+      getJSONField('noExist.id', {
+        context: ['path'],
+        model: user,
+        subSchemas: { data: dataType.schema }
+      })
     } catch (err) {
       should(err.fields).eql([
         {
-          path: [ 'path' ],
+          path: ['path'],
           value: 'noExist.id',
           message: 'Field does not exist: noExist'
         }
@@ -37,29 +45,39 @@ describe('errors', () => {
 
   it('should return serializable errors', () => {
     try {
-      getJSONField('noExist.id', { context: [ 'path' ], model: user, subSchemas: { data: dataType.schema } })
+      getJSONField('noExist.id', {
+        context: ['path'],
+        model: user,
+        subSchemas: { data: dataType.schema }
+      })
     } catch (err) {
-      should(err.toString()).eql(`
+      should(err.toString()).eql(
+        `
 Error: Validation Error
 Issues:
  - { path: [ 'path' ], value: 'noExist.id', message: 'Field does not exist: noExist' }
-      `.trim())
+      `.trim()
+      )
     }
   })
 
   it('should allow removing specific field paths', () => {
     try {
-      getJSONField('noExist.id', { context: [ 'test', 'path' ], model: user, subSchemas: { data: dataType.schema } })
+      getJSONField('noExist.id', {
+        context: ['test', 'path'],
+        model: user,
+        subSchemas: { data: dataType.schema }
+      })
     } catch (err) {
       should(err.fields).eql([
         {
-          path: [ 'test', 'path' ],
+          path: ['test', 'path'],
           value: 'noExist.id',
           message: 'Field does not exist: noExist'
         }
       ])
 
-      err.removePath([ 'test' ])
+      err.removePath(['test'])
 
       should(err.isEmpty()).equal(true)
       should(err.fields).eql([])

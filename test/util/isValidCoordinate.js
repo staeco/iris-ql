@@ -2,7 +2,6 @@ import should from 'should'
 import { lat, lon } from '../../src/util/isValidCoordinate'
 
 describe('util#isValidCoordinate', () => {
-
   it('should return type error', () => {
     should(lat('nope')).equal('Latitude not a number, got string')
     should(lon('nope')).equal('Longitude not a number, got string')

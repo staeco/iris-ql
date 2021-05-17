@@ -2,7 +2,7 @@ import { ValidationError } from '../errors'
 import QueryValue from '../QueryValue'
 
 export const parse = (v) => {
-  const [ alias, ...rest ] = v.split('.')
+  const [alias, ...rest] = v.split('.')
   const joinKey = alias.replace('~', '')
   return { alias: joinKey, field: rest.join('.') }
 }
@@ -20,11 +20,14 @@ export default (v, opt) => {
     })
   }
 
-  return new QueryValue({ field }, {
-    ...joinConfig,
-    hydrateJSON,
-    context,
-    instanceQuery: true,
-    from: joinKey !== 'parent' ? joinKey : undefined
-  }).value()
+  return new QueryValue(
+    { field },
+    {
+      ...joinConfig,
+      hydrateJSON,
+      context,
+      instanceQuery: true,
+      from: joinKey !== 'parent' ? joinKey : undefined
+    }
+  ).value()
 }

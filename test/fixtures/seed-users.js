@@ -34,6 +34,4 @@ const data = [
 ].map((v) => db.models.user.build(v).toJSON()) // generate the IDs
 
 export default async () =>
-  Promise.all(data.map(async (i) =>
-    db.models.user.upsert(i)
-  ))
+  Promise.all(data.map(async (i) => db.models.user.upsert(i)))

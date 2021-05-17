@@ -11,41 +11,43 @@ json.extension = 'json'
 describe('AnalyticsQuery#executeStream', () => {
   const { user } = db.models
   it('should execute with scope', async () => {
-    const query = new AnalyticsQuery({
-      aggregations: [
-        {
-          value: { function: 'count' },
-          alias: 'count'
-        },
-        {
-          value: { field: 'name' },
-          alias: 'name'
-        }
-      ],
-      groupings: [
-        { field: 'name' }
-      ]
-    }, { model: user.scope('public') })
+    const query = new AnalyticsQuery(
+      {
+        aggregations: [
+          {
+            value: { function: 'count' },
+            alias: 'count'
+          },
+          {
+            value: { field: 'name' },
+            alias: 'name'
+          }
+        ],
+        groupings: [{ field: 'name' }]
+      },
+      { model: user.scope('public') }
+    )
     const stream = await query.executeStream()
     const res = await collect.array(stream)
     res.length.should.equal(3)
   })
   it('should execute with transform', async () => {
-    const query = new AnalyticsQuery({
-      aggregations: [
-        {
-          value: { function: 'count' },
-          alias: 'count'
-        },
-        {
-          value: { field: 'name' },
-          alias: 'name'
-        }
-      ],
-      groupings: [
-        { field: 'name' }
-      ]
-    }, { model: user.scope('public') })
+    const query = new AnalyticsQuery(
+      {
+        aggregations: [
+          {
+            value: { function: 'count' },
+            alias: 'count'
+          },
+          {
+            value: { field: 'name' },
+            alias: 'name'
+          }
+        ],
+        groupings: [{ field: 'name' }]
+      },
+      { model: user.scope('public') }
+    )
     const stream = await query.executeStream({
       transform: (v) => ({
         ...v,
@@ -59,21 +61,22 @@ describe('AnalyticsQuery#executeStream', () => {
     should.not.exist(res[0].name)
   })
   it('should execute with format', async () => {
-    const query = new AnalyticsQuery({
-      aggregations: [
-        {
-          value: { function: 'count' },
-          alias: 'count'
-        },
-        {
-          value: { field: 'name' },
-          alias: 'name'
-        }
-      ],
-      groupings: [
-        { field: 'name' }
-      ]
-    }, { model: user.scope('public') })
+    const query = new AnalyticsQuery(
+      {
+        aggregations: [
+          {
+            value: { function: 'count' },
+            alias: 'count'
+          },
+          {
+            value: { field: 'name' },
+            alias: 'name'
+          }
+        ],
+        groupings: [{ field: 'name' }]
+      },
+      { model: user.scope('public') }
+    )
     const stream = await query.executeStream({
       format: json
     })
@@ -85,21 +88,22 @@ describe('AnalyticsQuery#executeStream', () => {
     should.exist(parsed[0].name)
   })
   it('should work with timeout', async () => {
-    const query = new AnalyticsQuery({
-      aggregations: [
-        {
-          value: { function: 'count' },
-          alias: 'count'
-        },
-        {
-          value: { field: 'name' },
-          alias: 'name'
-        }
-      ],
-      groupings: [
-        { field: 'name' }
-      ]
-    }, { model: user.scope('public') })
+    const query = new AnalyticsQuery(
+      {
+        aggregations: [
+          {
+            value: { function: 'count' },
+            alias: 'count'
+          },
+          {
+            value: { field: 'name' },
+            alias: 'name'
+          }
+        ],
+        groupings: [{ field: 'name' }]
+      },
+      { model: user.scope('public') }
+    )
     const stream = await query.executeStream({
       timeout: 1000,
       format: json

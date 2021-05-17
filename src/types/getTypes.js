@@ -5,11 +5,13 @@ import * as functions from './functions'
 import toSchemaType from './toSchemaType'
 
 const getValueTypes = (v) =>
-  sortBy(Object.entries(schemaTypes).reduce((prev, [ type, desc ]) => {
-    if (!desc || typeof desc.test !== 'function') return prev
-    if (desc.test(v) === true) prev.push({ type })
-    return prev
-  }, []))
+  sortBy(
+    Object.entries(schemaTypes).reduce((prev, [type, desc]) => {
+      if (!desc || typeof desc.test !== 'function') return prev
+      if (desc.test(v) === true) prev.push({ type })
+      return prev
+    }, [])
+  )
 
 const getJSONTypes = (fieldPath, { model, subSchemas }) => {
   const path = fieldPath.split('.')
@@ -23,16 +25,18 @@ const getJSONTypes = (fieldPath, { model, subSchemas }) => {
   if (!attrDef) return []
   const desc = schemaTypes[attrDef.type]
   if (!desc) return []
-  return [ pickBy({
-    type: attrDef.type,
-    measurement: attrDef.measurement,
-    items: attrDef.items,
-    validation: attrDef.validation
-  }) ]
+  return [
+    pickBy({
+      type: attrDef.type,
+      measurement: attrDef.measurement,
+      items: attrDef.items,
+      validation: attrDef.validation
+    })
+  ]
 }
 
 const getJoinTypes = (fieldPath, { joins }) => {
-  const [ join, ...rest ] = fieldPath.split('.')
+  const [join, ...rest] = fieldPath.split('.')
   return getPlainFieldTypes(rest.join('.'), joins?.[join.replace('~', '')])
 }
 
@@ -44,7 +48,7 @@ const getFieldTypes = (fieldPath, { model, subSchemas }) => {
     name: desc.name,
     notes: desc.notes
   })
-  return schemaType ? [ schemaType ] : []
+  return schemaType ? [schemaType] : []
 }
 
 const getPlainFieldTypes = (fieldPath, opt) =>
@@ -65,10 +69,7 @@ const getTypes = (v, opt = {}) => {
       const resolvedArgs = sigArgs.map((sig, idx) => {
         const nopt = {
           ...opt,
-          context: [
-            ...opt.context || [],
-            'arguments', idx
-          ]
+          context: [...(opt.context || []), 'arguments', idx]
         }
         const argValue = args[idx]
         return {
@@ -77,11 +78,11 @@ const getTypes = (v, opt = {}) => {
         }
       })
       const nv = pickBy(fn.returns.dynamic(resolvedArgs, opt))
-      return Array.isArray(nv) ? pickBy(nv) : [ nv ]
+      return Array.isArray(nv) ? pickBy(nv) : [nv]
     }
     return Array.isArray(fn.returns.static)
       ? fn.returns.static
-      : [ fn.returns.static ]
+      : [fn.returns.static]
   }
   if (v.field) {
     if (typeof v.field !== 'string') return []

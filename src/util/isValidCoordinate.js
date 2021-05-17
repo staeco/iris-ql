@@ -8,7 +8,8 @@ export const lat = (lat) => {
 }
 
 export const lon = (lon) => {
-  if (typeof lon !== 'number') return `Longitude not a number, got ${typeof lon}`
+  if (typeof lon !== 'number')
+    return `Longitude not a number, got ${typeof lon}`
   if (lon < -180) return 'Longitude less than -180'
   if (lon > 180) return 'Longitude greater than 180'
   return true

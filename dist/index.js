@@ -1,58 +1,50 @@
 "use strict";
-
-exports.__esModule = true;
-exports.types = exports.functions = void 0;
-
-var _connect = _interopRequireDefault(require("./connect"));
-
-exports.connect = _connect.default;
-
-var _sql = _interopRequireDefault(require("./sql"));
-
-exports.setup = _sql.default;
-
-var _operators = _interopRequireDefault(require("./operators"));
-
-exports.operators = _operators.default;
-
-var functions = _interopRequireWildcard(require("./types/functions"));
-
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.QueryValue = exports.Aggregation = exports.Ordering = exports.Filter = exports.AnalyticsQuery = exports.Query = exports.getTypes = exports.types = exports.functions = exports.operators = exports.setup = exports.connect = void 0;
+const connect_1 = __importDefault(require("./connect"));
+exports.connect = connect_1.default;
+const sql_1 = __importDefault(require("./sql"));
+exports.setup = sql_1.default;
+const operators_1 = __importDefault(require("./operators"));
+exports.operators = operators_1.default;
+const functions = __importStar(require("./types/functions"));
 exports.functions = functions;
-
-var types = _interopRequireWildcard(require("./types"));
-
+const types = __importStar(require("./types"));
 exports.types = types;
-
-var _getTypes = _interopRequireDefault(require("./types/getTypes"));
-
-exports.getTypes = _getTypes.default;
-
-var _AnalyticsQuery = _interopRequireDefault(require("./AnalyticsQuery"));
-
-exports.AnalyticsQuery = _AnalyticsQuery.default;
-
-var _Query = _interopRequireDefault(require("./Query"));
-
-exports.Query = _Query.default;
-
-var _QueryValue = _interopRequireDefault(require("./QueryValue"));
-
-exports.QueryValue = _QueryValue.default;
-
-var _Ordering = _interopRequireDefault(require("./Ordering"));
-
-exports.Ordering = _Ordering.default;
-
-var _Filter = _interopRequireDefault(require("./Filter"));
-
-exports.Filter = _Filter.default;
-
-var _Aggregation = _interopRequireDefault(require("./Aggregation"));
-
-exports.Aggregation = _Aggregation.default;
-
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+const getTypes_1 = __importDefault(require("./types/getTypes"));
+exports.getTypes = getTypes_1.default;
+const AnalyticsQuery_1 = __importDefault(require("./AnalyticsQuery"));
+exports.AnalyticsQuery = AnalyticsQuery_1.default;
+const Query_1 = __importDefault(require("./Query"));
+exports.Query = Query_1.default;
+const QueryValue_1 = __importDefault(require("./QueryValue"));
+exports.QueryValue = QueryValue_1.default;
+const Ordering_1 = __importDefault(require("./Ordering"));
+exports.Ordering = Ordering_1.default;
+const Filter_1 = __importDefault(require("./Filter"));
+exports.Filter = Filter_1.default;
+const Aggregation_1 = __importDefault(require("./Aggregation"));
+exports.Aggregation = Aggregation_1.default;
+//# sourceMappingURL=index.js.map

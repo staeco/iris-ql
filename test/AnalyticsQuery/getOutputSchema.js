@@ -7,25 +7,26 @@ import dataType from '../fixtures/911-call'
 describe('AnalyticsQuery#getOutputSchema', () => {
   const { user, datum } = db.models
   it('should get a basic schema', async () => {
-    const query = new AnalyticsQuery({
-      aggregations: [
-        {
-          name: 'Total #',
-          notes: 'Total number of users',
-          value: { function: 'count' },
-          alias: 'count'
-        },
-        {
-          name: 'Username',
-          notes: 'Their name',
-          value: { field: 'name' },
-          alias: 'name'
-        }
-      ],
-      groupings: [
-        { field: 'name' }
-      ]
-    }, { model: user })
+    const query = new AnalyticsQuery(
+      {
+        aggregations: [
+          {
+            name: 'Total #',
+            notes: 'Total number of users',
+            value: { function: 'count' },
+            alias: 'count'
+          },
+          {
+            name: 'Username',
+            notes: 'Their name',
+            value: { field: 'name' },
+            alias: 'name'
+          }
+        ],
+        groupings: [{ field: 'name' }]
+      },
+      { model: user }
+    )
     const res = query.getOutputSchema()
     should.exist(res)
     should(res).eql({
@@ -42,7 +43,10 @@ describe('AnalyticsQuery#getOutputSchema', () => {
     })
   })
   it('should get crime time series', async () => {
-    const query = new AnalyticsQuery(crimeTimeSeries, { model: datum, subSchemas: { data: dataType.schema } })
+    const query = new AnalyticsQuery(crimeTimeSeries, {
+      model: datum,
+      subSchemas: { data: dataType.schema }
+    })
     const res = query.getOutputSchema()
     should.exist(res)
     should(res).eql({
@@ -58,7 +62,10 @@ describe('AnalyticsQuery#getOutputSchema', () => {
     })
   })
   it('should get crime per officer', async () => {
-    const query = new AnalyticsQuery(crimePerOfficer, { model: datum, subSchemas: { data: dataType.schema } })
+    const query = new AnalyticsQuery(crimePerOfficer, {
+      model: datum,
+      subSchemas: { data: dataType.schema }
+    })
     const res = query.getOutputSchema()
     should.exist(res)
     should(res).eql({

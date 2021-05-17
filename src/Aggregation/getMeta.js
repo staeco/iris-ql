@@ -7,14 +7,14 @@ const fmt = (v) => capitalize.words(decamelize(v, { separator: ' ' }))
 
 const getFieldSchema = (field, opt) => {
   if (field.includes('.')) {
-    const [ head, tail ] = field.split('.')
+    const [head, tail] = field.split('.')
     return opt.subSchemas[head][tail]
   }
   return opt.model.rawAttributes[field]
 }
 
 const getJoinSchema = (field, opt) => {
-  const [ join, ...rest ] = field.split('.')
+  const [join, ...rest] = field.split('.')
   return getFieldSchema(rest.join('.'), opt.joins?.[join.replace('~', '')])
 }
 

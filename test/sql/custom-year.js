@@ -21,11 +21,13 @@ describe('sql#custom-year#date_part_with_custom', () => {
   it('should fall back to regular date part if not custom', async () => {
     const start = 9 // october
     const check = async (date, part, expected) =>
-      should(await select('date_part_with_custom(:part, :time, :start)', false, {
-        part,
-        time: new Date(date),
-        start
-      })).eql(expected)
+      should(
+        await select('date_part_with_custom(:part, :time, :start)', false, {
+          part,
+          time: new Date(date),
+          start
+        })
+      ).eql(expected)
 
     await check('1-1-2019', 'year', 2019)
     await check('2-1-2019', 'year', 2019)
@@ -55,11 +57,13 @@ describe('sql#custom-year#date_part_with_custom', () => {
   it('should handle a basic october custom year, seeking year', async () => {
     const start = 9 // october
     const check = async (date, part, expected) =>
-      should(await select('date_part_with_custom(:part, :time, :start)', false, {
-        part,
-        time: new Date(date),
-        start
-      })).eql(expected)
+      should(
+        await select('date_part_with_custom(:part, :time, :start)', false, {
+          part,
+          time: new Date(date),
+          start
+        })
+      ).eql(expected)
 
     await check('1-1-2019', 'custom_year', 2019)
     await check('2-1-2019', 'custom_year', 2019)
@@ -89,11 +93,13 @@ describe('sql#custom-year#date_part_with_custom', () => {
   it('should handle a basic october custom year, seeking quarter', async () => {
     const start = 9 // october
     const check = async (date, part, expected) =>
-      should(await select('date_part_with_custom(:part, :time, :start)', false, {
-        part,
-        time: new Date(date),
-        start
-      })).eql(expected)
+      should(
+        await select('date_part_with_custom(:part, :time, :start)', false, {
+          part,
+          time: new Date(date),
+          start
+        })
+      ).eql(expected)
 
     await check('1-1-2019', 'custom_quarter', 2)
     await check('2-1-2019', 'custom_quarter', 2)
@@ -111,11 +117,13 @@ describe('sql#custom-year#date_part_with_custom', () => {
   it('should handle a basic october custom year, seeking month', async () => {
     const start = 9 // october
     const check = async (date, part, expected) =>
-      should(await select('date_part_with_custom(:part, :time, :start)', false, {
-        part,
-        time: new Date(date),
-        start
-      })).eql(expected)
+      should(
+        await select('date_part_with_custom(:part, :time, :start)', false, {
+          part,
+          time: new Date(date),
+          start
+        })
+      ).eql(expected)
 
     await check('1-1-2019', 'custom_month', 5)
     await check('2-1-2019', 'custom_month', 6)
@@ -149,12 +157,16 @@ describe('sql#custom-year#date_trunc_with_custom', () => {
   const check = async (date, bucket, expected) => {
     const time = moment.tz(date, 'MM-DD-YYYY', timezone).toISOString()
     const out = moment.tz(expected, 'MM-DD-YYYY', timezone).toISOString()
-    const res = await select('date_trunc_with_custom(:bucket, :time, :timezone, :start)', false, {
-      bucket,
-      time,
-      timezone,
-      start
-    })
+    const res = await select(
+      'date_trunc_with_custom(:bucket, :time, :timezone, :start)',
+      false,
+      {
+        bucket,
+        time,
+        timezone,
+        start
+      }
+    )
     should(res.toISOString()).eql(out)
   }
 

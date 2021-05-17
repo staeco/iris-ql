@@ -6,12 +6,15 @@ import dataType from '../fixtures/911-call'
 describe('Query#getOutputSchema', () => {
   const { datum } = db.models
   it('should get a basic schema', async () => {
-    const query = new Query({
-      filters: { sourceId: '911-calls' },
-      limit: 1
-    }, {
-      model: datum
-    })
+    const query = new Query(
+      {
+        filters: { sourceId: '911-calls' },
+        limit: 1
+      },
+      {
+        model: datum
+      }
+    )
     const res = query.getOutputSchema()
     should.exist(res)
     should(res).eql({
@@ -47,13 +50,16 @@ describe('Query#getOutputSchema', () => {
     })
   })
   it('should work with subSchemas', async () => {
-    const query = new Query({
-      filters: { sourceId: '911-calls' },
-      limit: 1
-    }, {
-      model: datum,
-      subSchemas: { data: dataType.schema }
-    })
+    const query = new Query(
+      {
+        filters: { sourceId: '911-calls' },
+        limit: 1
+      },
+      {
+        model: datum,
+        subSchemas: { data: dataType.schema }
+      }
+    )
     const res = query.getOutputSchema()
     should.exist(res)
     should(res).eql({
@@ -90,12 +96,15 @@ describe('Query#getOutputSchema', () => {
     })
   })
   it('should work with scopes', async () => {
-    const query = new Query({
-      filters: { sourceId: '911-calls' },
-      limit: 1
-    }, {
-      model: datum.scope('public')
-    })
+    const query = new Query(
+      {
+        filters: { sourceId: '911-calls' },
+        limit: 1
+      },
+      {
+        model: datum.scope('public')
+      }
+    )
     const res = query.getOutputSchema()
     should.exist(res)
     should(res).eql({
@@ -126,13 +135,16 @@ describe('Query#getOutputSchema', () => {
     })
   })
   it('should work with exclusions and scopes', async () => {
-    const query = new Query({
-      filters: { sourceId: '911-calls' },
-      limit: 1,
-      exclusions: [ 'id', 'createdAt', 'sourceId' ]
-    }, {
-      model: datum.scope('public')
-    })
+    const query = new Query(
+      {
+        filters: { sourceId: '911-calls' },
+        limit: 1,
+        exclusions: ['id', 'createdAt', 'sourceId']
+      },
+      {
+        model: datum.scope('public')
+      }
+    )
     const res = query.getOutputSchema()
     should.exist(res)
     should(res).eql({

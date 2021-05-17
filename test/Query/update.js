@@ -13,10 +13,7 @@ describe('Query#update', () => {
     const query = new Query({ limit: 1 }, { model: user.scope('public') })
     query.update((v) => ({
       ...v,
-      where: [
-        ...v.where,
-        { createdAt: { $eq: null } }
-      ]
+      where: [...v.where, { createdAt: { $eq: null } }]
     }))
     const res = await query.execute()
     should.exist(res.count)
