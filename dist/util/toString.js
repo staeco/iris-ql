@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.join = exports.select = exports.column = exports.identifier = exports.jsonPath = exports.value = exports.where = void 0;
+exports.where = exports.value = exports.select = exports.jsonPath = exports.join = exports.identifier = exports.column = void 0;
 
 // sequelize < 6 uses QueryGenerator, > 6 uses queryGenerator
 const getQueryGenerator = model => model.sequelize.dialect.queryGenerator || model.sequelize.dialect.QueryGenerator;

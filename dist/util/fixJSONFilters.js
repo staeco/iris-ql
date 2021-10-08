@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.hydrate = exports.unwrap = void 0;
+exports.unwrap = exports.hydrate = void 0;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 

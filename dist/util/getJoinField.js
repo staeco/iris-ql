@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.default = exports.parse = void 0;
+exports.parse = exports.default = void 0;
 
 var _errors = require("../errors");
 

@@ -1,32 +1,27 @@
 -- From: https://wiki.postgresql.org/wiki/Aggregate_Median
-CREATE OR REPLACE FUNCTION _final_median(anyarray) RETURNS float8 AS $$
-  WITH q AS
-  (
+CREATE OR REPLACE FUNCTION _final_median(numeric[])
+   RETURNS numeric AS
+$$
+   SELECT AVG(val)
+   FROM (
      SELECT val
      FROM unnest($1) val
-     WHERE VAL IS NOT NULL
      ORDER BY 1
-  ),
-  cnt AS
-  (
-    SELECT COUNT(*) AS c FROM q
-  )
-  SELECT AVG(val)::float8
-  FROM
-  (
-    SELECT val FROM q
-    LIMIT  2 - MOD((SELECT c FROM cnt), 2)
-    OFFSET GREATEST(CEIL((SELECT c FROM cnt) / 2.0) - 1,0)
-  ) q2;
-$$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE;
+     LIMIT  2 - MOD(array_upper($1, 1), 2)
+     OFFSET CEIL(array_upper($1, 1) / 2.0) - 1
+   ) sub;
+$$
+LANGUAGE 'sql' IMMUTABLE;
 
 DROP AGGREGATE IF EXISTS median(anyelement);
-CREATE AGGREGATE median(anyelement) (
+DROP AGGREGATE IF EXISTS median(numeric);
+CREATE AGGREGATE median(numeric) (
   SFUNC=array_append,
-  STYPE=anyarray,
+  STYPE=numeric[],
   FINALFUNC=_final_median,
   INITCOND='{}'
 );
+
 CREATE OR REPLACE FUNCTION add(a numeric, b numeric) RETURNS numeric AS $$
   SELECT a + b;
 $$ LANGUAGE SQL IMMUTABLE PARALLEL SAFE

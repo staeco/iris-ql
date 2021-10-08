@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.boundingBox = exports.geojson = exports.distance = exports.intersects = exports.length = exports.area = exports.extract = exports.bucket = exports.interval = exports.last = exports.now = exports.eq = exports.lte = exports.gte = exports.lt = exports.gt = exports.remainder = exports.percentage = exports.divide = exports.multiply = exports.subtract = exports.add = exports.round = exports.distinctCount = exports.count = exports.median = exports.average = exports.sum = exports.max = exports.min = exports.expand = void 0;
+exports.sum = exports.subtract = exports.round = exports.remainder = exports.percentage = exports.now = exports.multiply = exports.min = exports.median = exports.max = exports.lte = exports.lt = exports.length = exports.last = exports.interval = exports.intersects = exports.gte = exports.gt = exports.geojson = exports.extract = exports.expand = exports.eq = exports.divide = exports.distinctCount = exports.distance = exports.count = exports.bucket = exports.boundingBox = exports.average = exports.area = exports.add = void 0;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 

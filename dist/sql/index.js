@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.default = exports.groups = void 0;
+exports.groups = exports.default = void 0;
 
 var _gracefulFs = require("graceful-fs");
 

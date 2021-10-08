@@ -1,7 +1,7 @@
 "use strict";
 
 exports.__esModule = true;
-exports.multipolygon = exports.polygon = exports.multiline = exports.line = exports.point = exports.date = exports.boolean = exports.number = exports.text = exports.object = exports.array = void 0;
+exports.text = exports.polygon = exports.point = exports.object = exports.number = exports.multipolygon = exports.multiline = exports.line = exports.date = exports.boolean = exports.array = void 0;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
