@@ -62,7 +62,7 @@ describe('AnalyticsQuery#getOutputSchema', () => {
     const res = query.getOutputSchema()
     should.exist(res)
     should(res).eql({
-      pre70s: { name: 'Pre70S', type: 'number' },
+      pre70s: { name: 'Pre70s', type: 'number' },
       weekly: { name: 'Weekly', type: 'number' },
       total: { name: 'Total', type: 'number' },
       officer: {
