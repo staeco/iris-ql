@@ -26,6 +26,67 @@ export const crimeTimeSeries = {
   ]
 }
 
+export const crimeBetweenQuarters = {
+  filters: [ {
+    sourceId: '911-calls',
+    data: {
+      receivedAt: { $ne: null }
+    }
+  },
+  {
+    function: 'gte',
+    arguments: [
+      {
+        function: 'bucket',
+        arguments: [ 'day', { field: 'data.receivedAt' } ]
+      },
+      {
+        function: 'bucket',
+        arguments: [
+          'day',
+          new Date('1-1-2010').toISOString()
+        ]
+      }
+    ]
+  },
+  {
+    function: 'lte',
+    arguments: [
+      {
+        function: 'bucket',
+        arguments: [ 'day', { field: 'data.receivedAt' } ]
+      },
+      {
+        function: 'bucket',
+        arguments: [
+          'day',
+          new Date(Date.now()).toISOString()
+        ]
+      }
+    ]
+  }
+  ],
+  aggregations: [
+    { value: { function: 'count' }, alias: 'total' },
+    {
+      alias: 'day',
+      value: {
+        function: 'bucket',
+        arguments: [
+          'day',
+          { field: 'data.receivedAt' }
+        ]
+      }
+    }
+  ],
+  orderings: [
+    { value: { field: 'day' }, direction: 'desc' }
+  ],
+  groupings: [
+    { field: 'day' }
+  ]
+}
+
 const seventies = new Date(0).toISOString()
 export const crimePerOfficer = {
   sourceId: '911-calls',

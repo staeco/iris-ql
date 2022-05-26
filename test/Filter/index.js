@@ -39,6 +39,18 @@ describe('Filter', () => {
     should.exist(query.toJSON())
     should.exist(query.input)
   })
+  it('should work with multiple nested functions', async () => {
+    const v = {
+      function: 'gte',
+      arguments: [
+        3,
+        { function: 'now' }
+      ]
+    }
+    const query = new Filter([ v, v ] , { model: user })
+    should.exist(query.value())
+    should.exist(query.toJSON())
+  })
   it('should work with mixed functions and operators', async () => {
     const query = new Filter({
       createdAt: {

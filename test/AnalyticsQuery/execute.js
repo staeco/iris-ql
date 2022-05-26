@@ -1,7 +1,7 @@
 import should from 'should'
 import { AnalyticsQuery } from '../../src'
 import db from '../fixtures/db'
-import { crimeTimeSeries, crimePerOfficer } from '../fixtures/analytics'
+import { crimeTimeSeries, crimePerOfficer, crimeBetweenQuarters } from '../fixtures/analytics'
 import dataType from '../fixtures/911-call'
 
 describe('AnalyticsQuery#execute', () => {
@@ -47,6 +47,20 @@ describe('AnalyticsQuery#execute', () => {
   })
   it('should get crime time series', async () => {
     const query = new AnalyticsQuery(crimeTimeSeries, { model: datum, subSchemas: { data: dataType.schema } })
+    const res = await query.execute()
+    should(res).eql([
+      {
+        total: 1,
+        day: new Date('2017-05-17T00:00:00.000Z')
+      },
+      {
+        total: 1,
+        day: new Date('2017-05-15T00:00:00.000Z')
+      }
+    ])
+  })
+  it('should get crime between quarters', async () => {
+    const query = new AnalyticsQuery(crimeBetweenQuarters, { model: datum, subSchemas: { data: dataType.schema } })
     const res = await query.execute()
     should(res).eql([
       {
