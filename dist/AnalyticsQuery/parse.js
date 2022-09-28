@@ -43,11 +43,11 @@ function _ref3(i) {
 }
 
 function _ref5(k, v) {
-  return typeof (v == null ? void 0 : v.field) === 'string';
+  return typeof v?.field === 'string';
 }
 
 function _ref6(k, v) {
-  return typeof (v == null ? void 0 : v.function) === 'string' && aggregateFunctions.includes(v.function);
+  return typeof v?.function === 'string' && aggregateFunctions.includes(v.function);
 }
 
 var _default = (query = {}, opt) => {
@@ -166,15 +166,13 @@ var _default = (query = {}, opt) => {
   // validate each aggregation and ensure it is either used in groupings, or contains an aggregate function
 
   query.aggregations.forEach((agg, idx) => {
-    var _query$groupings;
-
     const hasField = (0, _search.default)(agg.value, _ref5);
     if (!hasField) return; // no field, doesnt need an aggregate fn
 
     const hasAggregateFunction = (0, _search.default)(agg.value, _ref6);
     if (hasAggregateFunction) return; // valid
 
-    const matchedGrouping = (_query$groupings = query.groupings) == null ? void 0 : _query$groupings.find(v => {
+    const matchedGrouping = query.groupings?.find(v => {
       if (!v) return false;
       return (0, _fastDeepEqual.default)(v, agg.value) || v.field === agg.alias;
     });

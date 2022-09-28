@@ -27,15 +27,11 @@ const getFieldSchema = (field, opt) => {
 };
 
 const getJoinSchema = (field, opt) => {
-  var _opt$joins;
-
   const [join, ...rest] = field.split('.');
-  return getFieldSchema(rest.join('.'), (_opt$joins = opt.joins) == null ? void 0 : _opt$joins[join.replace('~', '')]);
+  return getFieldSchema(rest.join('.'), opt.joins?.[join.replace('~', '')]);
 };
 
 var _default = (agg, opt = {}) => {
-  var _fieldSchema, _fieldSchema2;
-
   const types = (0, _getTypes.default)(agg.value, opt);
   if (types.length === 0) return; // no types? weird
 
@@ -47,8 +43,8 @@ var _default = (agg, opt = {}) => {
   }
 
   return (0, _lodash.pickBy)({
-    name: agg.name || ((_fieldSchema = fieldSchema) == null ? void 0 : _fieldSchema.name) || fmt(agg.alias),
-    notes: agg.notes || ((_fieldSchema2 = fieldSchema) == null ? void 0 : _fieldSchema2.notes),
+    name: agg.name || fieldSchema?.name || fmt(agg.alias),
+    notes: agg.notes || fieldSchema?.notes,
     type: primaryType.type,
     items: primaryType.items,
     measurement: primaryType.measurement,

@@ -16,10 +16,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // this is how you want to return millions of rows with low memory overhead
 const batchSize = 16;
 
-function _ref() {
-  return null;
-}
-
 const streamable = async ({
   useMaster,
   model,
@@ -54,21 +50,16 @@ const streamable = async ({
     }
   }));
 
-  function _ref2(err) {
+  function _ref(err) {
     if (err && onError) onError(err);
-    return null;
-  }
-
-  function _ref3(err) {
-    if (err && onError) onError(err);
-    model.sequelize.connectionManager.releaseConnection(conn).then(_ref).catch(_ref2);
+    model.sequelize.connectionManager.releaseConnection(conn);
   }
 
   const end = err => {
     if (err && onError) onError(err);
     if (err) out.emit('error', err); // clean up the connection
 
-    query.destroy(null, _ref3);
+    query.destroy(null, _ref);
   };
 
   if (transform) {

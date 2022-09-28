@@ -59,10 +59,12 @@ const getGeoReturnType = (raw) => {
 
 const getGeometryValue = (raw) => {
   let o
-  try {
-    o = JSON.parse(raw)
-  } catch (err) {
-    throw new Error('Not a valid object!')
+  if (typeof raw === 'string') {
+    try {
+      o = JSON.parse(raw)
+    } catch (err) {
+      throw new Error('Not a valid JSON string!')
+    }
   }
   if (!isObject(o)) throw new Error('Not a valid object!')
   if (typeof o.type !== 'string') throw new Error('Not a valid GeoJSON object!')

@@ -75,9 +75,7 @@ const toSchemaType = (type, subSchema) => {
   };
 
   if (key === 'GEOMETRY' || key === 'GEOGRAPHY') {
-    var _type$type;
-
-    const subtype = (_type$type = type.type) == null ? void 0 : _type$type.toLowerCase();
+    const subtype = type.type?.toLowerCase();
     if (geomTypes[subtype]) return {
       type: geomTypes[subtype]
     };

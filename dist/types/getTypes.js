@@ -35,7 +35,7 @@ const getJSONTypes = (fieldPath, {
   const col = path.shift();
   const colInfo = model.rawAttributes[col];
   if (!colInfo) return [];
-  const schema = (subSchemas == null ? void 0 : subSchemas[col]) || colInfo.subSchema;
+  const schema = subSchemas?.[col] || colInfo.subSchema;
   if (!schema) return [];
   const field = path[0];
   const attrDef = schema[field];
@@ -54,7 +54,7 @@ const getJoinTypes = (fieldPath, {
   joins
 }) => {
   const [join, ...rest] = fieldPath.split('.');
-  return getPlainFieldTypes(rest.join('.'), joins == null ? void 0 : joins[join.replace('~', '')]);
+  return getPlainFieldTypes(rest.join('.'), joins?.[join.replace('~', '')]);
 };
 
 const getFieldTypes = (fieldPath, {
@@ -63,7 +63,7 @@ const getFieldTypes = (fieldPath, {
 }) => {
   const desc = model.rawAttributes[fieldPath];
   if (!desc) return [];
-  const schemaType = (0, _lodash.pickBy)({ ...(0, _toSchemaType.default)(desc.type, subSchemas == null ? void 0 : subSchemas[fieldPath]),
+  const schemaType = (0, _lodash.pickBy)({ ...(0, _toSchemaType.default)(desc.type, subSchemas?.[fieldPath]),
     name: desc.name,
     notes: desc.notes
   });

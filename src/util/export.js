@@ -37,11 +37,6 @@ const streamable = async ({ useMaster, model, sql, transform, timeout, finishTim
     query.destroy(null, (err) => {
       if (err && onError) onError(err)
       model.sequelize.connectionManager.releaseConnection(conn)
-        .then(() => null)
-        .catch((err) => {
-          if (err && onError) onError(err)
-          return null
-        })
     })
   }
   if (transform) {

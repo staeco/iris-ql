@@ -19,7 +19,7 @@ var _tz = require("../util/tz");
 
 var _getJoinField = require("../util/getJoinField");
 
-var _search2 = _interopRequireDefault(require("../util/search"));
+var _search = _interopRequireDefault(require("../util/search"));
 
 var _ = require("./");
 
@@ -29,22 +29,18 @@ const wgs84 = 4326; // some operations we don't want to display a percentage aft
 // 33% * 100,000 should return 33,000 as a flat integer
 // 100,000 / 77% should return 130,000 as a flat integer
 
-const isPercentage = i => {
-  var _i$measurement;
-
-  return ((_i$measurement = i.measurement) == null ? void 0 : _i$measurement.type) === 'percentage';
-};
+const isPercentage = i => i.measurement?.type === 'percentage';
 
 const inheritNumeric = ({
   retainPercentage
 }, [infoA, infoB]) => {
   const filter = i => (i.type === 'number' || i.type === 'date') && (retainPercentage || !isPercentage(i));
 
-  const primaryTypeA = infoA == null ? void 0 : infoA.types.find(filter);
-  const primaryTypeB = infoB == null ? void 0 : infoB.types.find(filter);
+  const primaryTypeA = infoA?.types.find(filter);
+  const primaryTypeB = infoB?.types.find(filter);
   return {
-    type: (primaryTypeA == null ? void 0 : primaryTypeA.type) || (primaryTypeB == null ? void 0 : primaryTypeB.type),
-    measurement: (primaryTypeA == null ? void 0 : primaryTypeA.measurement) || (primaryTypeB == null ? void 0 : primaryTypeB.measurement)
+    type: primaryTypeA?.type || primaryTypeB?.type,
+    measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
   };
 };
 
@@ -90,10 +86,12 @@ const getGeoReturnType = raw => {
 const getGeometryValue = raw => {
   let o;
 
-  try {
-    o = JSON.parse(raw);
-  } catch (err) {
-    throw new Error('Not a valid object!');
+  if (typeof raw === 'string') {
+    try {
+      o = JSON.parse(raw);
+    } catch (err) {
+      throw new Error('Not a valid JSON string!');
+    }
   }
 
   if (!(0, _isPlainObj.default)(o)) throw new Error('Not a valid object!');
@@ -221,13 +219,11 @@ const max = {
 exports.max = max;
 
 function _ref3(k, v) {
-  return (v == null ? void 0 : v.field) && !v.field.startsWith('~');
+  return v?.field && !v.field.startsWith('~');
 }
 
 function _ref4(k, v) {
-  var _v$field;
-
-  return v == null ? void 0 : (_v$field = v.field) == null ? void 0 : _v$field.startsWith('~');
+  return v?.field?.startsWith('~');
 }
 
 const sum = {
@@ -249,12 +245,10 @@ const sum = {
   },
   aggregate: true,
   execute: ([f], opt, qv) => {
-    var _search;
-
     if (!opt.joins) return _sequelize.default.fn('sum', numeric(f));
     const distincts = [];
-    const primaryDistinct = (0, _search2.default)(f.raw, _ref3);
-    const joinDistincts = (_search = (0, _search2.default)(f.raw, _ref4)) == null ? void 0 : _search.map(i => qv({
+    const primaryDistinct = (0, _search.default)(f.raw, _ref3);
+    const joinDistincts = (0, _search.default)(f.raw, _ref4)?.map(i => qv({
       field: `~${(0, _getJoinField.parse)(i.value.field).alias}.id`
     }));
     if (primaryDistinct) distincts.push(qv({

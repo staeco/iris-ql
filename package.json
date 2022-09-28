@@ -1,6 +1,6 @@
 {
   "name": "iris-ql",
-  "version": "4.5.1",
+  "version": "4.5.2",
   "description": "User friendly API query language",
   "main": "dist/index.js",
   "keywords": [],
@@ -75,5 +75,6 @@
     "pg-query-stream": "^4.0.0",
     "pluralize": "^8.0.0",
     "pretty-ms": "^7.0.0"
-  }
+  },
+  "packageManager": "yarn@1.22.19"
 }
