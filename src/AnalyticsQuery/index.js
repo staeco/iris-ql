@@ -12,7 +12,7 @@ const isEmpty = (s) => !s || s.length === 0
 export default class AnalyticsQuery {
   constructor(obj, options = {}) {
     if (!obj) throw new Error('Missing value!')
-    if (isEmpty(obj.aggregations) && isEmpty(obj.groupings) && isEmpty(obj.joins)) return new Query(obj, { ...options, count: false }) // skip the advanced stuff and kick it down a level
+    if (isEmpty(obj.aggregations) && isEmpty(obj.groupings)) return new Query(obj, { ...options, count: false }) // skip the advanced stuff and kick it down a level
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
     if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!')
     this.input = obj

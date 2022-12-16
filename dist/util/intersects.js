@@ -2,13 +2,9 @@
 
 exports.__esModule = true;
 exports.default = void 0;
-
 var _getGeoFields = _interopRequireDefault(require("./getGeoFields"));
-
 var _sequelize = require("sequelize");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 var _default = (geo, {
   model,
   column = model.name
@@ -19,6 +15,5 @@ var _default = (geo, {
   if (wheres.length === 1) return wheres[0];
   return (0, _sequelize.or)(...wheres);
 };
-
 exports.default = _default;
 module.exports = exports.default;

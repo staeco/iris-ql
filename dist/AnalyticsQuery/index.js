@@ -2,45 +2,33 @@
 
 exports.__esModule = true;
 exports.default = void 0;
-
 var _sequelize = require("sequelize");
-
 var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
-
 var _parse = _interopRequireDefault(require("./parse"));
-
 var _export = _interopRequireDefault(require("../util/export"));
-
 var _toString = require("../util/toString");
-
 var _runWithTimeout = _interopRequireDefault(require("../util/runWithTimeout"));
-
 var _getMeta = _interopRequireDefault(require("../Aggregation/getMeta"));
-
 var _Query = _interopRequireDefault(require("../Query"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const isEmpty = s => !s || s.length === 0;
-
 function _ref(acc, [k, mod]) {
   const idx = acc.findIndex(j => j.alias === k);
   if (idx === -1) throw new Error(`Join not found: ${k}`);
   if (mod.where && !Array.isArray(mod.where)) throw new Error(`Invalid where array on join update for ${k}!`);
-
   if (mod.where) {
-    acc[idx] = { ...acc[idx],
+    acc[idx] = {
+      ...acc[idx],
       where: [...acc[idx].where, ...mod.where]
     };
   }
-
   return acc;
 }
-
 class AnalyticsQuery {
   constructor(obj, options = {}) {
     this.update = fn => {
-      if ((0, _isPlainObj.default)(fn)) return this.update(v => ({ ...v,
+      if ((0, _isPlainObj.default)(fn)) return this.update(v => ({
+        ...v,
         ...fn
       }));
       if (typeof fn !== 'function') throw new Error('Missing update function!');
@@ -49,7 +37,6 @@ class AnalyticsQuery {
       this._parsed = newValue;
       return this;
     };
-
     this.constrain = ({
       defaultLimit,
       maxLimit,
@@ -62,7 +49,8 @@ class AnalyticsQuery {
       return this.update(v => {
         const limit = v.limit || defaultLimit;
         const newJoins = joins ? Object.entries(joins).reduce(_ref, Array.from(v.joins)) : v.joins;
-        return { ...v,
+        return {
+          ...v,
           attributes: attributes || v.attributes,
           where: where ? [...v.where, ...where] : v.where,
           limit: maxLimit ? limit ? Math.min(limit, maxLimit) : maxLimit : limit,
@@ -70,21 +58,17 @@ class AnalyticsQuery {
         };
       });
     };
-
     this.value = () => this._parsed;
-
     this.toJSON = () => this.input;
-
     this.getOutputSchema = () => this.input.aggregations.reduce((prev, agg, idx) => {
-      const meta = (0, _getMeta.default)(agg, { ...this.options,
+      const meta = (0, _getMeta.default)(agg, {
+        ...this.options,
         context: ['aggregations', idx]
       });
       if (!meta) return prev; // no types? weird
-
       prev[agg.alias] = meta;
       return prev;
     }, {});
-
     this.execute = async ({
       useMaster,
       debug = this.options.model.sequelize.options.logging,
@@ -102,14 +86,18 @@ class AnalyticsQuery {
         model: this.options.model,
         transaction
       });
-
+      console.log('value');
+      console.log(this.value());
+      console.log('model');
+      console.log(this.options.model);
+      console.log('this.options');
+      console.log(this.options);
       if (!timeout) return exec();
       return (0, _runWithTimeout.default)(exec, {
         sequelize: this.options.model.sequelize,
         timeout
       });
     };
-
     this.executeStream = async ({
       onError,
       format,
@@ -132,20 +120,17 @@ class AnalyticsQuery {
       model: this.options.model,
       value: this.value()
     });
-
     if (!obj) throw new Error('Missing value!');
-    if (isEmpty(obj.aggregations) && isEmpty(obj.groupings) && isEmpty(obj.joins)) return new _Query.default(obj, { ...options,
+    if (isEmpty(obj.aggregations) && isEmpty(obj.groupings)) return new _Query.default(obj, {
+      ...options,
       count: false
     }); // skip the advanced stuff and kick it down a level
-
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
     if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!');
     this.input = obj;
     this.options = options;
     this._parsed = (0, _parse.default)(obj, options);
   }
-
 }
-
 exports.default = AnalyticsQuery;
 module.exports = exports.default;
