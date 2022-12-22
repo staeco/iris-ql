@@ -86,12 +86,6 @@ class AnalyticsQuery {
         model: this.options.model,
         transaction
       });
-      console.log('value');
-      console.log(this.value());
-      console.log('model');
-      console.log(this.options.model);
-      console.log('this.options');
-      console.log(this.options);
       if (!timeout) return exec();
       return (0, _runWithTimeout.default)(exec, {
         sequelize: this.options.model.sequelize,

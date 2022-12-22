@@ -62,8 +62,6 @@ export default (query, opt = {}) => {
             context: [ ...context, 'joins', idx ]
           }).value()
         } catch (err) {
-          console.log('error')
-          console.log(error)
           error.add(err)
           return null
         }
