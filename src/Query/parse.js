@@ -300,6 +300,14 @@ export default (query, opt = {}) => {
     }
   }
 
+  // where clause (for joins with no groupings)
+  if (query.where) {
+    out.where.push(new Filter(query.where, {
+      ...state,
+      context: [ ...context, 'where' ]
+    }).value())
+  }
+
   if (!error.isEmpty()) throw error
   out.joins = joins
   return out

@@ -14,6 +14,7 @@ describe('Query#constrain', () => {
       where: [ { createdAt: { $eq: null } } ]
     })
     const res = await query.execute()
+    console.log(res)
     should.exist(res.count)
     should.exist(res.rows)
     res.count.should.equal(0)

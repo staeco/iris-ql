@@ -4,6 +4,9 @@ import exportStream from '../util/export'
 import getTypes from '../types/getTypes'
 import getModelFieldLimit from '../util/getModelFieldLimit'
 import runWithTimeout from '../util/runWithTimeout'
+import { select } from '../util/toString'
+import { QueryTypes } from 'sequelize'
+
 
 export default class Query {
   constructor(obj, options = {}) {
@@ -64,13 +67,26 @@ export default class Query {
 
   execute = async ({ raw = false, useMaster, debug = this.options.model.sequelize.options.logging, timeout } = {}) => {
     const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll'
+    // const exec = (transaction) =>
+    //   this.options.model[fn]({
+    //     raw,
+    //     useMaster,
+    //     logging: debug,
+    //     transaction,
+    //     ...this.value()
+    //   })
     const exec = (transaction) =>
-      this.options.model[fn]({
-        raw,
+      this.options.model.sequelize.query(select({
+        value: this.value(),
+        model: this.options.model,
+        analytics: true
+      }), {
         useMaster,
+        raw: true,
+        type: QueryTypes.SELECT,
         logging: debug,
-        transaction,
-        ...this.value()
+        model: this.options.model,
+        transaction
       })
 
     if (!timeout) return exec()

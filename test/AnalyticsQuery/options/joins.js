@@ -820,26 +820,30 @@ describe('AnalyticsQuery#joins', () => {
 
     const res = await query.execute()
     should.exist(res)
-    // should(res.length).eql(10)
+    console.log("WE GOT A JOIN RESULT")
+    console.log(res)
+    should(res.length).eql(10)
 
     // assert on number of results in join and verify _alias result column
     let callCount = 0
     let bikeCount = 0
     let transitPassCount = 0
     res.forEach((result) => {
-      if (result.dataValues.sourceId == 'bike-trips') {
-        should.not.exist(result.dataValues.data._alias)
+      if (result.sourceId == 'bike-trips') {
+        should.not.exist(result._alias)
         bikeCount += 1
-      } else if (result.dataValues.sourceId == '911-calls') {
-        should(result.dataValues.data._alias).eql('calls')
+      } else if (result.sourceId == '911-calls') {
+        should(result._alias).eql('calls')
         callCount += 1
-      } else if (result.dataValues.sourceId == 'transit-passengers') {
-        should(result.dataValues.data._alias).eql('transitPassengers')
+      } else if (result.sourceId == 'transit-passengers') {
+        should(result._alias).eql('transitPassengers')
         transitPassCount += 1
       }
     })
     should(bikeCount).eql(2)
-    // should(callCount).eql(2)
-    // should(transitPassCount).eql(6)
+    should(callCount).eql(2)
+    should(transitPassCount).eql(6)
+    // let groups = res.groupBy(res.dataValues._alias)
+    // console.log(groups)
   })
 })

@@ -343,6 +343,14 @@ var _default = (query, opt = {}) => {
       query.orderings.forEach(_ref4);
     }
   }
+
+  // where clause (for joins with no groupings)
+  if (query.where) {
+    out.where.push(new _Filter.default(query.where, {
+      ...state,
+      context: [...context, 'where']
+    }).value());
+  }
   if (!error.isEmpty()) throw error;
   out.joins = joins;
   return out;

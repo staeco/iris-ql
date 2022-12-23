@@ -8,6 +8,8 @@ var _export = _interopRequireDefault(require("../util/export"));
 var _getTypes = _interopRequireDefault(require("../types/getTypes"));
 var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
 var _runWithTimeout = _interopRequireDefault(require("../util/runWithTimeout"));
+var _toString = require("../util/toString");
+var _sequelize = require("sequelize");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 class Query {
   constructor(obj, options = {}) {
@@ -70,12 +72,25 @@ class Query {
       timeout
     } = {}) => {
       const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll';
-      const exec = transaction => this.options.model[fn]({
-        raw,
+      // const exec = (transaction) =>
+      //   this.options.model[fn]({
+      //     raw,
+      //     useMaster,
+      //     logging: debug,
+      //     transaction,
+      //     ...this.value()
+      //   })
+      const exec = transaction => this.options.model.sequelize.query((0, _toString.select)({
+        value: this.value(),
+        model: this.options.model,
+        analytics: true
+      }), {
         useMaster,
+        raw: true,
+        type: _sequelize.QueryTypes.SELECT,
         logging: debug,
-        transaction,
-        ...this.value()
+        model: this.options.model,
+        transaction
       });
       if (!timeout) return exec();
       return (0, _runWithTimeout.default)(exec, {
