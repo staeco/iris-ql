@@ -89,13 +89,8 @@ const select = ({
       model._expandIncludeAll(nv);
     }
   }
-  console.log("nv");
-  console.log(nv);
   let basic = qg.selectQuery(from || model.getTableName(), nv, model);
-  console.log("basic");
-  console.log(basic);
   if (!value.joins) return basic;
-  console.log("here");
 
   // inject joins into the query, sequelize has no way of doing this
   const isUnionAll = !nv.attributes && !nv.group;
@@ -109,29 +104,9 @@ const select = ({
     out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`);
   } else {
     const joinStr = value.joins.map(unionAll).join(' ');
-    console.log("joinStr");
-    console.log(joinStr);
     if (joinStr) basic = basic.replace('SELECT', `SELECT NULL AS _alias,`);
     out = basic.replace(';', ` ${joinStr};`);
   }
-  // const injectPoint = `FROM ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(model.name)}`
-  // console.log("injectPoint")
-  // console.log(injectPoint)
-  console.log("value.joins");
-  console.log(value.joins);
-
-  // const joinStr = value.joins
-  //   .map(join)
-  //   .join(' ')
-  // const joinArr = value.joins
-  // .map(join)
-  // console.log("value.joins.filter((j) => basic.includes(qg.quoteIdentifier(j.alias)))")
-  // console.log(value.joins.filter((j) => basic.includes(qg.quoteIdentifier(j.alias))))
-  // console.log("joinArr")
-  // console.log(joinArr)
-  // const out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`)
-  console.log("out");
-  console.log(out);
   return out;
 };
 exports.select = select;
@@ -153,38 +128,13 @@ exports.join = join;
 const unionAll = ({
   where,
   model,
-  alias,
-  required
+  alias
 }) => {
-  console.log("join in toString");
-  console.log("where");
-  console.log(where);
-  console.log("model");
-  console.log(model);
-  console.log("alias");
-  console.log(alias);
-  console.log("required");
-  console.log(required);
-  console.log(where.length);
   const qg = getQueryGenerator(model);
-  // console.log(this.value())
   const whereStr = qg.whereItemsQuery(where, {
     model
   });
-  console.log("whereStr");
-  console.log(whereStr);
-  const unionStr = qg.selectQuery(model.getTableName(), where, model).replace('SELECT', `SELECT \'${alias}\' AS _alias,`).slice(0, -1);
-  console.log("unionStr");
-  console.log(unionStr);
-  console.log("returnStr");
-  console.log(`UNION ALL ${unionStr} WHERE ${whereStr}`);
+  const unionStr = qg.selectQuery(model.getTableName(), where, model).replace('SELECT', `SELECT '${alias}' AS _alias,`).slice(0, -1);
   return `UNION ALL ${unionStr} WHERE ${whereStr}`;
-
-  // const whereStr = qg.whereItemsQuery(where, {
-  //   prefix: qg.sequelize.literal(qg.quoteIdentifier(alias)),
-  //   model
-  // })
-  // const joinType = required ? 'INNER JOIN' : 'LEFT JOIN'
-  // return `${joinType} ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(alias)} ON ${whereStr}`
 };
 exports.unionAll = unionAll;

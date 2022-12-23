@@ -66,26 +66,14 @@ export default class Query {
   }
 
   execute = async ({ raw = false, useMaster, debug = this.options.model.sequelize.options.logging, timeout } = {}) => {
-    const fn = this.options.count !== false ? 'findAndCountAll' : 'findAll'
-    // const exec = (transaction) =>
-    //   this.options.model[fn]({
-    //     raw,
-    //     useMaster,
-    //     logging: debug,
-    //     transaction,
-    //     ...this.value()
-    //   })
-    if (this.options.count) {
-      const exec = (transaction) =>
-      this.options.model['findAndCountAll']({
+    const exec = this.options.count !== false ? (transaction) =>
+      this.options.model.findAndCountAll({
         raw,
         useMaster,
         logging: debug,
         transaction,
         ...this.value()
-      })
-    }
-    const exec = (transaction) =>
+      }) : (transaction) =>
       this.options.model.sequelize.query(select({
         value: this.value(),
         model: this.options.model,

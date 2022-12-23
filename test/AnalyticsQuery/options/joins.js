@@ -1,10 +1,13 @@
 import should from 'should'
+import 'core-js/actual/array/group-by'
 import { AnalyticsQuery } from '../../../src'
 import db from '../../fixtures/db'
 import call from '../../fixtures/911-call'
 import bikeTrip from '../../fixtures/bike-trip'
 import transitPassenger from '../../fixtures/transit-passenger'
 import transitTrip from '../../fixtures/transit-trip'
+
+require('core-js/actual/array/group-by')
 
 describe('AnalyticsQuery#joins', () => {
   const { datum } = db.models
@@ -820,30 +823,13 @@ describe('AnalyticsQuery#joins', () => {
 
     const res = await query.execute()
     should.exist(res)
-    console.log("WE GOT A JOIN RESULT")
-    console.log(res)
     should(res.length).eql(10)
 
     // assert on number of results in join and verify _alias result column
-    let callCount = 0
-    let bikeCount = 0
-    let transitPassCount = 0
-    res.forEach((result) => {
-      if (result.sourceId == 'bike-trips') {
-        should.not.exist(result._alias)
-        bikeCount += 1
-      } else if (result.sourceId == '911-calls') {
-        should(result._alias).eql('calls')
-        callCount += 1
-      } else if (result.sourceId == 'transit-passengers') {
-        should(result._alias).eql('transitPassengers')
-        transitPassCount += 1
-      }
-    })
-    should(bikeCount).eql(2)
-    should(callCount).eql(2)
-    should(transitPassCount).eql(6)
-    // let groups = res.groupBy(res.dataValues._alias)
-    // console.log(groups)
+    const aliasGroups = res.groupBy((result) => result._alias)
+    should(Object.keys(aliasGroups) == [ 'null', 'calls', 'transitPassengers' ])
+    should(aliasGroups.null.length == 2)
+    should(aliasGroups.calls.length == 2)
+    should(aliasGroups.transitPassengers.length == 6)
   })
 })
