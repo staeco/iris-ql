@@ -75,6 +75,16 @@ export default class Query {
     //     transaction,
     //     ...this.value()
     //   })
+    if (this.options.count) {
+      const exec = (transaction) =>
+      this.options.model['findAndCountAll']({
+        raw,
+        useMaster,
+        logging: debug,
+        transaction,
+        ...this.value()
+      })
+    }
     const exec = (transaction) =>
       this.options.model.sequelize.query(select({
         value: this.value(),
