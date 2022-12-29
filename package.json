@@ -63,7 +63,6 @@
   },
   "dependencies": {
     "capitalize": "^2.0.0",
-    "core-js": "^3.26.1",
     "decamelize": "^5.0.0",
     "deepdash": "^5.3.0",
     "fast-deep-equal": "github:yocontra/fast-deep-equal",

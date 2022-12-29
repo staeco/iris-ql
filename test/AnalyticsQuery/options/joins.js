@@ -7,7 +7,7 @@ import bikeTrip from '../../fixtures/bike-trip'
 import transitPassenger from '../../fixtures/transit-passenger'
 import transitTrip from '../../fixtures/transit-trip'
 
-require('core-js/actual/array/group-by')
+const _lodash = require('lodash')
 
 describe('AnalyticsQuery#joins', () => {
   const { datum } = db.models
@@ -826,7 +826,7 @@ describe('AnalyticsQuery#joins', () => {
     should(res.length).eql(10)
 
     // assert on number of results in join and verify _alias result column
-    const aliasGroups = res.groupBy((result) => result._alias)
+    const aliasGroups = _lodash.groupBy(res, '_alias')
     should(Object.keys(aliasGroups) == [ 'null', 'calls', 'transitPassengers' ])
     should(aliasGroups.null.length == 2)
     should(aliasGroups.calls.length == 2)
