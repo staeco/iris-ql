@@ -15,6 +15,7 @@ export default class Query {
     if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!')
     this.input = obj
     this.options = options
+    if (this.options.joins) this.options.count = false
     this._parsed = parse(obj, options)
     this._parsedCollection = parse(obj, { ...options, instanceQuery: false })
   }

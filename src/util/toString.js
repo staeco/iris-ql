@@ -59,10 +59,13 @@ export const select = ({ value, model, from, analytics }) => {
       .join(' ')
     out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`)
   } else {
+    // string joins together into a union all query
     const joinStr = value.joins
       .map(unionAll)
       .join(' ')
+    // add alias to primary query to avoid errors
     if (joinStr) basic = basic.replace('SELECT', `SELECT NULL AS _alias,`)
+    // inject union statements into end of primary query
     out = basic.replace(';', ` ${joinStr};`)
   }
   return out
@@ -81,11 +84,16 @@ export const join = ({ where, model, alias, required }) => {
 
 export const unionAll = ({ where, model, alias }) => {
   const qg = getQueryGenerator(model)
-  const whereStr = qg.whereItemsQuery(where, {
-    model
-  })
+  // select statement in format: SELECT alias AS _alias, SELECT * FROM table
   const unionStr = qg.selectQuery(model.getTableName(), where, model)
     .replace('SELECT', `SELECT '${alias}' AS _alias,`)
     .slice(0,-1)
-  return `UNION ALL ${unionStr} WHERE ${whereStr}`
+  // return with where statement if applicable
+  if (where.length > 1 || Object.keys(where[0]).length > 0) { //if where !== [{}]
+    const whereStr = qg.whereItemsQuery(where, {
+      model
+    })
+    return `UNION ALL ${unionStr} WHERE ${whereStr}`
+  }
+  return `UNION ALL ${unionStr}`
 }
