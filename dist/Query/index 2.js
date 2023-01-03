@@ -154,7 +154,12 @@ class Query {
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
     if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!');
     this.input = obj;
+    console.log('this.input');
+    console.log(this.input);
     this.options = options;
+    console.log('this.options');
+    console.log(this.options);
+    if (this.options.joins) this.options.count = false;
     this._parsed = (0, _parse.default)(obj, options);
     this._parsedCollection = (0, _parse.default)(obj, {
       ...options,

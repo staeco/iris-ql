@@ -18,19 +18,18 @@ describe('Query#joins', () => {
       ],
       joins: [ {
         name: '911 Calls',
-        alias: 'calls'
-        // where: [
-        //   { sourceId: '911-calls' }
-        // ]
-      }
-        //   {
-        //     name: 'Transit Passengers',
-        //     alias: 'transitPassengers',
-        //     where: [
-        //       { sourceId: 'transit-passengers' }
-        //     ]
-        //   }
-      ]
+        alias: 'calls',
+        where: [
+          { sourceId: '911-calls' }
+        ]
+      },
+      {
+        name: 'Transit Passengers',
+        alias: 'transitPassengers',
+        where: [
+          { sourceId: 'transit-passengers' }
+        ]
+      } ]
     }, {
       model: datum,
       subSchemas: { data: bikeTrip.schema },
@@ -38,11 +37,11 @@ describe('Query#joins', () => {
         calls: {
           model: datum,
           subSchemas: { data: call.schema }
+        },
+        transitPassengers: {
+          model: datum,
+          subSchemas: { data: transitPassenger.schema }
         }
-        // transitPassengers: {
-        //   model: datum,
-        //   subSchemas: { data: transitPassenger.schema }
-        // }
       }
     })
 

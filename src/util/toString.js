@@ -49,6 +49,8 @@ export const select = ({ value, model, from, analytics }) => {
   if (!value.joins) return basic
 
   // inject joins into the query, sequelize has no way of doing this
+  console.log('nv printed')
+  console.log(nv)
   const isUnionAll = !nv.attributes && !nv.group
   let out
   if (!isUnionAll) {
