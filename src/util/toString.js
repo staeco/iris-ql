@@ -49,9 +49,13 @@ export const select = ({ value, model, from, analytics }) => {
   if (!value.joins) return basic
 
   // inject joins into the query, sequelize has no way of doing this
-  console.log('nv printed')
-  console.log(nv)
-  const isUnionAll = !nv.attributes && !nv.group
+  let isAggregate = false
+  if (nv.attributes) {
+    nv.attributes.forEach((attribute) => {
+      if (attribute[0].fn) isAggregate = true
+    })
+  }
+  const isUnionAll = !nv.group && !isAggregate
   let out
   if (!isUnionAll) {
     const injectPoint = `FROM ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(model.name)}`

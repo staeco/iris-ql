@@ -93,18 +93,28 @@ const select = ({
   if (!value.joins) return basic;
 
   // inject joins into the query, sequelize has no way of doing this
-  const isUnionAll = !nv.attributes && !nv.group;
+  let isAggregate = false;
+  function _ref(attribute) {
+    if (attribute[0].fn) isAggregate = true;
+  }
+  if (nv.attributes) {
+    nv.attributes.forEach(_ref);
+  }
+  const isUnionAll = !nv.group && !isAggregate;
   let out;
-  function _ref(j) {
+  function _ref2(j) {
     return basic.includes(qg.quoteIdentifier(j.alias));
   }
   if (!isUnionAll) {
     const injectPoint = `FROM ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(model.name)}`;
-    const joinStr = value.joins.filter(_ref).map(join).join(' ');
+    const joinStr = value.joins.filter(_ref2).map(join).join(' ');
     out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`);
   } else {
+    // string joins together into a union all query
     const joinStr = value.joins.map(unionAll).join(' ');
+    // add alias to primary query to avoid errors
     if (joinStr) basic = basic.replace('SELECT', `SELECT NULL AS _alias,`);
+    // inject union statements into end of primary query
     out = basic.replace(';', ` ${joinStr};`);
   }
   return out;
@@ -131,10 +141,16 @@ const unionAll = ({
   alias
 }) => {
   const qg = getQueryGenerator(model);
-  const whereStr = qg.whereItemsQuery(where, {
-    model
-  });
+  // select statement in format: SELECT alias AS _alias, SELECT * FROM table
   const unionStr = qg.selectQuery(model.getTableName(), where, model).replace('SELECT', `SELECT '${alias}' AS _alias,`).slice(0, -1);
-  return `UNION ALL ${unionStr} WHERE ${whereStr}`;
+  // return with where statement if applicable
+  if (where.length > 1 || Object.keys(where[0]).length > 0) {
+    //if where !== [{}]
+    const whereStr = qg.whereItemsQuery(where, {
+      model
+    });
+    return `UNION ALL ${unionStr} WHERE ${whereStr}`;
+  }
+  return `UNION ALL ${unionStr}`;
 };
 exports.unionAll = unionAll;

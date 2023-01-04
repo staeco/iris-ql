@@ -155,6 +155,7 @@ class Query {
     if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!');
     this.input = obj;
     this.options = options;
+    if (this.options.joins) this.options.count = false;
     this._parsed = (0, _parse.default)(obj, options);
     this._parsedCollection = (0, _parse.default)(obj, {
       ...options,
