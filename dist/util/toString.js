@@ -70,14 +70,6 @@ const select = ({
   from,
   analytics
 }) => {
-  console.log(value);
-  console.log("value");
-  console.log(model);
-  console.log("model");
-  console.log(from);
-  console.log("from");
-  console.log(analytics);
-  console.log("analytics");
   const qg = getQueryGenerator(model);
   const nv = {
     ...value
@@ -99,15 +91,6 @@ const select = ({
   }
   let basic = qg.selectQuery(from || model.getTableName(), nv, model);
   if (!value.joins) return basic;
-
-  // inject joins into the query, sequelize has no way of doing this
-  // let isAggregate = false
-  // if (nv.attributes) {
-  //   nv.attributes.forEach((attribute) => {
-  //     if (attribute[0].fn) isAggregate = true
-  //   })
-  // }
-  // const isUnionAll = !nv.group && !isAggregate
   const isUnionAll = !analytics;
   let out;
   function _ref(j) {
@@ -122,8 +105,16 @@ const select = ({
     const joinStr = value.joins.map(unionAll).join(' ');
     // add alias to primary query to avoid errors
     if (joinStr) basic = basic.replace('SELECT', `SELECT NULL AS _alias,`);
-    // inject union statements into end of primary query
-    out = basic.replace(';', ` ${joinStr};`);
+    let statementStart = basic.slice(0, -1);
+    let statementEnd = ';';
+    // if limit, separate basic query out to inject limit statement at the end
+    if (value.limit) {
+      const limitSplit = basic.split(' LIMIT ');
+      statementStart = limitSplit[0];
+      statementEnd = ` LIMIT ${limitSplit[1]}`;
+    }
+    // compile final statement
+    out = `${statementStart} ${joinStr}${statementEnd}`;
   }
   return out;
 };

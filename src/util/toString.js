@@ -64,8 +64,16 @@ export const select = ({ value, model, from, analytics }) => {
       .join(' ')
     // add alias to primary query to avoid errors
     if (joinStr) basic = basic.replace('SELECT', `SELECT NULL AS _alias,`)
-    // inject union statements into end of primary query
-    out = basic.replace(';', ` ${joinStr};`)
+    let statementStart = basic.slice(0,-1)
+    let statementEnd = ';'
+    // if limit, separate basic query out to inject limit statement at the end
+    if (value.limit) {
+      const limitSplit = basic.split(' LIMIT ')
+      statementStart = limitSplit[0]
+      statementEnd = ` LIMIT ${limitSplit[1]}`
+    }
+    // compile final statement
+    out = `${statementStart} ${joinStr}${statementEnd}`
   }
   return out
 }

@@ -56,4 +56,46 @@ describe('Query#joins', () => {
     should(aliasGroups.calls.length == 2)
     should(aliasGroups.transitPassengers.length == 6)
   })
+
+  it('should handle union all with limit', async () => {
+    const query = new Query({
+      filters: [
+        {
+          sourceId: 'bike-trips'
+        }
+      ],
+      joins: [ {
+        name: '911 Calls',
+        alias: 'calls',
+        where: [
+          { sourceId: '911-calls' }
+        ]
+      },
+      {
+        name: 'Transit Passengers',
+        alias: 'transitPassengers',
+        where: [
+          { sourceId: 'transit-passengers' }
+        ]
+      } ],
+      limit: 8
+    }, {
+      model: datum,
+      subSchemas: { data: bikeTrip.schema },
+      joins: {
+        calls: {
+          model: datum,
+          subSchemas: { data: call.schema }
+        },
+        transitPassengers: {
+          model: datum,
+          subSchemas: { data: transitPassenger.schema }
+        }
+      }
+    })
+
+    const res = await query.execute()
+    should.exist(res)
+    should(res.length).eql(8)
+  })
 })
