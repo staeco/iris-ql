@@ -27,14 +27,6 @@ export const column = ({ column, model, from, instanceQuery = true }) => {
 }
 
 export const select = ({ value, model, from, analytics }) => {
-  console.log(value)
-  console.log('value')
-  console.log(model)
-  console.log('model')
-  console.log(from)
-  console.log('from')
-  console.log(analytics)
-  console.log('analytics')
   const qg = getQueryGenerator(model)
   const nv = { ...value }
 
@@ -56,14 +48,6 @@ export const select = ({ value, model, from, analytics }) => {
   let basic = qg.selectQuery(from || model.getTableName(), nv, model)
   if (!value.joins) return basic
 
-  // inject joins into the query, sequelize has no way of doing this
-  // let isAggregate = false
-  // if (nv.attributes) {
-  //   nv.attributes.forEach((attribute) => {
-  //     if (attribute[0].fn) isAggregate = true
-  //   })
-  // }
-  // const isUnionAll = !nv.group && !isAggregate
   const isUnionAll = !analytics
   let out
   if (!isUnionAll) {
