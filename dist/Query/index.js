@@ -80,7 +80,7 @@ class Query {
       }) : transaction => this.options.model.sequelize.query((0, _toString.select)({
         value: this.value(),
         model: this.options.model,
-        analytics: true
+        analytics: false
       }), {
         useMaster,
         raw: true,

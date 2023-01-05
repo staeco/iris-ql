@@ -70,6 +70,14 @@ const select = ({
   from,
   analytics
 }) => {
+  console.log(value);
+  console.log("value");
+  console.log(model);
+  console.log("model");
+  console.log(from);
+  console.log("from");
+  console.log(analytics);
+  console.log("analytics");
   const qg = getQueryGenerator(model);
   const nv = {
     ...value
@@ -93,21 +101,21 @@ const select = ({
   if (!value.joins) return basic;
 
   // inject joins into the query, sequelize has no way of doing this
-  let isAggregate = false;
-  function _ref(attribute) {
-    if (attribute[0].fn) isAggregate = true;
-  }
-  if (nv.attributes) {
-    nv.attributes.forEach(_ref);
-  }
-  const isUnionAll = !nv.group && !isAggregate;
+  // let isAggregate = false
+  // if (nv.attributes) {
+  //   nv.attributes.forEach((attribute) => {
+  //     if (attribute[0].fn) isAggregate = true
+  //   })
+  // }
+  // const isUnionAll = !nv.group && !isAggregate
+  const isUnionAll = !analytics;
   let out;
-  function _ref2(j) {
+  function _ref(j) {
     return basic.includes(qg.quoteIdentifier(j.alias));
   }
   if (!isUnionAll) {
     const injectPoint = `FROM ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(model.name)}`;
-    const joinStr = value.joins.filter(_ref2).map(join).join(' ');
+    const joinStr = value.joins.filter(_ref).map(join).join(' ');
     out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`);
   } else {
     // string joins together into a union all query

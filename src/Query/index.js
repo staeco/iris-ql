@@ -78,7 +78,7 @@ export default class Query {
       this.options.model.sequelize.query(select({
         value: this.value(),
         model: this.options.model,
-        analytics: true
+        analytics: false
       }), {
         useMaster,
         raw: true,
