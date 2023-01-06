@@ -91,21 +91,30 @@ const select = ({
   }
   let basic = qg.selectQuery(from || model.getTableName(), nv, model);
   if (!value.joins) return basic;
-  const isUnionAll = !analytics;
   let out;
   function _ref(j) {
     return basic.includes(qg.quoteIdentifier(j.alias));
   }
-  if (!isUnionAll) {
+  if (analytics) {
     const injectPoint = `FROM ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(model.name)}`;
     const joinStr = value.joins.filter(_ref).map(join).join(' ');
     out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`);
   } else {
+    //if query has join and no analytics, it is a union all
     // string joins together into a union all query
-    const joinStr = value.joins.map(unionAll).join(' ');
-    // add alias to primary query to avoid errors
-    if (joinStr) basic = basic.replace('SELECT', `SELECT NULL AS _alias,`);
-    let statementStart = basic.slice(0, -1);
+    let joinStr = value.joins.map(unionAll).join(' ');
+    if (joinStr) {
+      if (value.attributes) {
+        // extract attributes from primary select statement
+        // const selectSubstring = basic.match(new RegExp('SELECT ' + '(.*)' + ' FROM'))[1]
+        const selectSubstring = basic.match(new RegExp('SELECT (.*) FROM'))[1];
+        // inject attributes into union statements, replacing '*'
+        joinStr = joinStr.replace('*', selectSubstring);
+      }
+      // add alias to primary query to avoid errors
+      basic = basic.replace('SELECT', `SELECT NULL AS _alias,`);
+    }
+    let statementStart = basic.slice(0, -1); //primary query minus the ';'
     let statementEnd = ';';
     // if limit, separate basic query out to inject limit statement at the end
     if (value.limit) {
