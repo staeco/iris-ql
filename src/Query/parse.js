@@ -11,6 +11,7 @@ import getModelFieldLimit from '../util/getModelFieldLimit'
 import parseTimeOptions from '../util/parseTimeOptions'
 import Filter from '../Filter'
 import Ordering from '../Ordering'
+import Join from '../Join'
 
 const wgs84 = 4326
 const srid = (v) => fn('ST_SetSRID', v, wgs84)
@@ -19,6 +20,7 @@ export default (query, opt = {}) => {
   const error = new ValidationError()
   const { model, context = [] } = opt
   const attrs = getScopedAttributes(model)
+  let joins
 
   // options becomes our initial state - then we are going to mutate from here in each phase
   let state = {
@@ -42,6 +44,29 @@ export default (query, opt = {}) => {
     }
   } catch (err) {
     error.add(err)
+  }
+
+  // check joins before we dive in
+  if (query.joins) {
+    if (!Array.isArray(query.joins)) {
+      error.add({
+        path: [ ...context, 'joins' ],
+        value: query.joins,
+        message: 'Must be an array.'
+      })
+    } else {
+      joins = query.joins.map((i, idx) => {
+        try {
+          return new Join(i, {
+            ...state,
+            context: [ ...context, 'joins', idx ]
+          }).value()
+        } catch (err) {
+          error.add(err)
+          return null
+        }
+      })
+    }
   }
 
   // searching
@@ -275,6 +300,15 @@ export default (query, opt = {}) => {
     }
   }
 
+  // where clause (for joins with no groupings)
+  if (query.where) {
+    out.where.push(new Filter(query.where, {
+      ...state,
+      context: [ ...context, 'where' ]
+    }).value())
+  }
+
   if (!error.isEmpty()) throw error
+  out.joins = joins
   return out
 }

@@ -45,16 +45,43 @@ export const select = ({ value, model, from, analytics }) => {
     }
   }
 
-  const basic = qg.selectQuery(from || model.getTableName(), nv, model)
+  let basic = qg.selectQuery(from || model.getTableName(), nv, model)
   if (!value.joins) return basic
 
-  // inject joins into the query, sequelize has no way of doing this
-  const injectPoint = `FROM ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(model.name)}`
-  const joinStr = value.joins
-    .filter((j) => basic.includes(qg.quoteIdentifier(j.alias)))
-    .map(join)
-    .join(' ')
-  const out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`)
+  let out
+  if (analytics) {
+    const injectPoint = `FROM ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(model.name)}`
+    const joinStr = value.joins
+      .filter((j) => basic.includes(qg.quoteIdentifier(j.alias)))
+      .map(join)
+      .join(' ')
+    out = basic.replace(injectPoint, `${injectPoint} ${joinStr}`)
+  } else { //if query has join and no analytics, it is a union all
+    // string joins together into a union all query
+    let joinStr = value.joins
+      .map(unionAll)
+      .join(' ')
+    if (joinStr) {
+      if (value.attributes) {
+        // extract attributes from primary query
+        const selectSubstring = basic.match(new RegExp('SELECT (.*) FROM'))[1]
+        // inject attributes into union statements, replacing '*'
+        joinStr = joinStr.replace('*', selectSubstring)
+      }
+      // add alias to primary query to avoid errors
+      basic = basic.replace('SELECT', `SELECT NULL AS _alias,`)
+    }
+    let statementStart = basic.slice(0,-1) //primary query minus the ';'
+    let statementEnd = ';'
+    // if limit, separate primary query out to inject limit statement at the end
+    if (value.limit) {
+      const limitSplit = basic.split(' LIMIT ')
+      statementStart = limitSplit[0]
+      statementEnd = ` LIMIT ${limitSplit[1]}`
+    }
+    // compile final statement
+    out = `${statementStart} ${joinStr}${statementEnd}`
+  }
   return out
 }
 
@@ -66,4 +93,21 @@ export const join = ({ where, model, alias, required }) => {
   })
   const joinType = required ? 'INNER JOIN' : 'LEFT JOIN'
   return `${joinType} ${qg.quoteIdentifier(model.getTableName())} AS ${qg.quoteIdentifier(alias)} ON ${whereStr}`
+}
+
+
+export const unionAll = ({ where, model, alias }) => {
+  const qg = getQueryGenerator(model)
+  // select statement in format: SELECT alias AS _alias, SELECT * FROM table
+  const unionStr = qg.selectQuery(model.getTableName(), where, model)
+    .replace('SELECT', `SELECT '${alias}' AS _alias,`)
+    .slice(0,-1)
+  // return with where statement if applicable
+  if (where.length > 1 || Object.keys(where[0]).length > 0) { //if where !== [{}]
+    const whereStr = qg.whereItemsQuery(where, {
+      model
+    })
+    return `UNION ALL ${unionStr} WHERE ${whereStr}`
+  }
+  return `UNION ALL ${unionStr}`
 }

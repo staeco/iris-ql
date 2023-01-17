@@ -2,7 +2,6 @@
 
 exports.__esModule = true;
 exports.default = void 0;
-
 var _default = async (fn, {
   timeout,
   sequelize,
@@ -18,6 +17,5 @@ var _default = async (fn, {
     `.trim(), qopt);
   return fn(transaction, sequelize);
 });
-
 exports.default = _default;
 module.exports = exports.default;

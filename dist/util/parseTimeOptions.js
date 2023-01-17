@@ -2,22 +2,19 @@
 
 exports.__esModule = true;
 exports.default = void 0;
-
 var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
-
 var _errors = require("../errors");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /* eslint-disable no-magic-numbers */
-const zones = new Set(_momentTimezone.default.tz.names());
 
+const zones = new Set(_momentTimezone.default.tz.names());
 var _default = (query, {
   context = []
 }) => {
   const error = new _errors.ValidationError();
-  const out = {}; // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
+  const out = {};
 
+  // if user specified a timezone, tack it on so downstream stuff in types/query knows about it
   if (query.timezone) {
     if (typeof query.timezone !== 'string') {
       error.add({
@@ -36,11 +33,9 @@ var _default = (query, {
         out.timezone = query.timezone;
       }
     }
-
     delete query.timezone;
-  } // if user specified a customYearStart, tack it on so downstream stuff in types/query knows about it
-
-
+  }
+  // if user specified a customYearStart, tack it on so downstream stuff in types/query knows about it
   if (query.customYearStart) {
     if (typeof query.customYearStart !== 'number') {
       error.add({
@@ -59,13 +54,10 @@ var _default = (query, {
         out.customYearStart = query.customYearStart;
       }
     }
-
     delete query.customYearStart;
   }
-
   if (!error.isEmpty()) throw error;
   return out;
 };
-
 exports.default = _default;
 module.exports = exports.default;
