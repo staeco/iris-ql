@@ -2,23 +2,41 @@
 
 exports.__esModule = true;
 exports.default = void 0;
+
 var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
+
 var _sequelize = require("sequelize");
+
 var _isValidCoordinate = require("../util/isValidCoordinate");
+
 var _intersects = _interopRequireDefault(require("../util/intersects"));
+
 var _errors = require("../errors");
+
 var _date = _interopRequireDefault(require("../util/iffy/date"));
+
 var _number = _interopRequireDefault(require("../util/iffy/number"));
+
 var _stringArray = _interopRequireDefault(require("../util/iffy/stringArray"));
+
 var _getScopedAttributes = _interopRequireDefault(require("../util/getScopedAttributes"));
+
 var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
+
 var _parseTimeOptions = _interopRequireDefault(require("../util/parseTimeOptions"));
+
 var _Filter = _interopRequireDefault(require("../Filter"));
+
 var _Ordering = _interopRequireDefault(require("../Ordering"));
+
 var _Join = _interopRequireDefault(require("../Join"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 const wgs84 = 4326;
+
 const srid = v => (0, _sequelize.fn)('ST_SetSRID', v, wgs84);
+
 var _default = (query, opt = {}) => {
   const error = new _errors.ValidationError();
   const {
@@ -26,38 +44,30 @@ var _default = (query, opt = {}) => {
     context = []
   } = opt;
   const attrs = (0, _getScopedAttributes.default)(model);
-  let joins;
+  let joins; // options becomes our initial state - then we are going to mutate from here in each phase
 
-  // options becomes our initial state - then we are going to mutate from here in each phase
-  let state = {
-    ...opt,
+  let state = { ...opt,
     fieldLimit: opt.fieldLimit || (0, _getModelFieldLimit.default)(model)
-  };
+  }; // options we pass on, default in fieldLimit
 
-  // options we pass on, default in fieldLimit
   const out = {
     where: [{} // very dumb fix for https://github.com/sequelize/sequelize/issues/10142
     ],
-
     order: []
-  };
+  }; // if user specified time settins, tack them onto options from the query so downstream knows about it
 
-  // if user specified time settins, tack them onto options from the query so downstream knows about it
   try {
-    state = {
-      ...state,
+    state = { ...state,
       ...(0, _parseTimeOptions.default)(query, state)
     };
   } catch (err) {
     error.add(err);
-  }
+  } // check joins before we dive in
 
-  // check joins before we dive in
 
   function _ref(i, idx) {
     try {
-      return new _Join.default(i, {
-        ...state,
+      return new _Join.default(i, { ...state,
         context: [...context, 'joins', idx]
       }).value();
     } catch (err) {
@@ -65,6 +75,7 @@ var _default = (query, opt = {}) => {
       return null;
     }
   }
+
   if (query.joins) {
     if (!Array.isArray(query.joins)) {
       error.add({
@@ -75,17 +86,18 @@ var _default = (query, opt = {}) => {
     } else {
       joins = query.joins.map(_ref);
     }
-  }
+  } // searching
 
-  // searching
 
   function _ref2(f) {
     return attrs[f.field].searchable;
   }
+
   if (query.search) {
     const searchable = state.fieldLimit.filter(_ref2);
     const isSearchable = searchable.length > 0;
     const isValid = typeof query.search === 'string';
+
     if (!isValid) {
       error.add({
         path: [...context, 'search'],
@@ -93,6 +105,7 @@ var _default = (query, opt = {}) => {
         message: 'Must be a string.'
       });
     }
+
     if (!isSearchable) {
       error.add({
         path: [...context, 'search'],
@@ -100,6 +113,7 @@ var _default = (query, opt = {}) => {
         message: 'Endpoint does not support search.'
       });
     }
+
     if (isValid && isSearchable) {
       const trimmed = query.search.trim();
       out.where.push({
@@ -110,9 +124,9 @@ var _default = (query, opt = {}) => {
         }))
       });
     }
-  }
+  } // broad time ranges
 
-  // broad time ranges
+
   if (query.before) {
     try {
       const beforeVal = (0, _date.default)(query.before);
@@ -135,6 +149,7 @@ var _default = (query, opt = {}) => {
       });
     }
   }
+
   if (query.after) {
     try {
       const afterVal = (0, _date.default)(query.after);
@@ -156,9 +171,9 @@ var _default = (query, opt = {}) => {
         message: 'Not a valid date!'
       });
     }
-  }
+  } // if they defined a geo bounding box
 
-  // if they defined a geo bounding box
+
   if (query.within) {
     if (!(0, _isPlainObj.default)(query.within)) {
       error.add({
@@ -181,6 +196,7 @@ var _default = (query, opt = {}) => {
       const xmaxIssue = (0, _isValidCoordinate.lon)(actualXMax);
       const yminIssue = (0, _isValidCoordinate.lat)(actualYMin);
       const ymaxIssue = (0, _isValidCoordinate.lat)(actualYMax);
+
       if (xminIssue !== true) {
         error.add({
           path: [...context, 'within', 'xmin'],
@@ -188,6 +204,7 @@ var _default = (query, opt = {}) => {
           message: xminIssue
         });
       }
+
       if (yminIssue !== true) {
         error.add({
           path: [...context, 'within', 'ymin'],
@@ -195,6 +212,7 @@ var _default = (query, opt = {}) => {
           message: yminIssue
         });
       }
+
       if (xmaxIssue !== true) {
         error.add({
           path: [...context, 'within', 'xmax'],
@@ -202,6 +220,7 @@ var _default = (query, opt = {}) => {
           message: xmaxIssue
         });
       }
+
       if (ymaxIssue !== true) {
         error.add({
           path: [...context, 'within', 'ymax'],
@@ -209,14 +228,15 @@ var _default = (query, opt = {}) => {
           message: ymaxIssue
         });
       }
+
       const box = srid((0, _sequelize.fn)('ST_MakeEnvelope', actualXMin, actualYMin, actualXMax, actualYMax));
       out.where.push((0, _intersects.default)(box, {
         model
       }));
     }
-  }
+  } // if they defined a point
 
-  // if they defined a point
+
   if (query.intersects) {
     if (!(0, _isPlainObj.default)(query.intersects)) {
       error.add({
@@ -233,6 +253,7 @@ var _default = (query, opt = {}) => {
       const actualY = (0, _number.default)(y);
       const latIssue = (0, _isValidCoordinate.lat)(actualY);
       const lonIssue = (0, _isValidCoordinate.lon)(actualX);
+
       if (lonIssue !== true) {
         error.add({
           path: [...context, 'intersects', 'x'],
@@ -240,6 +261,7 @@ var _default = (query, opt = {}) => {
           message: lonIssue
         });
       }
+
       if (latIssue !== true) {
         error.add({
           path: [...context, 'intersects', 'y'],
@@ -247,16 +269,17 @@ var _default = (query, opt = {}) => {
           message: latIssue
         });
       }
+
       out.where.push((0, _intersects.default)(srid((0, _sequelize.fn)('ST_Point', actualX, actualY)), {
         model
       }));
     }
-  }
+  } // exclusions
 
-  // exclusions
 
   function _ref3(k, idx) {
     const [first] = k.split('.');
+
     if (!first || !state.fieldLimit.some(f => f.field === first)) {
       error.add({
         path: [...context, 'exclusions', idx],
@@ -265,16 +288,18 @@ var _default = (query, opt = {}) => {
       });
       return null;
     }
+
     return k;
   }
+
   if (query.exclusions) {
     const parsed = (0, _stringArray.default)(query.exclusions).map(_ref3);
     if (parsed.length > 0) out.attributes = {
       exclude: parsed
     };
-  }
+  } // limit
 
-  // limit
+
   if (query.limit) {
     try {
       out.limit = (0, _number.default)(query.limit);
@@ -285,9 +310,9 @@ var _default = (query, opt = {}) => {
         message: 'Invalid limit.'
       });
     }
-  }
+  } // offset
 
-  // offset
+
   if (typeof query.offset !== 'undefined') {
     try {
       out.offset = (0, _number.default)(query.offset);
@@ -298,9 +323,9 @@ var _default = (query, opt = {}) => {
         message: 'Invalid offset.'
       });
     }
-  }
+  } // filterings
 
-  // filterings
+
   if (query.filters) {
     if (!(0, _isPlainObj.default)(query.filters) && !Array.isArray(query.filters)) {
       error.add({
@@ -310,28 +335,26 @@ var _default = (query, opt = {}) => {
       });
     } else {
       try {
-        out.where.push(new _Filter.default(query.filters, {
-          ...state,
+        out.where.push(new _Filter.default(query.filters, { ...state,
           context: [...context, 'filters']
         }).value());
       } catch (err) {
         error.add(err);
       }
     }
-  }
+  } // ordering
 
-  // ordering
 
   function _ref4(v, idx) {
     try {
-      out.order.push(new _Ordering.default(v, {
-        ...state,
+      out.order.push(new _Ordering.default(v, { ...state,
         context: [...context, 'orderings', idx]
       }).value());
     } catch (err) {
       error.add(err);
     }
   }
+
   if (query.orderings) {
     if (!Array.isArray(query.orderings)) {
       error.add({
@@ -342,18 +365,19 @@ var _default = (query, opt = {}) => {
     } else {
       query.orderings.forEach(_ref4);
     }
-  }
+  } // where clause (for joins with no groupings)
 
-  // where clause (for joins with no groupings)
+
   if (query.where) {
-    out.where.push(new _Filter.default(query.where, {
-      ...state,
+    out.where.push(new _Filter.default(query.where, { ...state,
       context: [...context, 'where']
     }).value());
   }
+
   if (!error.isEmpty()) throw error;
   out.joins = joins;
   return out;
 };
+
 exports.default = _default;
 module.exports = exports.default;

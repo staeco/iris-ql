@@ -2,27 +2,40 @@
 
 exports.__esModule = true;
 exports.sum = exports.subtract = exports.round = exports.remainder = exports.percentage = exports.now = exports.multiply = exports.min = exports.median = exports.max = exports.lte = exports.lt = exports.length = exports.last = exports.interval = exports.intersects = exports.gte = exports.gt = exports.geojson = exports.extract = exports.expand = exports.eq = exports.divide = exports.distinctCount = exports.distance = exports.count = exports.bucket = exports.boundingBox = exports.average = exports.area = exports.add = void 0;
-var _sequelize = _interopRequireDefault(require("sequelize"));
-var _capitalize = _interopRequireDefault(require("capitalize"));
-var _decamelize = _interopRequireDefault(require("decamelize"));
-var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
-var _prettyMs = _interopRequireDefault(require("pretty-ms"));
-var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
-var _tz = require("../util/tz");
-var _getJoinField = require("../util/getJoinField");
-var _search = _interopRequireDefault(require("../util/search"));
-var _ = require("./");
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-const wgs84 = 4326;
 
-// some operations we don't want to display a percentage after, for example:
+var _sequelize = _interopRequireDefault(require("sequelize"));
+
+var _capitalize = _interopRequireDefault(require("capitalize"));
+
+var _decamelize = _interopRequireDefault(require("decamelize"));
+
+var _isPlainObj = _interopRequireDefault(require("is-plain-obj"));
+
+var _prettyMs = _interopRequireDefault(require("pretty-ms"));
+
+var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
+
+var _tz = require("../util/tz");
+
+var _getJoinField = require("../util/getJoinField");
+
+var _search = _interopRequireDefault(require("../util/search"));
+
+var _ = require("./");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const wgs84 = 4326; // some operations we don't want to display a percentage after, for example:
 // 33% * 100,000 should return 33,000 as a flat integer
 // 100,000 / 77% should return 130,000 as a flat integer
+
 const isPercentage = i => i.measurement?.type === 'percentage';
+
 const inheritNumeric = ({
   retainPercentage
 }, [infoA, infoB]) => {
   const filter = i => (i.type === 'number' || i.type === 'date') && (retainPercentage || !isPercentage(i));
+
   const primaryTypeA = infoA?.types.find(filter);
   const primaryTypeB = infoB?.types.find(filter);
   return {
@@ -30,32 +43,38 @@ const inheritNumeric = ({
     measurement: primaryTypeA?.measurement || primaryTypeB?.measurement
   };
 };
+
 function _ref(i) {
   return i.type;
 }
+
 const numeric = info => {
   if (info.value.type === 'numeric') return info.value; // already cast as numeric
-  const flatTypes = info.types.map(_ref);
-  //if (flatTypes.includes('number')) return info.value // already a number
+
+  const flatTypes = info.types.map(_ref); //if (flatTypes.includes('number')) return info.value // already a number
+
   if (flatTypes.includes('date')) {
     return _sequelize.default.fn('time_to_ms', info.value);
   }
+
   return _sequelize.default.cast(info.value, 'numeric');
 };
+
 const getGeoReturnType = raw => {
   let o;
+
   try {
     o = JSON.parse(raw);
   } catch (err) {
     return 'geometry';
   }
-  if (!(0, _isPlainObj.default)(o)) return 'geometry';
 
-  // FeatureCollection
-  if (Array.isArray(o.features)) return 'geometry';
-  // Feature
-  if (o.geometry) return getGeoReturnType(JSON.stringify(o.geometry));
-  // Regular types
+  if (!(0, _isPlainObj.default)(o)) return 'geometry'; // FeatureCollection
+
+  if (Array.isArray(o.features)) return 'geometry'; // Feature
+
+  if (o.geometry) return getGeoReturnType(JSON.stringify(o.geometry)); // Regular types
+
   if (_.point.test(o) === true) return 'point';
   if (_.line.test(o) === true) return 'line';
   if (_.multiline.test(o) === true) return 'multiline';
@@ -63,8 +82,10 @@ const getGeoReturnType = raw => {
   if (_.multipolygon.test(o) === true) return 'multipolygon';
   return 'geometry';
 };
+
 const getGeometryValue = raw => {
   let o;
+
   if (typeof raw === 'string') {
     try {
       o = JSON.parse(raw);
@@ -72,18 +93,17 @@ const getGeometryValue = raw => {
       throw new Error('Not a valid JSON string!');
     }
   }
+
   if (!(0, _isPlainObj.default)(o)) throw new Error('Not a valid object!');
-  if (typeof o.type !== 'string') throw new Error('Not a valid GeoJSON object!');
+  if (typeof o.type !== 'string') throw new Error('Not a valid GeoJSON object!'); // FeatureCollection
 
-  // FeatureCollection
-  if (Array.isArray(o.features)) return _sequelize.default.fn('from_geojson_collection', raw);
+  if (Array.isArray(o.features)) return _sequelize.default.fn('from_geojson_collection', raw); // Feature
 
-  // Feature
-  if (o.geometry) return getGeometryValue(JSON.stringify(o.geometry));
+  if (o.geometry) return getGeometryValue(JSON.stringify(o.geometry)); // Anything else
 
-  // Anything else
   return _sequelize.default.fn('from_geojson', raw);
 };
+
 const partsToDB = {
   hourOfDay: 'hour',
   dayOfWeek: 'isodow',
@@ -130,13 +150,12 @@ const categories = {
   comparisons: 'Comparison',
   time: 'Date/Time',
   geospatial: 'Geospatial'
-};
-
-// Arrays
+}; // Arrays
 
 function _ref2(i) {
   return i.type === 'array';
 }
+
 const expand = {
   name: 'Expand List',
   notes: 'Expands a list to a set of rows',
@@ -153,9 +172,8 @@ const expand = {
     dynamic: ([listInfo]) => listInfo.types.find(_ref2).items
   },
   execute: ([listInfo]) => _sequelize.default.fn('unnest', listInfo.value)
-};
+}; // Aggregations
 
-// Aggregations
 exports.expand = expand;
 const min = {
   name: 'Minimum',
@@ -199,12 +217,15 @@ const max = {
   execute: ([f]) => _sequelize.default.fn('max', numeric(f))
 };
 exports.max = max;
+
 function _ref3(k, v) {
   return v?.field && !v.field.startsWith('~');
 }
+
 function _ref4(k, v) {
   return v?.field?.startsWith('~');
 }
+
 const sum = {
   name: 'Sum',
   notes: 'Aggregates the sum total of a number',
@@ -309,9 +330,8 @@ const distinctCount = {
   },
   aggregate: true,
   execute: ([f]) => _sequelize.default.fn('count', _sequelize.default.fn('distinct', f.value))
-};
+}; // Math
 
-// Math
 exports.distinctCount = distinctCount;
 const round = {
   name: 'Round',
@@ -476,9 +496,8 @@ const remainder = {
     })
   },
   execute: ([a, b]) => _sequelize.default.fn('modulus', numeric(a), numeric(b))
-};
+}; // Comparisons
 
-// Comparisons
 exports.remainder = remainder;
 const gt = {
   name: 'Greater Than',
@@ -583,9 +602,8 @@ const eq = {
     }
   },
   execute: ([a, b]) => _sequelize.default.fn('eq', numeric(a), numeric(b))
-};
+}; // Time
 
-// Time
 exports.eq = eq;
 const now = {
   name: 'Now',
@@ -617,7 +635,9 @@ const last = {
     const {
       raw
     } = a;
+
     const milli = _momentTimezone.default.duration(raw).asMilliseconds();
+
     if (milli === 0) throw new Error('Invalid duration!');
     return _sequelize.default.literal(`CURRENT_DATE - INTERVAL ${opt.model.sequelize.escape((0, _prettyMs.default)(milli, {
       verbose: true
@@ -681,9 +701,11 @@ const bucket = {
     timezone = 'Etc/UTC'
   } = {}) => {
     const trunc = truncatesToDB[p.raw];
+
     if (trunc.startsWith('custom')) {
       return _sequelize.default.fn('date_trunc_with_custom', trunc, f.value, timezone, customYearStart);
     }
+
     return _sequelize.default.fn('date_trunc', trunc, f.value, timezone);
   }
 };
@@ -720,14 +742,15 @@ const extract = {
   } = {}) => {
     const part = partsToDB[p.raw];
     const d = (0, _tz.force)(f.value, timezone);
+
     if (part.startsWith('custom')) {
       return _sequelize.default.fn('date_part_with_custom', part, d, customYearStart);
     }
+
     return _sequelize.default.fn('date_part', part, d);
   }
-};
+}; // Geospatial
 
-// Geospatial
 exports.extract = extract;
 const area = {
   name: 'Area',

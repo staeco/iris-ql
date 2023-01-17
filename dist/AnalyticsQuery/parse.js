@@ -2,25 +2,37 @@
 
 exports.__esModule = true;
 exports.default = void 0;
+
 var _fastDeepEqual = _interopRequireDefault(require("fast-deep-equal"));
+
 var _Query = _interopRequireDefault(require("../Query"));
+
 var _QueryValue = _interopRequireDefault(require("../QueryValue"));
+
 var _Aggregation = _interopRequireDefault(require("../Aggregation"));
+
 var _Join = _interopRequireDefault(require("../Join"));
+
 var _errors = require("../errors");
+
 var functions = _interopRequireWildcard(require("../types/functions"));
+
 var _search = _interopRequireDefault(require("../util/search"));
+
 var _getModelFieldLimit = _interopRequireDefault(require("../util/getModelFieldLimit"));
+
 var _parseTimeOptions = _interopRequireDefault(require("../util/parseTimeOptions"));
+
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 const aggregateFunctions = Object.entries(functions).reduce((acc, [k, v]) => {
   if (v.aggregate) acc.push(k);
   return acc;
-}, []);
-
-// this is an extension of parseQuery that allows for aggregations and groupings
+}, []); // this is an extension of parseQuery that allows for aggregations and groupings
 
 function _ref3(i) {
   return {
@@ -29,12 +41,15 @@ function _ref3(i) {
     value: i.value
   };
 }
+
 function _ref5(k, v) {
   return typeof v?.field === 'string';
 }
+
 function _ref6(k, v) {
   return typeof v?.function === 'string' && aggregateFunctions.includes(v.function);
 }
+
 var _default = (query = {}, opt) => {
   const {
     model,
@@ -42,30 +57,24 @@ var _default = (query = {}, opt) => {
   } = opt;
   const error = new _errors.ValidationError();
   let attrs = [],
-    joins;
+      joins; // options becomes our initial state - then we are going to mutate from here in each phase
 
-  // options becomes our initial state - then we are going to mutate from here in each phase
-  let state = {
-    ...opt,
+  let state = { ...opt,
     fieldLimit: opt.fieldLimit || (0, _getModelFieldLimit.default)(model)
-  };
+  }; // if user specified time settings, tack them onto options from the query so downstream knows about it
 
-  // if user specified time settings, tack them onto options from the query so downstream knows about it
   try {
-    state = {
-      ...state,
+    state = { ...state,
       ...(0, _parseTimeOptions.default)(query, state)
     };
   } catch (err) {
     error.add(err);
-  }
+  } // check joins before we dive in
 
-  // check joins before we dive in
 
   function _ref(i, idx) {
     try {
-      return new _Join.default(i, {
-        ...state,
+      return new _Join.default(i, { ...state,
         context: [...context, 'joins', idx]
       }).value();
     } catch (err) {
@@ -73,6 +82,7 @@ var _default = (query = {}, opt) => {
       return null;
     }
   }
+
   if (query.joins) {
     if (!Array.isArray(query.joins)) {
       error.add({
@@ -84,14 +94,12 @@ var _default = (query = {}, opt) => {
       joins = query.joins.map(_ref);
     }
   }
-  if (!error.isEmpty()) throw error;
 
-  // basic checks
+  if (!error.isEmpty()) throw error; // basic checks
 
   function _ref2(a, idx) {
     try {
-      return new _Aggregation.default(a, {
-        ...state,
+      return new _Aggregation.default(a, { ...state,
         context: [...context, 'aggregations', idx]
       }).value();
     } catch (err) {
@@ -99,6 +107,7 @@ var _default = (query = {}, opt) => {
       return null;
     }
   }
+
   if (!Array.isArray(query.aggregations)) {
     error.add({
       path: [...context, 'aggregations'],
@@ -113,26 +122,26 @@ var _default = (query = {}, opt) => {
         message: 'Must have at least one aggregation.'
       });
     }
+
     attrs = query.aggregations.map(_ref2);
   }
-  if (!error.isEmpty()) throw error;
 
-  // primary query check phase
+  if (!error.isEmpty()) throw error; // primary query check phase
+
   const aggFieldLimit = query.aggregations.map(_ref3);
   state.fieldLimit = [...state.fieldLimit, ...aggFieldLimit];
   let out = {};
+
   try {
     out = new _Query.default(query, state).value();
   } catch (err) {
     error.add(err);
-  }
+  } // groupings, last phase
 
-  // groupings, last phase
 
   function _ref4(i, idx) {
     try {
-      return new _QueryValue.default(i, {
-        ...state,
+      return new _QueryValue.default(i, { ...state,
         context: [...context, 'groupings', idx]
       }).value();
     } catch (err) {
@@ -140,6 +149,7 @@ var _default = (query = {}, opt) => {
       return null;
     }
   }
+
   if (query.groupings) {
     if (!Array.isArray(query.groupings)) {
       error.add({
@@ -151,28 +161,30 @@ var _default = (query = {}, opt) => {
       out.group = query.groupings.map(_ref4);
     }
   }
-  if (!error.isEmpty()) throw error;
 
-  // post-parse checks
+  if (!error.isEmpty()) throw error; // post-parse checks
   // validate each aggregation and ensure it is either used in groupings, or contains an aggregate function
+
   query.aggregations.forEach((agg, idx) => {
     const hasField = (0, _search.default)(agg.value, _ref5);
     if (!hasField) return; // no field, doesnt need an aggregate fn
+
     const hasAggregateFunction = (0, _search.default)(agg.value, _ref6);
     if (hasAggregateFunction) return; // valid
+
     const matchedGrouping = query.groupings?.find(v => {
       if (!v) return false;
       return (0, _fastDeepEqual.default)(v, agg.value) || v.field === agg.alias;
     });
     if (matchedGrouping) return; // valid
+
     error.add({
       path: [...context, 'aggregations', idx, 'value'],
       value: agg.value,
       message: 'Must contain an aggregation.'
     });
-  });
+  }); // validate each aggregation is unique
 
-  // validate each aggregation is unique
   query.aggregations.reduce((seen, agg, idx) => {
     if (seen.includes(agg.alias)) {
       error.add({
@@ -183,6 +195,7 @@ var _default = (query = {}, opt) => {
     } else {
       seen.push(agg.alias);
     }
+
     return seen;
   }, []);
   if (!error.isEmpty()) throw error;
@@ -190,5 +203,6 @@ var _default = (query = {}, opt) => {
   out.joins = joins;
   return out;
 };
+
 exports.default = _default;
 module.exports = exports.default;

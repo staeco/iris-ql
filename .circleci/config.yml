@@ -33,7 +33,7 @@ jobs:
   checkout_code:
     <<: *container_config
     docker:
-      - image: node:15
+      - image: node:16
     steps:
       - *restore_repo
       - checkout
@@ -45,7 +45,7 @@ jobs:
   install_deps:
     <<: *container_config
     docker:
-      - image: node:15
+      - image: node:16
     steps:
       - *restore_repo
       - *restore_node_modules
@@ -59,7 +59,7 @@ jobs:
   test_12:
     <<: *container_config
     docker:
-      - image: node:15
+      - image: node:16
       - image: circleci/postgres:12-postgis
         environment:
           - POSTGRES_USER: root
@@ -76,8 +76,25 @@ jobs:
   test_13:
     <<: *container_config
     docker:
-      - image: node:15
+      - image: node:16
       - image: circleci/postgres:13-postgis
+        environment:
+          - POSTGRES_USER: root
+          - POSTGRES_PASSWORD: ci-pass
+          - POSTGRES_DB: iris_testing
+    working_directory: /home/circleci/iris-ql
+    environment:
+      POSTGRES_URL: "postgres://root@localhost/iris_testing"
+    steps:
+      - *attach_workspace
+      - *restore_repo
+      - *restore_node_modules
+      - run: "yarn test:ci --silent"
+  test_14:
+    <<: *container_config
+    docker:
+      - image: node:16
+      - image: circleci/postgres:14-postgis
         environment:
           - POSTGRES_USER: root
           - POSTGRES_PASSWORD: ci-pass
@@ -104,5 +121,8 @@ workflows:
           requires:
             - install_deps
       - test_13:
+          requires:
+            - install_deps
+      - test_14:
           requires:
             - install_deps

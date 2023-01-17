@@ -10,6 +10,7 @@ const geomTypes = {
   polygon: 'polygon',
   multipolygon: 'multipolygon'
 };
+
 const toSchemaType = (type, subSchema) => {
   const key = type.key || type.constructor.key;
   if (key === 'STRING') return {
@@ -72,6 +73,7 @@ const toSchemaType = (type, subSchema) => {
     type: 'array',
     items: toSchemaType(type.type)
   };
+
   if (key === 'GEOMETRY' || key === 'GEOGRAPHY') {
     const subtype = type.type?.toLowerCase();
     if (geomTypes[subtype]) return {
@@ -80,11 +82,12 @@ const toSchemaType = (type, subSchema) => {
     return {
       type: 'geometry'
     };
-  }
+  } // Unsupported types: ENUM, BLOB, CIDR, INET, MACADDR, RANGE, HSTORE
 
-  // Unsupported types: ENUM, BLOB, CIDR, INET, MACADDR, RANGE, HSTORE
+
   return null;
 };
+
 var _default = toSchemaType;
 exports.default = _default;
 module.exports = exports.default;

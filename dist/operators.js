@@ -2,7 +2,9 @@
 
 exports.__esModule = true;
 exports.default = void 0;
+
 var _sequelize = require("sequelize");
+
 var _default = {
   $eq: _sequelize.Op.eq,
   $ne: _sequelize.Op.ne,

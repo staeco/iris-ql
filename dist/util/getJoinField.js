@@ -2,9 +2,13 @@
 
 exports.__esModule = true;
 exports.parse = exports.default = void 0;
+
 var _errors = require("../errors");
+
 var _QueryValue = _interopRequireDefault(require("../QueryValue"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 const parse = v => {
   const [alias, ...rest] = v.split('.');
   const joinKey = alias.replace('~', '');
@@ -13,7 +17,9 @@ const parse = v => {
     field: rest.join('.')
   };
 };
+
 exports.parse = parse;
+
 var _default = (v, opt) => {
   const {
     joins,
@@ -26,6 +32,7 @@ var _default = (v, opt) => {
   } = parse(v);
   const joinKey = alias.replace('~', '');
   const joinConfig = joins?.[joinKey];
+
   if (!joinConfig) {
     throw new _errors.ValidationError({
       path: context,
@@ -33,14 +40,15 @@ var _default = (v, opt) => {
       message: 'Must be a defined join!'
     });
   }
+
   return new _QueryValue.default({
     field
-  }, {
-    ...joinConfig,
+  }, { ...joinConfig,
     hydrateJSON,
     context,
     instanceQuery: true,
     from: joinKey !== 'parent' ? joinKey : undefined
   }).value();
 };
+
 exports.default = _default;

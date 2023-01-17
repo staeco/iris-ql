@@ -2,10 +2,15 @@
 
 exports.__esModule = true;
 exports.default = void 0;
+
 var _sequelize = _interopRequireDefault(require("sequelize"));
+
 var _errors = require("../errors");
+
 var _toString = require("./toString");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var _default = ({
   aggregation,
   filters,
@@ -26,5 +31,6 @@ var _default = ({
   });
   return _sequelize.default.literal(`${agg} FILTER (WHERE ${query})`);
 };
+
 exports.default = _default;
 module.exports = exports.default;
