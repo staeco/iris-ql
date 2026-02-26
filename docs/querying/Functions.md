@@ -77,6 +77,19 @@ Aggregates the total count.
 }
 ```
 
+### Standard Deviation(numeric) -> numeric
+
+Aggregates the standard deviation value of the given argument.
+
+```js
+{
+  function: 'standardDeviation',
+  arguments: [
+    { field: 'cost' }
+  ]
+}
+```
+
 ## Logic
 
 ### gt(A numeric, B numeric) -> boolean

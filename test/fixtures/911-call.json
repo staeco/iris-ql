@@ -110,6 +110,10 @@
       "validation": {
         "required": true
       }
+    },
+    "description": {
+      "name": "Description",
+      "type": "text"
     }
   }
 }

@@ -21,7 +21,7 @@ describe('util#aggregateWithFilter', () => {
   it('should return aggregation', () => {
     const filters = new Filter({ name: { $ne: null } }, { model: user })
 
-    const t = aggregateWithFilter({ aggregation: agg, filters, model: user })
-    should(t.val).equal('[object Object] FILTER (WHERE 1=1)')
+    const t = aggregateWithFilter({ aggregation: agg, filters: filters.value(), model: user })
+    should(t.val).equal('[object Object] FILTER (WHERE "user"."name" IS NOT NULL)')
   })
 })

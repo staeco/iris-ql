@@ -32,6 +32,13 @@
       "validation": {
         "min": 0
       }
+    },
+    "age": {
+      "name": "Age",
+      "type": "number",
+      "validation": {
+        "required": true
+      }
     }
   }
 }

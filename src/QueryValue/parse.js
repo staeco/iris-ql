@@ -126,6 +126,7 @@ const parse = (v, opt) => {
       })
     }
   }
+
   if (v.field) {
     if (typeof v.field !== 'string') {
       throw new ValidationError({

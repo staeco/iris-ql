@@ -112,7 +112,8 @@ const transitPassengers = [
       id: 'SRC-1-A',
       route: 'A',
       year: 2018,
-      passengers: 2564
+      passengers: 2564,
+      age: 20
     }
   },
   {
@@ -121,7 +122,8 @@ const transitPassengers = [
       id: 'SRC-1-B',
       route: 'B',
       year: 2018,
-      passengers: 6566
+      passengers: 6566,
+      age: 18
     }
   },
   {
@@ -130,7 +132,8 @@ const transitPassengers = [
       id: 'SRC-2-A',
       route: 'A',
       year: 2019,
-      passengers: 3218
+      passengers: 3218,
+      age: 20
     }
   },
   {
@@ -139,7 +142,8 @@ const transitPassengers = [
       id: 'SRC-2-B',
       route: 'B',
       year: 2019,
-      passengers: 7622
+      passengers: 7622,
+      age: 20
     }
   },
   {
@@ -148,7 +152,8 @@ const transitPassengers = [
       id: 'SRC-3-A',
       route: 'A',
       year: 2019,
-      passengers: 10
+      passengers: 10,
+      age: 18
     }
   },
   {
@@ -157,7 +162,8 @@ const transitPassengers = [
       id: 'SRC-3-B',
       route: 'B',
       year: 2019,
-      passengers: 10
+      passengers: 10,
+      age: 30
     }
   }
 ]
@@ -219,11 +225,50 @@ const transitTrips = [
   }
 ]
 
+const carTrips = [
+  {
+    sourceId: 'car-trips',
+    data: {
+      id: 'SRC-1-A',
+      pickUp: 'Bronx',
+      drop: 'Brooklyn',
+      cost: '100'
+    }
+  },
+  {
+    sourceId: 'car-trips',
+    data: {
+      id: 'SRC-1-B',
+      pickUp: 'Bronx',
+      drop: 'Manhattan',
+      cost: '100'
+    }
+  },
+  {
+    sourceId: 'car-trips',
+    data: {
+      id: 'SRC-1-C',
+      pickUp: 'Manhattan',
+      drop: 'Queens',
+      cost: 'NA'
+    }
+  },
+  {
+    sourceId: 'car-trips',
+    data: {
+      id: 'SRC-1-D',
+      pickUp: 'Queens',
+      drop: 'Bronx',
+      cost: 'NA'
+    }
+  }
+]
 const data = [
   ...calls,
   ...bikeTrips,
   ...transitPassengers,
-  ...transitTrips
+  ...transitTrips,
+  ...carTrips
 ].map((v) => db.models.datum.build(v).toJSON()) // generate the IDs
 
 export default async () =>

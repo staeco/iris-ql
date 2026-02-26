@@ -121,7 +121,8 @@ const categories = {
   math: 'Math',
   comparisons: 'Comparison',
   time: 'Date/Time',
-  geospatial: 'Geospatial'
+  geospatial: 'Geospatial',
+  conversion: 'Conversion'
 }
 
 // Arrays
@@ -277,6 +278,146 @@ export const distinctCount = {
   execute: ([ f ]) =>
     sql.fn('count', sql.fn('distinct', f.value))
 }
+export const standardDeviation = {
+  name: 'Standard Deviation',
+  notes: 'Aggregates the standard deviation of a number',
+  category: categories.aggregations,
+  signature: [
+    {
+      name: 'Value',
+      types: [ 'number' ],
+      required: true
+    }
+  ],
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric.bind(null, { retainPercentage: true })
+  },
+  aggregate: true,
+  execute: ([ f ]) => sql.fn('STDDEV_POP', numeric(f))
+}
+export const totalCountOfField = {
+  name: 'Total Count Of Field',
+  notes: 'Counts all values (including duplicates)',
+  category: categories.aggregations,
+  signature: [
+    {
+      name: 'Field',
+      types: 'any',
+      required: true
+    }
+  ],
+  returns: {
+    static: { type: 'number' }
+  },
+  aggregate: true,
+  execute: ([ f ]) =>
+    sql.fn('count', f.value)
+}
+export const listAll = {
+  name: 'List (All)',
+  notes: 'Returns list of all values (numeric and non-numeric) as JSON array',
+  category: categories.aggregations,
+  signature: [
+    {
+      name: 'Field',
+      types: 'any',
+      required: true
+    }
+  ],
+  returns: {
+    static: { type: 'array' },
+    dynamic: inheritNumeric.bind(null, { retainPercentage: false })
+  },
+  aggregate: true,
+  execute: ([ f ]) => {
+    const val = f?.value?.val?.val
+    return sql.literal(`
+      json_agg(${val})
+    `)
+  }
+}
+export const confidenceLowerBound = {
+  name: 'Confidence Interval Lower',
+  notes: 'Lower bound of 95% confidence interval',
+  category: categories.aggregations,
+  signature: [
+    {
+      name: 'Value A',
+      types: [ 'number' ],
+      required: true
+    }
+  ],
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric.bind(null, { retainPercentage: true })
+  },
+  aggregate: true,
+  execute: ([ f ]) => {
+    const val = f?.value?.val?.val
+    return sql.literal(`
+      AVG(
+        CASE
+          WHEN ${val} ~ '^-?\\d+(\\.\\d+)?$' THEN (${val})::numeric
+          ELSE NULL
+        END
+      ) - 1.96 * STDDEV_POP(
+        CASE
+          WHEN ${val} ~ '^-?\\d+(\\.\\d+)?$' THEN (${val})::numeric
+          ELSE NULL
+        END
+      ) / SQRT(
+        COUNT(
+          CASE
+            WHEN ${val} ~ '^-?\\d+(\\.\\d+)?$' THEN 1
+            ELSE NULL
+          END
+        )
+      )
+    `)
+  }
+}
+export const confidenceUpperBound = {
+  name: 'Confidence Interval Upper',
+  notes: 'Upper bound of 95% confidence interval',
+  category: categories.aggregations,
+  signature: [
+    {
+      name: 'Value A',
+      types: [ 'number' ],
+      required: true
+    }
+  ],
+  returns: {
+    static: { type: 'number' },
+    dynamic: inheritNumeric.bind(null, { retainPercentage: true })
+  },
+  aggregate: true,
+  execute: ([ f ]) => {
+    const val = f?.value?.val?.val
+    return sql.literal(`
+      AVG(
+        CASE
+          WHEN ${val} ~ '^-?\\d+(\\.\\d+)?$' THEN (${val})::numeric
+          ELSE NULL
+        END
+      ) + 1.96 * STDDEV_POP(
+        CASE
+          WHEN ${val} ~ '^-?\\d+(\\.\\d+)?$' THEN (${val})::numeric
+          ELSE NULL
+        END
+      ) / SQRT(
+        COUNT(
+          CASE
+            WHEN ${val} ~ '^-?\\d+(\\.\\d+)?$' THEN 1
+            ELSE NULL
+          END
+        )
+      )
+    `)
+  }
+}
+
 
 // Math
 export const round = {
@@ -831,4 +972,28 @@ export const boundingBox = {
   },
   execute: ([ xmin, ymin, xmax, ymax ]) =>
     sql.fn('ST_SetSRID', sql.fn('ST_MakeEnvelope', xmin.value, ymin.value, xmax.value, ymax.value), wgs84)
+}
+
+// Conversion
+export const convertToNumber = {
+  name: 'Convert Number',
+  notes: 'Convert text to number',
+  category: categories.conversion,
+  signature: [
+    {
+      name: 'Field',
+      types: [ 'text' ],
+      required: true
+    }
+  ],
+  returns: {
+    static: { type: 'number' }
+  },
+  execute: ([ value ]) => {
+    const val = value?.value?.val
+    return sql.literal(`CASE 
+      WHEN ${val} ~ '^-?\\d+(\\.\\d+)?$' THEN (${val})::NUMERIC 
+      ELSE 0 
+    END`)
+  }
 }

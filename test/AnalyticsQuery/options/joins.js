@@ -81,6 +81,7 @@ describe('AnalyticsQuery#joins', () => {
       { totalTrips: 2, totalCalls: 1, year: 2017 }
     ])
   })
+
   it('should handle a geospatial join with complete constraints', async () => {
     const query = new AnalyticsQuery({
       joins: [ {

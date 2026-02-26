@@ -52,6 +52,8 @@ export default (obj, opt) => {
     return v
   }
 
+  if (obj && !isObject(obj) && !Array.isArray(obj)) return null
+
   const transformed = transformValues(obj)
   // turn where object into string with fields hydrated
   if (!error.isEmpty()) throw error

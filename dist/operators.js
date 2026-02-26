@@ -2,10 +2,8 @@
 
 exports.__esModule = true;
 exports.default = void 0;
-
 var _sequelize = require("sequelize");
-
-var _default = {
+var _default = exports.default = {
   $eq: _sequelize.Op.eq,
   $ne: _sequelize.Op.ne,
   $gte: _sequelize.Op.gte,
@@ -40,5 +38,4 @@ var _default = {
   $all: _sequelize.Op.all,
   $values: _sequelize.Op.values
 };
-exports.default = _default;
 module.exports = exports.default;

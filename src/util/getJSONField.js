@@ -32,6 +32,7 @@ export default (v, opt) => {
     })
   }
   const lit = sql.literal(jsonPath({ column: col, model, path, from, instanceQuery }))
+
   const schema = subSchemas[col] || colInfo.subSchema
   if (!schema) {
     // did not give sufficient info to query json objects safely!
