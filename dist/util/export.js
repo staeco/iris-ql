@@ -86,6 +86,7 @@ var _default = async ({
     model,
     analytics
   });
+  console.log('sql >>>>', sql);
   const src = await streamable({
     useMaster,
     model,
