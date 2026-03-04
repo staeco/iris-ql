@@ -11,7 +11,6 @@ const isEmpty = (s) => !s || s.length === 0
 
 export default class AnalyticsQuery {
   constructor(obj, options = {}) {
-    console.log('iris-q - INNNN 22');
     if (!obj) throw new Error('Missing value!')
     if (isEmpty(obj.aggregations) && isEmpty(obj.groupings)) return new Query(obj, { ...options, count: false }) // skip the advanced stuff and kick it down a level
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
@@ -77,12 +76,6 @@ export default class AnalyticsQuery {
     }, {})
 
   execute = async ({ useMaster, debug = this.options.model.sequelize.options.logging, timeout } = {}) => {
-    console.log('Analytics Raw SQL -->', select({
-      value: this.value(),
-      model: this.options.model,
-      analytics: true
-    }))
-
     const exec = (transaction) =>
       this.options.model.sequelize.query(select({
         value: this.value(),

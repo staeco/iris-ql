@@ -74,11 +74,6 @@ class AnalyticsQuery {
       debug = this.options.model.sequelize.options.logging,
       timeout
     } = {}) => {
-      console.log('Analytics Raw SQL -->', (0, _toString.select)({
-        value: this.value(),
-        model: this.options.model,
-        analytics: true
-      }));
       const exec = transaction => this.options.model.sequelize.query((0, _toString.select)({
         value: this.value(),
         model: this.options.model,
@@ -119,7 +114,6 @@ class AnalyticsQuery {
       model: this.options.model,
       value: this.value()
     });
-    console.log('iris-q - INNNN 22');
     if (!obj) throw new Error('Missing value!');
     if (isEmpty(obj.aggregations) && isEmpty(obj.groupings)) return new _Query.default(obj, {
       ...options,

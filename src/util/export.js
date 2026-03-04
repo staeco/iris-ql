@@ -61,7 +61,6 @@ const streamable = async ({ useMaster, model, sql, transform, timeout, finishTim
 export default async ({ useMaster, model, value, format, transform, tupleFraction, debug, timeout, finishTimeout, onError, analytics = false }) => {
   const nv = { ...value }
   const sql = select({ value: nv, model, analytics })
-  console.log('sql >>>>', sql)
   const src = await streamable({
     useMaster,
     model,
