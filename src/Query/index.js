@@ -9,9 +9,7 @@ import { QueryTypes } from 'sequelize'
 
 
 export default class Query {
-  constructor(obj, options = {}) {
-    console.log('iris-q - INNNN');
-    
+  constructor(obj, options = {}) {    
     if (!obj) throw new Error('Missing query!')
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!')
     if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!')
@@ -69,11 +67,6 @@ export default class Query {
   }
 
   execute = async ({ raw = false, useMaster, debug = this.options.model.sequelize.options.logging, timeout } = {}) => {
-    console.log('Raw SQL -->', select({
-      value: this.value(),
-      model: this.options.model,
-      analytics: true
-    }))
     const exec = this.options.count !== false ? (transaction) =>
       this.options.model.findAndCountAll({
         raw,

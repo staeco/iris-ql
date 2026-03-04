@@ -71,11 +71,6 @@ class Query {
       debug = this.options.model.sequelize.options.logging,
       timeout
     } = {}) => {
-      console.log('Raw SQL -->', (0, _toString.select)({
-        value: this.value(),
-        model: this.options.model,
-        analytics: true
-      }));
       const exec = this.options.count !== false ? transaction => this.options.model.findAndCountAll({
         raw,
         useMaster,
@@ -155,7 +150,6 @@ class Query {
         timeout
       });
     };
-    console.log('iris-q - INNNN');
     if (!obj) throw new Error('Missing query!');
     if (!options.model || !options.model.rawAttributes) throw new Error('Missing model!');
     if (options.fieldLimit && !Array.isArray(options.fieldLimit)) throw new Error('Invalid fieldLimit!');
